@@ -1,0 +1,2849 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AD Academy - Active Directory מאסטרקלאס</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700;900&family=Noto+Sans+Hebrew:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050a0f;
+  --bg2: #080f17;
+  --bg3: #0c1824;
+  --card: #0d1f30;
+  --card2: #102540;
+  --border: #1a3a5c;
+  --border2: #1e4a73;
+  --cyan: #00d4ff;
+  --cyan2: #00a8cc;
+  --green: #00ff88;
+  --green2: #00cc6a;
+  --orange: #ff6b35;
+  --yellow: #ffd700;
+  --red: #ff3355;
+  --purple: #9d4edd;
+  --text: #c8e0f0;
+  --text2: #7a9db5;
+  --text3: #4a7a99;
+  --glow: 0 0 20px rgba(0,212,255,0.3);
+  --glow-green: 0 0 20px rgba(0,255,136,0.3);
+  --glow-orange: 0 0 20px rgba(255,107,53,0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  overflow-x: hidden;
+  direction: rtl;
+}
+
+/* Animated background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 20%, rgba(0,100,200,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(0,212,255,0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,255,136,0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Grid lines overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== NAVIGATION ===== */
+nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  background: rgba(5,10,15,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+}
+
+.nav-logo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.2rem;
+  color: var(--cyan);
+  text-shadow: var(--glow);
+  letter-spacing: 2px;
+}
+
+.nav-logo span { color: var(--green); }
+
+.nav-links {
+  display: flex;
+  gap: 0.3rem;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.nav-links a:hover {
+  color: var(--cyan);
+  border-color: var(--border2);
+  background: rgba(0,212,255,0.05);
+}
+
+/* ===== HERO ===== */
+.hero {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 4rem;
+}
+
+.hero-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--green);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+  padding: 0.4rem 1.5rem;
+  border: 1px solid rgba(0,255,136,0.3);
+  border-radius: 20px;
+  background: rgba(0,255,136,0.05);
+  animation: pulse-green 2s ease-in-out infinite;
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 0 10px rgba(0,255,136,0.2); }
+  50% { box-shadow: 0 0 25px rgba(0,255,136,0.5); }
+}
+
+.hero h1 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 0%, var(--cyan) 40%, var(--green) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero h1 .ad-letters {
+  font-family: 'Share Tech Mono', monospace;
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 30px rgba(0,212,255,0.5));
+}
+
+.hero-sub {
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  color: var(--text2);
+  margin-bottom: 2rem;
+  max-width: 700px;
+  line-height: 1.7;
+}
+
+.hero-stats {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.stat {
+  text-align: center;
+  padding: 1rem 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: transform 0.2s;
+}
+
+.stat:hover { transform: translateY(-3px); }
+
+.stat-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 2rem;
+  color: var(--cyan);
+  text-shadow: var(--glow);
+  display: block;
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hero-btns {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+  border: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--cyan2), var(--cyan));
+  color: #000;
+  box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,212,255,0.5);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--cyan);
+  border: 2px solid var(--cyan);
+}
+
+.btn-outline:hover {
+  background: rgba(0,212,255,0.1);
+  transform: translateY(-2px);
+}
+
+/* ===== SECTIONS ===== */
+section {
+  position: relative;
+  z-index: 1;
+  padding: 5rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-header {
+  margin-bottom: 3rem;
+}
+
+.section-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--green);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.section-title {
+  font-family: 'Exo 2', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.section-title .accent { color: var(--cyan); }
+
+.section-desc {
+  color: var(--text2);
+  font-size: 1rem;
+  margin-top: 0.8rem;
+  max-width: 700px;
+  line-height: 1.7;
+}
+
+/* ===== SEPARATOR ===== */
+.separator {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  margin: 0;
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s;
+}
+
+.card:hover {
+  border-color: var(--border2);
+  box-shadow: var(--glow);
+  transform: translateY(-3px);
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.card-icon {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.card h3 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.7rem;
+}
+
+.card p {
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* ===== TOPIC DEEP DIVES ===== */
+.topic-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.topic-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.topic-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--cyan);
+  background: rgba(0,212,255,0.1);
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0,212,255,0.3);
+}
+
+.topic-title {
+  font-family: 'Exo 2', sans-serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 900;
+  color: #fff;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .content-grid { grid-template-columns: 1fr; }
+  .nav-links { display: none; }
+}
+
+.info-block {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.info-block h4 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.info-block p, .info-block li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.8;
+}
+
+.info-block ul {
+  padding-right: 1.2rem;
+}
+
+.info-block li { margin-bottom: 0.3rem; }
+
+.highlight-box {
+  background: rgba(0,212,255,0.05);
+  border: 1px solid rgba(0,212,255,0.2);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.highlight-box.green {
+  background: rgba(0,255,136,0.05);
+  border-color: rgba(0,255,136,0.2);
+}
+
+.highlight-box.orange {
+  background: rgba(255,107,53,0.05);
+  border-color: rgba(255,107,53,0.2);
+}
+
+.highlight-box.purple {
+  background: rgba(157,78,221,0.05);
+  border-color: rgba(157,78,221,0.2);
+}
+
+.highlight-box h4 {
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+.highlight-box.green h4 { color: var(--green); }
+.highlight-box.orange h4 { color: var(--orange); }
+.highlight-box h4 { color: var(--cyan); }
+.highlight-box.purple h4 { color: var(--purple); }
+
+.highlight-box p, .highlight-box li {
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.8;
+}
+
+.highlight-box ul { padding-right: 1.2rem; }
+.highlight-box li { margin-bottom: 0.3rem; }
+
+/* Terminal block */
+.terminal {
+  background: #030810;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.2rem 1.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--green);
+  line-height: 1.8;
+  margin: 1.5rem 0;
+  position: relative;
+}
+
+.terminal::before {
+  content: '● ● ●';
+  display: block;
+  color: var(--text3);
+  font-size: 0.7rem;
+  margin-bottom: 0.8rem;
+  letter-spacing: 3px;
+}
+
+.terminal .cmd { color: var(--cyan); }
+.terminal .comment { color: var(--text3); }
+.terminal .output { color: var(--text2); }
+.terminal .error { color: var(--red); }
+
+/* ===== AD STRUCTURE DIAGRAM ===== */
+.ad-tree {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+  font-family: 'Share Tech Mono', monospace;
+  overflow-x: auto;
+}
+
+.tree-node {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.tree-node .icon { font-size: 1rem; }
+.forest-node { color: var(--yellow); }
+.domain-node { color: var(--cyan); }
+.ou-node { color: var(--green); }
+.object-node { color: var(--text2); }
+.indent { display: inline-block; width: 1.5rem; }
+
+/* ===== PROTOCOLS TABLE ===== */
+.proto-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.85rem;
+}
+
+.proto-table th {
+  background: var(--card2);
+  color: var(--cyan);
+  padding: 0.8rem 1rem;
+  text-align: right;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border2);
+}
+
+.proto-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.proto-table tr:hover td {
+  background: rgba(0,212,255,0.03);
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-family: 'Share Tech Mono', monospace;
+}
+
+.badge-tcp { background: rgba(0,212,255,0.15); color: var(--cyan); }
+.badge-udp { background: rgba(0,255,136,0.15); color: var(--green); }
+.badge-both { background: rgba(157,78,221,0.15); color: var(--purple); }
+.badge-port { background: rgba(255,215,0,0.15); color: var(--yellow); }
+
+/* ===== REPLICATION DIAGRAM ===== */
+.replication-flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.dc-box {
+  background: var(--card);
+  border: 2px solid var(--border2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  text-align: center;
+  min-width: 140px;
+}
+
+.dc-box .dc-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.dc-box .dc-name { font-family: 'Exo 2', sans-serif; font-weight: 700; color: #fff; font-size: 0.9rem; }
+.dc-box .dc-site { font-size: 0.75rem; color: var(--text3); font-family: 'Share Tech Mono', monospace; }
+
+.flow-arrow {
+  flex: 1;
+  min-width: 60px;
+  text-align: center;
+  color: var(--cyan);
+  font-size: 1.5rem;
+  padding: 0 0.5rem;
+  position: relative;
+}
+
+.flow-arrow .arrow-label {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.65rem;
+  color: var(--text3);
+  font-family: 'Share Tech Mono', monospace;
+  white-space: nowrap;
+}
+
+/* ===== QUIZ ===== */
+#quiz-section {
+  background: var(--bg2);
+}
+
+.quiz-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.quiz-progress {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 2rem;
+}
+
+.quiz-dot {
+  height: 6px;
+  flex: 1;
+  background: var(--border);
+  border-radius: 3px;
+  transition: background 0.3s;
+}
+
+.quiz-dot.done { background: var(--green); }
+.quiz-dot.current { background: var(--cyan); }
+
+.quiz-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2.5rem;
+  min-height: 350px;
+}
+
+.quiz-q-num {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  letter-spacing: 2px;
+}
+
+.quiz-question {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.quiz-option {
+  background: var(--bg3);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.95rem;
+  text-align: right;
+  color: var(--text);
+  font-family: 'Noto Sans Hebrew', sans-serif;
+}
+
+.quiz-option:hover {
+  border-color: var(--cyan);
+  background: rgba(0,212,255,0.05);
+  color: #fff;
+}
+
+.quiz-option.correct {
+  border-color: var(--green);
+  background: rgba(0,255,136,0.1);
+  color: var(--green);
+}
+
+.quiz-option.wrong {
+  border-color: var(--red);
+  background: rgba(255,51,85,0.1);
+  color: var(--red);
+}
+
+.quiz-option.disabled { pointer-events: none; }
+
+.quiz-feedback {
+  margin-top: 1.5rem;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  display: none;
+}
+
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.3); color: var(--text); }
+.quiz-feedback.wrong { background: rgba(255,51,85,0.08); border: 1px solid rgba(255,51,85,0.3); color: var(--text); }
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.quiz-score {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--text3);
+}
+
+.quiz-result {
+  text-align: center;
+  padding: 3rem;
+}
+
+.result-score {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--cyan), var(--green));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ===== FLASHCARDS ===== */
+.flashcard-container {
+  perspective: 1000px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.flashcard {
+  width: 100%;
+  height: 280px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+  cursor: pointer;
+}
+
+.flashcard.flipped { transform: rotateY(180deg); }
+
+.flashcard-face {
+  position: absolute;
+  inset: 0;
+  background: var(--card);
+  border: 2px solid var(--border2);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+  backface-visibility: hidden;
+}
+
+.flashcard-front { border-color: var(--cyan); }
+.flashcard-back { 
+  border-color: var(--green); 
+  transform: rotateY(180deg);
+  background: var(--card2);
+}
+
+.flashcard-front h3 {
+  font-family: 'Exo 2', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--cyan);
+}
+
+.flashcard-front p {
+  font-size: 0.85rem;
+  color: var(--text3);
+  margin-top: 0.5rem;
+}
+
+.flashcard-back p {
+  font-size: 0.95rem;
+  color: var(--text);
+  line-height: 1.7;
+}
+
+.flashcard-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.flashcard-counter {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--text3);
+  font-size: 0.85rem;
+  min-width: 80px;
+  text-align: center;
+}
+
+/* ===== MATCHING GAME ===== */
+.match-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.8rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.match-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: var(--text2);
+  line-height: 1.4;
+}
+
+.match-card:hover { border-color: var(--cyan); color: #fff; }
+.match-card.selected { border-color: var(--cyan); background: rgba(0,212,255,0.1); color: var(--cyan); }
+.match-card.matched { border-color: var(--green); background: rgba(0,255,136,0.1); color: var(--green); pointer-events: none; }
+.match-card.wrong-flash { border-color: var(--red); background: rgba(255,51,85,0.1); }
+
+/* ===== ACCORDION ===== */
+.accordion {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.accordion-header {
+  background: var(--card);
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #fff;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.accordion-header:hover { background: var(--card2); }
+
+.accordion-arrow {
+  color: var(--cyan);
+  transition: transform 0.3s;
+  font-size: 1.2rem;
+}
+
+.accordion.open .accordion-arrow { transform: rotate(180deg); }
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.accordion.open .accordion-body { max-height: 2000px; }
+
+.accordion-content {
+  padding: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  color: var(--text2);
+  line-height: 1.8;
+}
+
+.accordion-content ul { padding-right: 1.5rem; }
+.accordion-content li { margin-bottom: 0.5rem; }
+.accordion-content strong { color: var(--text); }
+
+/* ===== COMPARISON TABLE ===== */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+.compare-table th {
+  background: var(--card2);
+  padding: 0.8rem 1rem;
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  color: var(--cyan);
+  border-bottom: 2px solid var(--border2);
+}
+
+.compare-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+  color: var(--text2);
+}
+
+.compare-table td:first-child { font-weight: 600; color: var(--text); }
+.compare-table tr:hover td { background: rgba(0,212,255,0.02); }
+
+.check { color: var(--green); }
+.cross { color: var(--red); }
+
+/* ===== LAB EXERCISES ===== */
+.lab-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.lab-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.lab-num {
+  background: var(--orange);
+  color: #000;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-family: 'Exo 2', sans-serif;
+  flex-shrink: 0;
+}
+
+.lab-title {
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #fff;
+}
+
+.lab-difficulty {
+  margin-right: auto;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.diff-easy { background: rgba(0,255,136,0.15); color: var(--green); }
+.diff-med { background: rgba(255,215,0,0.15); color: var(--yellow); }
+.diff-hard { background: rgba(255,51,85,0.15); color: var(--red); }
+
+.lab-steps {
+  counter-reset: step;
+  list-style: none;
+  padding: 0;
+}
+
+.lab-step {
+  counter-increment: step;
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.88rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+.lab-step::before {
+  content: counter(step);
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--cyan);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-family: 'Share Tech Mono', monospace;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* ===== GLOSSARY ===== */
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.glossary-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  transition: border-color 0.2s;
+}
+
+.glossary-item:hover { border-color: var(--border2); }
+
+.glossary-term {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  color: var(--cyan);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.glossary-def {
+  font-size: 0.82rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  position: relative;
+  z-index: 1;
+  background: var(--bg2);
+  border-top: 1px solid var(--border);
+  padding: 3rem 2rem;
+  text-align: center;
+}
+
+footer .footer-logo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.5rem;
+  color: var(--cyan);
+  text-shadow: var(--glow);
+  margin-bottom: 1rem;
+}
+
+footer p {
+  color: var(--text3);
+  font-size: 0.85rem;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan2); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeInUp 0.6s ease forwards;
+}
+
+/* ===== FULL WIDTH SECTIONS ===== */
+.full-bg {
+  background: var(--bg2);
+  padding: 0;
+}
+
+.full-bg > section,
+.full-bg > .topic-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5rem 2rem;
+}
+
+/* ===== TICKER ===== */
+.ticker-wrap {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  padding: 0.6rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+.ticker {
+  display: flex;
+  gap: 3rem;
+  animation: ticker-scroll 25s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.ticker-item {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ticker-item span { color: var(--cyan); }
+
+/* ===== TIMELINE ===== */
+.timeline {
+  position: relative;
+  padding-right: 2rem;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  right: 7px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--cyan), var(--green));
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 2rem;
+  padding-right: 2rem;
+}
+
+.timeline-dot {
+  position: absolute;
+  right: -7px;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--cyan);
+  border: 3px solid var(--bg);
+  box-shadow: var(--glow);
+}
+
+.timeline-year {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--cyan);
+  margin-bottom: 0.4rem;
+}
+
+.timeline-title {
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 0.3rem;
+}
+
+.timeline-desc {
+  font-size: 0.85rem;
+  color: var(--text2);
+  line-height: 1.6;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .match-grid { grid-template-columns: repeat(3, 1fr); }
+  .content-grid { grid-template-columns: 1fr; }
+  .replication-flow { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+
+/* tab system */
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+}
+
+.tab-btn.active {
+  border-color: var(--cyan);
+  background: rgba(0,212,255,0.1);
+  color: var(--cyan);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ===== NAVIGATION ===== -->
+<nav>
+  <div class="nav-logo">AD<span>Academy</span></div>
+  <ul class="nav-links">
+    <li><a href="#what-is-ad">מה זה AD</a></li>
+    <li><a href="#structure">מבנה</a></li>
+    <li><a href="#protocols">פרוטוקולים</a></li>
+    <li><a href="#replication">רפליקציה</a></li>
+    <li><a href="#accounts">חשבונות</a></li>
+    <li><a href="#security">אבטחה</a></li>
+    <li><a href="#sessions">Sessions</a></li>
+    <li><a href="#sccm">SCCM</a></li>
+    <li><a href="#ata">ATA</a></li>
+    <li><a href="#lab">מעבדה</a></li>
+    <li><a href="#quiz">חידון</a></li>
+  </ul>
+</nav>
+
+<!-- ===== TICKER ===== -->
+<div style="height:60px"></div>
+<div class="ticker-wrap">
+  <div class="ticker">
+    <div class="ticker-item">🔐 <span>Active Directory</span> — מנהל הזהויות המרכזי בארגון</div>
+    <div class="ticker-item">🌐 <span>Domain Controller</span> — שרת המרכזי לאימות</div>
+    <div class="ticker-item">📁 <span>LDAP</span> — פרוטוקול גישה לספרייה</div>
+    <div class="ticker-item">🔑 <span>Kerberos</span> — מנגנון אימות מבוסס tickets</div>
+    <div class="ticker-item">🔄 <span>Replication</span> — סנכרון בין DCs</div>
+    <div class="ticker-item">🛡️ <span>GPO</span> — Group Policy Object</div>
+    <div class="ticker-item">👤 <span>OU</span> — Organizational Unit</div>
+    <div class="ticker-item">🔐 <span>Active Directory</span> — מנהל הזהויות המרכזי בארגון</div>
+    <div class="ticker-item">🌐 <span>Domain Controller</span> — שרת המרכזי לאימות</div>
+    <div class="ticker-item">📁 <span>LDAP</span> — פרוטוקול גישה לספרייה</div>
+    <div class="ticker-item">🔑 <span>Kerberos</span> — מנגנון אימות מבוסס tickets</div>
+    <div class="ticker-item">🔄 <span>Replication</span> — סנכרון בין DCs</div>
+    <div class="ticker-item">🛡️ <span>GPO</span> — Group Policy Object</div>
+    <div class="ticker-item">👤 <span>OU</span> — Organizational Unit</div>
+  </div>
+</div>
+
+<!-- ===== HERO ===== -->
+<div class="hero">
+  <div class="hero-badge">📡 ACTIVE DIRECTORY MASTER COURSE</div>
+  <h1>
+    הכל על<br>
+    <span class="ad-letters">Active Directory</span>
+  </h1>
+  <p class="hero-sub">
+    המדריך המקיף ביותר לעולם AD — מהבסיס ועד להתקדמות.
+    בנה ידע מעמיק בשבוע אחד, הבן את הארכיטקטורה, האבטחה, הפרוטוקולים ועוד.
+  </p>
+  <div class="hero-stats">
+    <div class="stat">
+      <span class="stat-num">12</span>
+      <span class="stat-label">נושאים עמוקים</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">80+</span>
+      <span class="stat-label">שאלות חידון</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">15+</span>
+      <span class="stat-label">תרגילים מעשיים</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">∞</span>
+      <span class="stat-label">כרטיסי למידה</span>
+    </div>
+  </div>
+  <div class="hero-btns">
+    <a href="#what-is-ad" class="btn btn-primary">🚀 התחל ללמוד</a>
+    <a href="#quiz" class="btn btn-outline">🎯 קח חידון</a>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 1: מה זה AD ===== -->
+<div id="what-is-ad" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 01 — יסודות</span>
+    <h2 class="section-title">מה זה <span class="accent">Active Directory</span>?</h2>
+    <p class="section-desc">הבנה מלאה של המושג, ההיסטוריה והחשיבות של Active Directory בעולם ה-IT הארגוני.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🎯 ההגדרה הפשוטה</h4>
+      <p>
+        <strong>Active Directory (AD)</strong> הוא שירות ספרייה (Directory Service) שפיתחה Microsoft. 
+        תחשוב עליו כמו "ספר הטלפונים הארגוני האולטימטיבי" — אבל הרבה יותר חזק.
+        הוא מנהל את כל <strong>הזהויות, ההרשאות, המדיניות והמשאבים</strong> בארגון.
+      </p>
+      <br>
+      <p>
+        כל פעם שאתה נכנס לעבודה ומזין שם משתמש וסיסמה — AD הוא זה שבודק אותך.
+        כל פעם שאתה ניגש לשרת קובץ, מדפסת, או אפליקציה — AD הוא זה שמחליט אם מותר לך.
+      </p>
+    </div>
+    <div class="info-block">
+      <h4>📅 היסטוריה קצרה</h4>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">1999</div>
+          <div class="timeline-title">Windows 2000 Server</div>
+          <div class="timeline-desc">השקת AD הראשונה, מבוסס על X.500 ו-LDAP</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2003</div>
+          <div class="timeline-title">Forests & Trusts</div>
+          <div class="timeline-desc">הכנסת יערות, אמונות בין דומיינים</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2008</div>
+          <div class="timeline-title">AD DS, AD FS, AD CS</div>
+          <div class="timeline-desc">הרחבת לשירותים נוספים: Federation, Certificate</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-year">2016+</div>
+          <div class="timeline-title">Azure AD / Entra ID</div>
+          <div class="timeline-desc">גרסת הענן, היברידיות עם On-Prem</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>💡 למה כל ארגון צריך AD?</h4>
+    <p>דמיין ארגון עם 500 עובדים ו-50 שרתים. בלי AD:</p>
+    <ul>
+      <li>כל שרת יצטרך לנהל את רשימת המשתמשים שלו בנפרד — זה 500 × 50 = 25,000 חשבונות!</li>
+      <li>כל שינוי סיסמה יצטרך לעדכן בכל מקום ידנית</li>
+      <li>לא ניתן לאכוף מדיניות אחידה על תחנות עבודה</li>
+      <li>אבטחה — בלתי אפשרית לנהל</li>
+    </ul>
+    <br>
+    <p><strong>עם AD:</strong> משתמש אחד, סיסמה אחת, הרשאות מרכזיות, מדיניות אחידה — כל זה מנוהל ממקום אחד.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🏗️ רכיבי AD המרכזיים</h4>
+      <ul>
+        <li><strong>AD DS</strong> — Directory Services (הליבה)</li>
+        <li><strong>AD CS</strong> — Certificate Services (PKI)</li>
+        <li><strong>AD FS</strong> — Federation Services (SSO)</li>
+        <li><strong>AD LDS</strong> — Lightweight Directory Services</li>
+        <li><strong>AD RMS</strong> — Rights Management Services</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🆚 AD vs Azure AD (Entra ID)</h4>
+      <table class="compare-table">
+        <tr>
+          <th>מאפיין</th>
+          <th>AD On-Prem</th>
+          <th>Azure AD</th>
+        </tr>
+        <tr>
+          <td>מיקום</td>
+          <td>On-Premise</td>
+          <td>ענן</td>
+        </tr>
+        <tr>
+          <td>פרוטוקול</td>
+          <td>Kerberos/LDAP</td>
+          <td>SAML/OAuth</td>
+        </tr>
+        <tr>
+          <td>GPO</td>
+          <td><span class="check">✓</span></td>
+          <td><span class="cross">✗</span></td>
+        </tr>
+        <tr>
+          <td>MFA מובנה</td>
+          <td><span class="cross">✗</span></td>
+          <td><span class="check">✓</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 2: מבנה AD ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="structure" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 02 — ארכיטקטורה</span>
+    <h2 class="section-title">מבנה <span class="accent">Active Directory</span></h2>
+    <p class="section-desc">ירארכיה לוגית, ירארכיה פיזית, ואיך הם עובדים יחד</p>
+  </div>
+
+  <div class="ad-tree">
+    <div style="color:var(--yellow); font-size:1rem; margin-bottom:1rem;">📐 מבנה לוגי של AD</div>
+    <div class="tree-node forest-node"><span class="icon">🌲</span> FOREST: corp.example.com (Koren-Holding)</div>
+    <div class="tree-node domain-node"><span class="indent"></span><span class="icon">🌐</span> TREE: example.com (Root Domain)</div>
+    <div class="tree-node domain-node"><span class="indent"></span><span class="indent"></span><span class="icon">🔷</span> DOMAIN: il.example.com</div>
+    <div class="tree-node ou-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">📁</span> OU: IT</div>
+    <div class="tree-node object-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">👤</span> User: david.cohen</div>
+    <div class="tree-node object-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">💻</span> Computer: IT-WS-001</div>
+    <div class="tree-node ou-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">📁</span> OU: HR</div>
+    <div class="tree-node object-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">👤</span> User: sara.levi</div>
+    <div class="tree-node ou-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">📁</span> OU: Servers</div>
+    <div class="tree-node object-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">🖥️</span> Computer: DC01</div>
+    <div class="tree-node object-node"><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="indent"></span><span class="icon">🖥️</span> Computer: FILE-SRV-01</div>
+    <div class="tree-node domain-node"><span class="indent"></span><span class="indent"></span><span class="icon">🔷</span> DOMAIN: uk.example.com</div>
+    <div class="tree-node domain-node"><span class="indent"></span><span class="icon">🌐</span> TREE: subsidiary.net (Child Tree)</div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🌲 Forest (יער)</h4>
+      <p>הגבול האבטחתי הגבוה ביותר ב-AD. יכיל עץ דומיין אחד או יותר. כל אובייקטים ביער חולקים:</p>
+      <ul style="margin-top:0.8rem">
+        <li>Schema אחד משותף</li>
+        <li>Configuration Container אחד</li>
+        <li>Global Catalog מאוחד</li>
+        <li>Trust אוטומטי בין דומיינים ביער</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🔷 Domain (דומיין)</h4>
+      <p>יחידת ניהול ואבטחה בסיסית. כל דומיין מכיל:</p>
+      <ul style="margin-top:0.8rem">
+        <li>Domain Controllers (DC) — שרתי האימות</li>
+        <li>Database AD — NTDS.dit</li>
+        <li>הגדרות מדיניות Group Policy</li>
+        <li>Trusts עם דומיינים אחרים</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>📁 Organizational Unit (OU)</h4>
+      <p>מיכל לוגי לארגון אובייקטים בתוך דומיין. OU מאפשר:</p>
+      <ul style="margin-top:0.8rem">
+        <li>הפעלת GPO ספציפי על קבוצת אובייקטים</li>
+        <li>האצלת הרשאות ניהול (Delegation)</li>
+        <li>מבנה היררכי — OU תוך OU</li>
+        <li>ניהול נוח: IT \ סיסטמאים \ Junior</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🖥️ Sites (אתרים פיזיים)</h4>
+      <p>הירארכיה <strong>פיזית</strong> של AD, מבוססת על טופולוגיית הרשת:</p>
+      <ul style="margin-top:0.8rem">
+        <li><strong>Site</strong> — רשת IP מחוברת היטב (LAN)</li>
+        <li><strong>Site Link</strong> — חיבור WAN בין אתרים</li>
+        <li>משמש לשליטה על תעבורת רפליקציה</li>
+        <li>משפיע על איזה DC המשתמש מתחבר</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box green">
+    <h4>🏆 FSMO Roles — תפקידים בודדים בדומיין</h4>
+    <p>חמישה תפקידים ייחודיים שחייבים להיות על DC אחד בלבד:</p>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem; margin-top:1rem;">
+      <div>
+        <strong style="color:var(--green)">Forest-wide (כל יער):</strong>
+        <ul style="padding-right:1.2rem; margin-top:0.4rem">
+          <li><strong>Schema Master</strong> — שולט בשינויי ה-Schema</li>
+          <li><strong>Domain Naming Master</strong> — מנהל הוספת/הסרת דומיינים</li>
+        </ul>
+      </div>
+      <div>
+        <strong style="color:var(--cyan)">Domain-wide (כל דומיין):</strong>
+        <ul style="padding-right:1.2rem; margin-top:0.4rem">
+          <li><strong>PDC Emulator</strong> — שעון, נעילות, עדכוני סיסמה</li>
+          <li><strong>RID Master</strong> — מחלק מזהי RID לאובייקטים</li>
+          <li><strong>Infrastructure Master</strong> — מעדכן הפניות בין דומיינים</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="terminal">
+    <div class="cmd"># בדיקת FSMO Roles:</div>
+    <div class="cmd">netdom query fsmo</div>
+    <br>
+    <div class="output">Schema master               DC01.corp.example.com</div>
+    <div class="output">Domain naming master        DC01.corp.example.com</div>
+    <div class="output">PDC                         DC01.corp.example.com</div>
+    <div class="output">RID pool manager            DC01.corp.example.com</div>
+    <div class="output">Infrastructure master       DC02.corp.example.com</div>
+    <br>
+    <div class="cmd"># או PowerShell:</div>
+    <div class="cmd">Get-ADDomain | Select-Object *Master, PDCEmulator</div>
+    <div class="cmd">Get-ADForest | Select-Object *Master</div>
+  </div>
+
+  <div class="info-block" style="margin-top:1.5rem">
+    <h4>📦 Global Catalog (GC)</h4>
+    <p>שרת מיוחד המכיל עותק חלקי של כל אובייקטי היער (לא רק הדומיין שלו). חיוני ל:</p>
+    <ul>
+      <li>חיפוש משתמשים ומשאבים בכל היער</li>
+      <li>כניסת לוגון — אימות חברות בקבוצות Universal</li>
+      <li>שירות Exchange (הכתובות נשמרות ב-GC)</li>
+      <li>גש דרך Port 3268 (LDAP) או 3269 (LDAPS)</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 3: פרוטוקולים ===== -->
+<div id="protocols" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 03 — פרוטוקולים</span>
+    <h2 class="section-title">פרוטוקולים בסביבת <span class="accent">Active Directory</span></h2>
+    <p class="section-desc">כל הפרוטוקולים שמריצים את AD — מ-Kerberos ועד DNS</p>
+  </div>
+
+  <table class="proto-table">
+    <thead>
+      <tr>
+        <th>פרוטוקול</th>
+        <th>יציאה</th>
+        <th>סוג</th>
+        <th>שימוש ב-AD</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Kerberos</strong></td>
+        <td><span class="badge badge-port">88</span></td>
+        <td><span class="badge badge-both">TCP/UDP</span></td>
+        <td>אימות ראשי — מנגנון tickets</td>
+      </tr>
+      <tr>
+        <td><strong>LDAP</strong></td>
+        <td><span class="badge badge-port">389</span></td>
+        <td><span class="badge badge-both">TCP/UDP</span></td>
+        <td>גישה וחיפוש בספרייה</td>
+      </tr>
+      <tr>
+        <td><strong>LDAPS</strong></td>
+        <td><span class="badge badge-port">636</span></td>
+        <td><span class="badge badge-tcp">TCP</span></td>
+        <td>LDAP מוצפן (SSL/TLS)</td>
+      </tr>
+      <tr>
+        <td><strong>DNS</strong></td>
+        <td><span class="badge badge-port">53</span></td>
+        <td><span class="badge badge-both">TCP/UDP</span></td>
+        <td>מיפוי שמות, מציאת DCs (SRV records)</td>
+      </tr>
+      <tr>
+        <td><strong>SMB / CIFS</strong></td>
+        <td><span class="badge badge-port">445</span></td>
+        <td><span class="badge badge-tcp">TCP</span></td>
+        <td>שיתוף קבצים, SYSVOL, NETLOGON</td>
+      </tr>
+      <tr>
+        <td><strong>RPC</strong></td>
+        <td><span class="badge badge-port">135</span> + דינמי</td>
+        <td><span class="badge badge-tcp">TCP</span></td>
+        <td>תקשורת בין DCs, ניהול מרחוק</td>
+      </tr>
+      <tr>
+        <td><strong>NTLM</strong></td>
+        <td>מגוון</td>
+        <td><span class="badge badge-both">TCP/UDP</span></td>
+        <td>אימות legacy (פחות מומלץ)</td>
+      </tr>
+      <tr>
+        <td><strong>Global Catalog</strong></td>
+        <td><span class="badge badge-port">3268</span> / <span class="badge badge-port">3269</span></td>
+        <td><span class="badge badge-tcp">TCP</span></td>
+        <td>חיפוש ביער שלם</td>
+      </tr>
+      <tr>
+        <td><strong>NTP / W32TM</strong></td>
+        <td><span class="badge badge-port">123</span></td>
+        <td><span class="badge badge-udp">UDP</span></td>
+        <td>סנכרון שעון — קריטי ל-Kerberos!</td>
+      </tr>
+      <tr>
+        <td><strong>WinRM / WMI</strong></td>
+        <td><span class="badge badge-port">5985/5986</span></td>
+        <td><span class="badge badge-tcp">TCP</span></td>
+        <td>ניהול מרחוק, PowerShell Remoting</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="content-grid">
+    <div>
+      <div class="highlight-box">
+        <h4>🎟️ Kerberos — איך זה עובד?</h4>
+        <p>Kerberos הוא פרוטוקול אימות מבוסס Tickets. הוא פועל בשלבים:</p>
+        <br>
+        <div style="font-size:0.85rem; line-height:2;">
+          <span style="color:var(--cyan)">1. AS-REQ</span> — הלקוח שולח בקשת אימות ל-KDC<br>
+          <span style="color:var(--cyan)">2. AS-REP</span> — KDC מחזיר TGT (Ticket Granting Ticket)<br>
+          <span style="color:var(--cyan)">3. TGS-REQ</span> — הלקוח מבקש Service Ticket<br>
+          <span style="color:var(--cyan)">4. TGS-REP</span> — KDC מחזיר Service Ticket<br>
+          <span style="color:var(--cyan)">5. AP-REQ</span> — הלקוח מתחבר לשירות עם הטיקט<br>
+          <span style="color:var(--cyan)">6. AP-REP</span> — השירות מאשר את הזהות
+        </div>
+        <br>
+        <p>⚠️ קריטי: כל המחשבים חייבים להיות מסונכרנים בזמן — סטייה של יותר מ-5 דקות = כישלון אימות!</p>
+      </div>
+    </div>
+    <div>
+      <div class="highlight-box orange">
+        <h4>⚠️ NTLM — הפרוטוקול הישן</h4>
+        <p>NTLM הוא מנגנון האימות ה<strong>ישן</strong> שעדיין קיים ל-backwards compatibility:</p>
+        <ul>
+          <li>משתמש ב-Challenge/Response</li>
+          <li>אין Mutual Authentication (חולשה!)</li>
+          <li>פגיע ל-Pass-the-Hash, Relay attacks</li>
+          <li>מופעל כאשר Kerberos נכשל</li>
+          <li>מומלץ להגביל ל-NTLMv2 לפחות</li>
+        </ul>
+        <br>
+        <p>✅ <strong>מומלץ:</strong> להגביל NTLM ולהשתמש רק ב-Kerberos כשאפשר</p>
+      </div>
+
+      <div class="highlight-box purple" style="margin-top:1rem">
+        <h4>📡 DNS — הבסיס של AD</h4>
+        <p>AD <strong>תלוי ב-DNS לחלוטין</strong>. ה-DNS מכיל:</p>
+        <ul>
+          <li><strong>SRV Records</strong> — מציאת DCs, GCs, Kerberos</li>
+          <li><strong>A Records</strong> — שמות לכתובות IP</li>
+          <li><strong>_ldap._tcp.corp.example.com</strong> — מציאת DC</li>
+          <li><strong>_kerberos._tcp.corp.example.com</strong> — KDC</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 4: רפליקציה ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="replication" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 04 — רפליקציה</span>
+    <h2 class="section-title">תהליך <span class="accent">Replication</span></h2>
+    <p class="section-desc">איך AD מסנכרן את עצמו בין Domain Controllers</p>
+  </div>
+
+  <div class="replication-flow">
+    <div class="dc-box">
+      <div class="dc-icon">🖥️</div>
+      <div class="dc-name">DC01</div>
+      <div class="dc-site">Site: Israel-TLV</div>
+    </div>
+    <div class="flow-arrow">
+      <span class="arrow-label">intra-site (instant)</span>
+      ⟷
+    </div>
+    <div class="dc-box">
+      <div class="dc-icon">🖥️</div>
+      <div class="dc-name">DC02</div>
+      <div class="dc-site">Site: Israel-TLV</div>
+    </div>
+    <div class="flow-arrow">
+      <span class="arrow-label">inter-site (scheduled)</span>
+      ⟷
+    </div>
+    <div class="dc-box">
+      <div class="dc-icon">🖥️</div>
+      <div class="dc-name">DC03</div>
+      <div class="dc-site">Site: US-NY</div>
+    </div>
+    <div class="flow-arrow">
+      <span class="arrow-label">inter-site (compressed)</span>
+      ⟷
+    </div>
+    <div class="dc-box">
+      <div class="dc-icon">🖥️</div>
+      <div class="dc-name">DC04</div>
+      <div class="dc-site">Site: US-NY</div>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🔄 Intra-Site Replication (תוך-אתר)</h4>
+      <ul>
+        <li><strong>מהיר:</strong> שינוי מתפשט תוך 15 שניות</li>
+        <li>לא מכווץ (רשת מהירה)</li>
+        <li>KCC (Knowledge Consistency Checker) בונה Ring Topology</li>
+        <li>שינויים נשלחים <strong>מיד</strong> (Urgent Replication לאירועים קריטיים)</li>
+        <li>Urgent: נעילת חשבון, שינוי סיסמה, LSA Policy</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🌐 Inter-Site Replication (בין-אתרים)</h4>
+      <ul>
+        <li>מתוזמן — ברירת מחדל כל 180 דקות</li>
+        <li>מכווץ — חוסך bandwidth</li>
+        <li>דרך Site Links ו-Bridgehead Servers</li>
+        <li>ISTG בוחר Bridgehead Server אוטומטית</li>
+        <li>ניתן לתזמן ולכוון את החלונות</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>📊 USN — Update Sequence Numbers</h4>
+    <p>כל שינוי ב-AD מקבל <strong>USN (Update Sequence Number)</strong> — מספר עולה. כך DC יודע מה כבר קיבל ומה עדיין חסר:</p>
+    <ul>
+      <li>כל DC שומר <strong>UTD Vector</strong> — מה ה-USN הגבוה שקיבל מכל DC</li>
+      <li>בעת רפליקציה: "תן לי הכל מ-USN 5432 ואילך"</li>
+      <li><strong>Originating USN</strong> vs <strong>Local USN</strong> — חשוב להבדיל</li>
+      <li>Attribute Metadata — כולל מי שינה, מתי, ומה ה-USN</li>
+    </ul>
+  </div>
+
+  <div class="highlight-box orange">
+    <h4>⚠️ Replication Conflicts — מה קורה כשיש סתירה?</h4>
+    <p>שני DCs ביצעו שינוי על אותו אובייקט לפני שהרפליקציה התרחשה:</p>
+    <ul>
+      <li><strong>Last Writer Wins</strong> — השינוי עם ה-Timestamp המאוחר יותר ינצח</li>
+      <li>Attribute-level conflict resolution — לא אובייקט שלם!</li>
+      <li>Object Deletion conflict: שינוי vs מחיקה — המחיקה ניצחת</li>
+      <li>Tombstone — אובייקט מחוק נשמר 60-180 יום לפני שנמחק לצמיתות</li>
+    </ul>
+  </div>
+
+  <div class="terminal">
+    <div class="cmd"># בדיקת סטטוס רפליקציה:</div>
+    <div class="cmd">repadmin /showrepl</div>
+    <div class="cmd">repadmin /replsummary</div>
+    <div class="cmd">repadmin /showutdvec DC01 dc=corp,dc=example,dc=com</div>
+    <br>
+    <div class="cmd"># כפיית רפליקציה:</div>
+    <div class="cmd">repadmin /syncall /AdeP</div>
+    <div class="cmd">repadmin /replicate DC02 DC01 "dc=corp,dc=example,dc=com"</div>
+    <br>
+    <div class="cmd"># בדיקת שגיאות רפליקציה:</div>
+    <div class="cmd">Get-ADReplicationFailure -Scope Forest</div>
+    <div class="cmd">Get-ADReplicationPartnerMetadata -Target DC01</div>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 5: חשבונות ===== -->
+<div id="accounts" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 05 — חשבונות</span>
+    <h2 class="section-title">חשבונות ב-<span class="accent">Active Directory</span></h2>
+    <p class="section-desc">משתמשים, קבוצות, מחשבים, Service Accounts וכל מה שביניהם</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('users-tab', this)">👤 User Accounts</button>
+    <button class="tab-btn" onclick="switchTab('groups-tab', this)">👥 Groups</button>
+    <button class="tab-btn" onclick="switchTab('computers-tab', this)">💻 Computer Accounts</button>
+    <button class="tab-btn" onclick="switchTab('service-tab', this)">⚙️ Service Accounts</button>
+  </div>
+
+  <div id="users-tab" class="tab-content active">
+    <div class="content-grid">
+      <div class="info-block">
+        <h4>👤 User Account Attributes</h4>
+        <ul>
+          <li><strong>sAMAccountName</strong> — שם משתמש (max 20 תווים)</li>
+          <li><strong>userPrincipalName</strong> — UPN (david@corp.com)</li>
+          <li><strong>distinguishedName</strong> — נתיב מלא ב-LDAP</li>
+          <li><strong>objectGUID</strong> — מזהה ייחודי גלובלי</li>
+          <li><strong>objectSID</strong> — Security Identifier</li>
+          <li><strong>memberOf</strong> — קבוצות שהמשתמש חבר</li>
+          <li><strong>pwdLastSet</strong> — תאריך שינוי סיסמה</li>
+          <li><strong>lastLogon</strong> — כניסה אחרונה</li>
+          <li><strong>accountExpires</strong> — תפוגת חשבון</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🔐 מדיניות סיסמאות</h4>
+        <p>שני סוגים:</p>
+        <br>
+        <strong style="color:var(--cyan)">Default Domain Password Policy:</strong>
+        <ul>
+          <li>מדיניות ברמת דומיין (GPO)</li>
+          <li>חלה על כולם — כל המשתמשים</li>
+          <li>אורך מינימלי, מורכבות, היסטוריה</li>
+        </ul>
+        <br>
+        <strong style="color:var(--green)">Fine-Grained Password Policy (PSO):</strong>
+        <ul>
+          <li>מדיניות שונה לקבוצות שונות</li>
+          <li>Admin יכול לדרוש סיסמה חזקה יותר</li>
+          <li>ניהול דרך ADAC או PowerShell</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="cmd"># יצירת משתמש:</div>
+      <div class="cmd">New-ADUser -Name "David Cohen" -SamAccountName "david.cohen" `</div>
+      <div class="cmd">  -UserPrincipalName "david.cohen@corp.example.com" `</div>
+      <div class="cmd">  -Path "OU=IT,DC=corp,DC=example,DC=com" `</div>
+      <div class="cmd">  -AccountPassword (ConvertTo-SecureString "P@ssw0rd!" -AsPlainText -Force) `</div>
+      <div class="cmd">  -Enabled $true</div>
+      <br>
+      <div class="cmd"># חיפוש משתמשים לא פעילים:</div>
+      <div class="cmd">Search-ADAccount -AccountInactive -TimeSpan 90.00:00:00 -UsersOnly</div>
+      <br>
+      <div class="cmd"># נעילת / שחרור חשבון:</div>
+      <div class="cmd">Unlock-ADAccount -Identity david.cohen</div>
+    </div>
+  </div>
+
+  <div id="groups-tab" class="tab-content">
+    <div class="content-grid">
+      <div class="info-block">
+        <h4>👥 סוגי קבוצות — Group Types</h4>
+        <br>
+        <strong style="color:var(--cyan)">Security Groups:</strong>
+        <p>לניהול הרשאות גישה למשאבים</p>
+        <br>
+        <strong style="color:var(--green)">Distribution Groups:</strong>
+        <p>לשליחת אימייל בלבד (Exchange), אין שימוש אבטחתי</p>
+      </div>
+      <div class="info-block">
+        <h4>🎯 Scope — טווח הקבוצה</h4>
+        <ul>
+          <li><strong>Domain Local</strong> — הרשאה למשאב בדומיין, חברות מכל מקום</li>
+          <li><strong>Global</strong> — ארגון משתמשים, גישה לכל מקום ביער</li>
+          <li><strong>Universal</strong> — ביער שלם, נשמר ב-GC (attention: GC traffic)</li>
+        </ul>
+        <br>
+        <p><strong style="color:var(--yellow)">Best Practice: AGDLP</strong></p>
+        <p>Accounts → Global Groups → Domain Local Groups → Permissions</p>
+      </div>
+    </div>
+
+    <div class="highlight-box green">
+      <h4>🏆 Built-in Groups חשובים</h4>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem">
+        <ul>
+          <li><strong>Domain Admins</strong> — מנהלי דומיין מלאים</li>
+          <li><strong>Enterprise Admins</strong> — מנהלי יער</li>
+          <li><strong>Schema Admins</strong> — שינוי Schema</li>
+          <li><strong>Administrators</strong> — ניהול DC</li>
+        </ul>
+        <ul>
+          <li><strong>Account Operators</strong> — ניהול חשבונות</li>
+          <li><strong>Backup Operators</strong> — גיבוי/שחזור</li>
+          <li><strong>Remote Desktop Users</strong> — כניסה מרחוק</li>
+          <li><strong>Protected Users</strong> — אבטחה מוגברת</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="computers-tab" class="tab-content">
+    <div class="content-grid">
+      <div class="info-block">
+        <h4>💻 Computer Account</h4>
+        <p>כל מחשב שמוצמד לדומיין מקבל חשבון משלו ב-AD. זה מאפשר:</p>
+        <ul style="margin-top:0.8rem">
+          <li>אימות המחשב עצמו (לא רק המשתמש)</li>
+          <li>הפעלת GPO על המחשב</li>
+          <li>כניסה ללא רשת (Cached Credentials)</li>
+          <li>Kerberos — המחשב מקבל TGT משלו</li>
+        </ul>
+        <br>
+        <p><strong>Machine Account Password:</strong> מתחדש כל 30 יום אוטומטית</p>
+      </div>
+      <div class="info-block">
+        <h4>🔗 Domain Join</h4>
+        <p>תהליך הצמדת מחשב לדומיין:</p>
+        <ul style="margin-top:0.8rem">
+          <li>1. DNS — מציאת DC</li>
+          <li>2. Netlogon — אימות</li>
+          <li>3. יצירת Computer Account ב-AD</li>
+          <li>4. יצירת Secure Channel</li>
+          <li>5. הורדת GPOs</li>
+          <li>6. רישום SPN</li>
+        </ul>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="cmd"># הצמדה לדומיין:</div>
+      <div class="cmd">Add-Computer -DomainName "corp.example.com" -Credential (Get-Credential) -Restart</div>
+      <br>
+      <div class="cmd"># בדיקת Secure Channel:</div>
+      <div class="cmd">Test-ComputerSecureChannel</div>
+      <div class="cmd">Repair-ComputerSecureChannel  # תיקון אם שבור</div>
+    </div>
+  </div>
+
+  <div id="service-tab" class="tab-content">
+    <div class="content-grid">
+      <div class="info-block">
+        <h4>⚙️ Service Accounts</h4>
+        <p>שלושה סוגי חשבונות שירות:</p>
+        <br>
+        <strong style="color:var(--red)">רגיל (User Account ישן):</strong>
+        <ul><li>בעיות: סיסמה לא מתחדשת, SPN conflicts</li></ul>
+        <br>
+        <strong style="color:var(--yellow)">MSA (Managed Service Account):</strong>
+        <ul>
+          <li>סיסמה אוטומטית (120 תווים, כל 30 יום)</li>
+          <li>מחובר למחשב אחד בלבד</li>
+          <li>Windows 2008 R2+</li>
+        </ul>
+        <br>
+        <strong style="color:var(--green)">gMSA (Group Managed Service Account):</strong>
+        <ul>
+          <li>כמו MSA אבל לכמה שרתים</li>
+          <li>אידיאלי ל-NLB, Web Farms</li>
+          <li>KDS Root Key נדרש</li>
+        </ul>
+      </div>
+      <div class="info-block">
+        <h4>🎫 SPN — Service Principal Name</h4>
+        <p>מזהה ייחודי של שירות ב-Kerberos. פורמט:</p>
+        <div class="terminal" style="margin:0.8rem 0">
+          <div class="cmd">serviceClass/host:port/serviceName</div>
+          <div class="output">HTTP/webserver.corp.com:80</div>
+          <div class="output">MSSQLSvc/sql01.corp.com:1433</div>
+          <div class="output">HOST/workstation01.corp.com</div>
+        </div>
+        <p>SPN כפול = בעיית Kerberos!</p>
+        <br>
+        <div class="terminal" style="margin:0">
+          <div class="cmd">setspn -L username</div>
+          <div class="cmd">setspn -X  # מציאת כפילויות</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 6: אבטחה ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="security" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 06 — אבטחה</span>
+    <h2 class="section-title">אבטחה ב-<span class="accent">Active Directory</span></h2>
+    <p class="section-desc">GPO, Tiered Administration, כלי ניטור ותקיפות נפוצות</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>📋 Group Policy Object (GPO)</h4>
+      <p>GPO מאפשר לאכוף הגדרות על משתמשים ומחשבים:</p>
+      <ul style="margin-top:0.8rem">
+        <li><strong>Computer Configuration</strong> — חל בעת אתחול</li>
+        <li><strong>User Configuration</strong> — חל בעת כניסה</li>
+        <li>מוחל לפי: Local → Site → Domain → OU</li>
+        <li><strong>מנגנון RSAT:</strong> gpmc.msc לניהול</li>
+        <li>Inheritance, Block, Enforce (לוחץ מלמעלה)</li>
+      </ul>
+      <br>
+      <p>דוגמאות שימוש: הגדרת Firewall, מניעת USB, מיפוי כוננים, הגדרת IE, הפצת תוכנות</p>
+    </div>
+    <div class="info-block">
+      <h4>🏛️ Tiered Administration Model</h4>
+      <p>מודל שלוש שכבות להגנה על חשבונות הכי חשובים:</p>
+      <br>
+      <div style="text-align:center; font-family:'Share Tech Mono',monospace; font-size:0.8rem; line-height:2.5">
+        <div style="background:rgba(255,51,85,0.15); border:1px solid rgba(255,51,85,0.4); padding:0.4rem; border-radius:6px; color:var(--red)">
+          🔴 TIER 0 — Domain/Enterprise Admins, DC, Schema
+        </div>
+        <div style="color:var(--text3)">↕ אין אינטראקציה</div>
+        <div style="background:rgba(255,215,0,0.1); border:1px solid rgba(255,215,0,0.4); padding:0.4rem; border-radius:6px; color:var(--yellow)">
+          🟡 TIER 1 — שרתי אפליקציה, DBAs, Admins
+        </div>
+        <div style="color:var(--text3)">↕ אין אינטראקציה</div>
+        <div style="background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.4); padding:0.4rem; border-radius:6px; color:var(--green)">
+          🟢 TIER 2 — Workstations, Help Desk, Users
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-grid" style="margin-top:1.5rem">
+    <div class="info-block">
+      <h4>🛡️ Privileged Access Workstation (PAW)</h4>
+      <ul>
+        <li>מחשב ייעודי לניהול פריבילג'ים</li>
+        <li>מנותק מהאינטרנט / דוא"ל</li>
+        <li>hardened — Windows Credential Guard</li>
+        <li>רק מ-PAW ניתן לנהל Tier 0</li>
+        <li>Just-in-Time (JIT) Access</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🔍 ACL — Access Control Lists</h4>
+      <ul>
+        <li><strong>DACL</strong> — מי יכול לעשות מה</li>
+        <li><strong>SACL</strong> — מה מוקלט ב-Audit Log</li>
+        <li><strong>ACE</strong> — רשומה בודדת ב-ACL</li>
+        <li>ירושה מ-OU לאובייקטים בתוכה</li>
+        <li>כלי: dsacls, ADExplorer, ADSI Edit</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box orange">
+    <h4>⚠️ תקיפות נפוצות על AD — מה צריך להגן?</h4>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:0.8rem">
+      <div>
+        <ul>
+          <li><strong>Pass-the-Hash</strong> — שימוש ב-NTLM Hash ישיר</li>
+          <li><strong>Pass-the-Ticket</strong> — גנבת Kerberos TGT</li>
+          <li><strong>Golden Ticket</strong> — זיוף TGT עם KRBTGT hash</li>
+          <li><strong>Silver Ticket</strong> — זיוף Service Ticket</li>
+          <li><strong>Kerberoasting</strong> — פיצוח SPN tickets</li>
+        </ul>
+      </div>
+      <div>
+        <ul>
+          <li><strong>DCSync</strong> — חיקוי DC לשליפת הכל</li>
+          <li><strong>AS-REP Roasting</strong> — ללא Pre-Auth</li>
+          <li><strong>BloodHound</strong> — מיפוי נתיבי תקיפה</li>
+          <li><strong>LDAP Enumeration</strong> — איסוף מידע</li>
+          <li><strong>AdminSDHolder</strong> — persistence</li>
+        </ul>
+      </div>
+    </div>
+    <br>
+    <p><strong style="color:var(--orange)">הגנה: </strong>Credential Guard, Protected Users Group, ATA/Defender for Identity, כיבוי NTLM, monitoring DCSync</p>
+  </div>
+
+  <div class="highlight-box green">
+    <h4>✅ Hardening Checklist</h4>
+    <ul>
+      <li>✅ Protected Users Group — לכל admin</li>
+      <li>✅ KRBTGT password reset — כל 6 חודשים</li>
+      <li>✅ Local Administrator Password Solution (LAPS)</li>
+      <li>✅ Disable LLMNR, NBT-NS (MITM prevention)</li>
+      <li>✅ SMB Signing Enabled</li>
+      <li>✅ Restrict NTLMv1, prefer NTLMv2 → Kerberos</li>
+      <li>✅ Enable Audit Logging (4624, 4625, 4648, 4776)</li>
+      <li>✅ Domain Controller Firewall</li>
+      <li>✅ Disable pre-authentication required = $false</li>
+      <li>✅ AdminSDHolder — monitor changes</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 7: User Sessions ===== -->
+<div id="sessions" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 07 — Sessions</span>
+    <h2 class="section-title"><span class="accent">User Sessions</span> ותהליך הכניסה</h2>
+    <p class="section-desc">מה קורה מרגע הקשת הסיסמה ועד לשולחן העבודה</p>
+  </div>
+
+  <div class="highlight-box">
+    <h4>🔄 תהליך Logon מלא (Domain Logon)</h4>
+    <div style="font-size:0.85rem; line-height:2.2; margin-top:0.8rem">
+      <span style="color:var(--cyan)">1.</span> המשתמש מקיש Ctrl+Alt+Del ומזין credentials<br>
+      <span style="color:var(--cyan)">2.</span> Winlogon → LSA (Local Security Authority) מקבל את הנתונים<br>
+      <span style="color:var(--cyan)">3.</span> LSA → Kerberos (או NTLM) מנסה לאמת מול DC<br>
+      <span style="color:var(--cyan)">4.</span> DC → KDC מחזיר TGT (Ticket Granting Ticket)<br>
+      <span style="color:var(--cyan)">5.</span> TGT נשמר ב-LSASS process memory (כאן מתרחש Pass-the-Ticket!)<br>
+      <span style="color:var(--cyan)">6.</span> DC מחזיר Access Token עם SIDs של המשתמש וקבוצותיו<br>
+      <span style="color:var(--cyan)">7.</span> הורדת Group Policy (Startup/Logon Scripts)<br>
+      <span style="color:var(--cyan)">8.</span> טעינת פרופיל (Roaming Profile אם מוגדר)<br>
+      <span style="color:var(--cyan)">9.</span> שולחן העבודה מופיע — Explorer.exe עולה עם ה-Token
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🎫 Access Token</h4>
+      <p>האסימון שמייצג את זהות המשתמש בתוך Windows:</p>
+      <ul style="margin-top:0.8rem">
+        <li>User SID</li>
+        <li>Group SIDs (כולל Domain Local, Global, Universal)</li>
+        <li>Privileges (SeDebugPrivilege, etc.)</li>
+        <li>Integrity Level (Low/Medium/High/System)</li>
+        <li>Logon Session ID</li>
+        <li>Source (Network, Interactive, Service)</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🏠 User Profiles</h4>
+      <ul>
+        <li><strong>Local Profile</strong> — שמור על המחשב המקומי בלבד</li>
+        <li><strong>Roaming Profile</strong> — נשמר על שרת, נטען בכל כניסה</li>
+        <li><strong>Mandatory Profile</strong> — פרופיל קבוע שלא נשמר</li>
+        <li><strong>Folder Redirection</strong> — Desktop/Documents → שרת</li>
+        <li>מיקום: \\server\profiles\%username%</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🔐 Credential Types ב-LSASS</h4>
+      <ul>
+        <li><strong>Kerberos Tickets</strong> (TGT + Service Tickets)</li>
+        <li><strong>NTLM Hashes</strong> — NTHash בזיכרון</li>
+        <li><strong>Plaintext Passwords</strong> — ב-WDigest (ישן!)</li>
+        <li><strong>DPAPI keys</strong> — הצפנת credentials</li>
+        <li>Mimikatz — כלי שמחלץ הכל מ-LSASS</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>⏰ Session Types</h4>
+      <ul>
+        <li><strong>Interactive</strong> — כניסה פיזית/RDP</li>
+        <li><strong>Network</strong> — גישה למשאב רשת</li>
+        <li><strong>Batch</strong> — Task Scheduler</li>
+        <li><strong>Service</strong> — שירות Windows</li>
+        <li><strong>RemoteInteractive</strong> — RDP</li>
+        <li><strong>NetworkCleartext</strong> — IIS Basic Auth</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box green">
+    <h4>🛡️ Credential Guard</h4>
+    <p>תכונת Windows 10/11 שמגינה על LSASS באמצעות Virtualization-Based Security (VBS):</p>
+    <ul>
+      <li>Credentials מוגנים ב-Isolated LSA Process (VSM)</li>
+      <li>Mimikatz לא יכול לחלץ Kerberos tickets מהזיכרון</li>
+      <li>דורש UEFI Secure Boot + Hyper-V</li>
+      <li>הפעלה: GPO → Device Guard → Enable Virtualization Based Security</li>
+    </ul>
+  </div>
+
+  <div class="terminal">
+    <div class="cmd"># ניטור Sessions:</div>
+    <div class="cmd">qwinsta /server:DC01          # הצגת sessions על שרת</div>
+    <div class="cmd">query session                  # sessions מקומיות</div>
+    <div class="cmd">logoff [session_id]            # ניתוק session</div>
+    <br>
+    <div class="cmd"># Event IDs חשובים לניטור:</div>
+    <div class="comment"># 4624 - Successful Logon</div>
+    <div class="comment"># 4625 - Failed Logon</div>
+    <div class="comment"># 4634/4647 - Logoff</div>
+    <div class="comment"># 4648 - Logon with explicit credentials</div>
+    <div class="comment"># 4769 - Kerberos Service Ticket requested</div>
+    <div class="comment"># 4776 - NTLM Authentication</div>
+    <div class="cmd">Get-WinEvent -FilterHashtable @{LogName='Security'; Id=4624} -MaxEvents 50</div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 8: SCCM ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="sccm" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 08 — SCCM</span>
+    <h2 class="section-title"><span class="accent">SCCM</span> — System Center Configuration Manager</h2>
+    <p class="section-desc">ניהול תשתית מרכזי — תוכנות, עדכונים, inventory, ועוד</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>📦 מה זה SCCM / Endpoint Config Manager?</h4>
+      <p>
+        SCCM (כיום: <strong>Microsoft Endpoint Configuration Manager</strong> או <strong>MECM</strong>) 
+        הוא פלטפורמת ניהול ארגונית שמשלימה את AD. 
+        בעוד AD מנהל <em>זהויות</em>, SCCM מנהל <em>מכשירים ואפליקציות</em>.
+      </p>
+      <br>
+      <p>SCCM משתלב עמוק עם AD לצורך גילוי מחשבים, ניהול קולקציות ואכיפת תצורה.</p>
+    </div>
+    <div class="info-block">
+      <h4>🏗️ רכיבי SCCM</h4>
+      <ul>
+        <li><strong>Site Server</strong> — שרת ה-SCCM הראשי</li>
+        <li><strong>Site Database</strong> — SQL Server, מאגר הנתונים</li>
+        <li><strong>Distribution Point (DP)</strong> — חלוקת תוכן</li>
+        <li><strong>Management Point (MP)</strong> — תקשורת עם Clients</li>
+        <li><strong>Software Update Point (SUP)</strong> — WSUS integration</li>
+        <li><strong>Reporting Services Point</strong> — דוחות SSRS</li>
+        <li><strong>SCCM Client</strong> — Agent על כל מחשב</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card-grid" style="margin:1.5rem 0">
+    <div class="card">
+      <div class="card-icon">📤</div>
+      <h3>Software Distribution</h3>
+      <p>הפצת אפליקציות ל-Collections. תמיכה ב-MSI, Script, App-V. Deployment Types, Dependencies, Supersedence.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h3>Software Updates</h3>
+      <p>ניהול Windows Updates דרך WSUS. ADR (Auto Deployment Rules) לעדכונים אוטומטיים. Maintenance Windows.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🖥️</div>
+      <h3>OS Deployment (OSD)</h3>
+      <p>הפצת תמונת Windows דרך Task Sequence. PXE Boot, MDT Integration. Zero-touch deployment.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📊</div>
+      <h3>Hardware/Software Inventory</h3>
+      <p>איסוף מידע על חומרה ותוכנה. WMI-based. ניתן להוסיף Custom Classes. Compliance Reporting.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚙️</div>
+      <h3>Compliance Settings (DCM)</h3>
+      <p>Configuration Baselines — בדיקת תצורה ואכיפתה. Remediation אוטומטי. CIS Benchmarks.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h3>Endpoint Protection</h3>
+      <p>ניהול Microsoft Defender Antivirus, Windows Firewall. Anti-malware policies. Integration עם Security Center.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>🔗 SCCM + AD Integration</h4>
+    <ul>
+      <li><strong>Active Directory Discovery</strong> — SCCM מגלה משתמשים, קבוצות, מחשבים מ-AD</li>
+      <li><strong>AD-based Collections</strong> — קולקציה מבוססת OU או Security Group</li>
+      <li><strong>AD Site Boundaries</strong> — שימוש ב-AD Sites לגבולות SCCM</li>
+      <li><strong>Group Policy</strong> — הפצת SCCM Client דרך GPO</li>
+      <li>Client Authentication דרך PKI / AD Certificates</li>
+    </ul>
+  </div>
+
+  <div class="terminal">
+    <div class="cmd"># SCCM PowerShell (ConfigMgr Module):</div>
+    <div class="cmd">Import-Module ($Env:SMS_ADMIN_UI_PATH.Substring(0,$Env:SMS_ADMIN_UI_PATH.Length-5) + '\ConfigurationManager.psd1')</div>
+    <div class="cmd">Set-Location "SMS:\Site_P01"</div>
+    <br>
+    <div class="cmd"># יצירת Collection:</div>
+    <div class="cmd">New-CMDeviceCollection -Name "Israel Workstations" -LimitingCollectionName "All Systems"</div>
+    <br>
+    <div class="cmd"># הפצת Application:</div>
+    <div class="cmd">Start-CMApplicationDeployment -Name "7-Zip 22.00" -CollectionName "Israel Workstations" -DeployAction Install</div>
+    <br>
+    <div class="cmd"># הפעלת Software Update:</div>
+    <div class="cmd">Invoke-CMClientAction -DeviceName "PC001" -ActionType SoftwareUpdatesScan</div>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 9: ATA ===== -->
+<div id="ata" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 09 — ניטור מתקדם</span>
+    <h2 class="section-title"><span class="accent">ATA</span> — Advanced Threat Analytics</h2>
+    <p class="section-desc">גילוי איומים מתקדמים בסביבת AD — ו-Microsoft Defender for Identity (הגרסה החדשה)</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🔍 מה זה ATA?</h4>
+      <p>
+        Microsoft Advanced Threat Analytics (ATA) היה כלי On-Premise לגילוי תקיפות מתקדמות ב-AD.
+        כיום הוחלף על ידי <strong>Microsoft Defender for Identity (MDI)</strong> — גרסת הענן.
+      </p>
+      <br>
+      <p>שניהם עובדים ע"י:</p>
+      <ul>
+        <li>Port Mirroring מה-DC</li>
+        <li>ניתוח תעבורת Kerberos, DNS, NTLM</li>
+        <li>Machine Learning לזיהוי אנומליות</li>
+        <li>Behavioral analytics (Baseline)</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🎯 איומים שATA/MDI מזהה</h4>
+      <ul>
+        <li>🔴 <strong>Pass-the-Ticket</strong> — שימוש ב-TGT גנוב</li>
+        <li>🔴 <strong>Pass-the-Hash</strong> — NTLM Hash שימוש חוזר</li>
+        <li>🔴 <strong>Golden Ticket</strong> — זיוף Kerberos</li>
+        <li>🔴 <strong>DCSync Attack</strong> — שכפול DC</li>
+        <li>🟡 <strong>Reconnaissance</strong> — סריקת AD</li>
+        <li>🟡 <strong>Kerberoasting</strong></li>
+        <li>🟡 <strong>Brute Force</strong> על Kerberos/NTLM</li>
+        <li>🟡 <strong>Lateral Movement</strong></li>
+        <li>🟢 <strong>Sensitive Groups Changes</strong></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="highlight-box purple">
+    <h4>🚀 Microsoft Defender for Identity (MDI)</h4>
+    <p>הגרסה החדשה, מבוססת ענן (Sentinel/Defender XDR):</p>
+    <ul>
+      <li>Sensor מותקן על DC (לא Gateway נפרד)</li>
+      <li>Cloud-powered analytics</li>
+      <li>Integration עם Microsoft 365 Defender</li>
+      <li>UEBA — User and Entity Behavior Analytics</li>
+      <li>Honeytokens — חשבונות מלכודת</li>
+      <li>Integration עם SIEM (Sentinel)</li>
+      <li>Timeline — ניתוח נתיב תקיפה</li>
+    </ul>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🔌 התקנת MDI Sensor</h4>
+      <ul>
+        <li>הורד MDI Sensor מ-Portal</li>
+        <li>התקן על כל Domain Controller</li>
+        <li>הגדר Directory Services Account (DSA)</li>
+        <li>DSA צריך: Read אובייקטים ב-AD</li>
+        <li>לא צריך Admin! (Principle of Least Privilege)</li>
+        <li>Sensor שולח נתונים ל-MDI Cloud</li>
+      </ul>
+    </div>
+    <div class="info-block">
+      <h4>🔎 Event Forwarding לאבטחה</h4>
+      <p>Event IDs שצריך לאסוף:</p>
+      <ul>
+        <li>4662 — שינויים על אובייקטים AD</li>
+        <li>4688 — Process Creation</li>
+        <li>4768/4769 — Kerberos Tickets</li>
+        <li>4776 — NTLM Auth</li>
+        <li>7045 — שירות חדש (persistence!)</li>
+        <li>Windows Event Forwarding (WEF) → SIEM</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 10: LAB ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="lab" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 10 — תרגול מעשי</span>
+    <h2 class="section-title">מעבדה — <span class="accent">Hands-On</span></h2>
+    <p class="section-desc">תרגולים מעשיים שיעזרו לך להבין AD מבפנים</p>
+  </div>
+
+  <div class="lab-card">
+    <div class="lab-header">
+      <div class="lab-num">1</div>
+      <div class="lab-title">הקמת Lab בסיסי — DC ו-Client</div>
+      <span class="badge lab-difficulty diff-easy">קל</span>
+    </div>
+    <ul class="lab-steps">
+      <li class="lab-step">הורד Hyper-V / VMware Workstation. צור שני VMs: Windows Server 2022 (DC) + Windows 11 (Client)</li>
+      <li class="lab-step">על ה-VM שיהיה DC: הגדר IP סטטי (192.168.1.10), DNS מצביע לעצמו (127.0.0.1)</li>
+      <li class="lab-step">התקן תפקיד AD DS: <code>Install-WindowsFeature AD-Domain-Services -IncludeManagementTools</code></li>
+      <li class="lab-step">קדם ל-DC: <code>Install-ADDSForest -DomainName "lab.local" -SafeModeAdministratorPassword (Read-Host -AsSecureString)</code></li>
+      <li class="lab-step">לאחר Restart — הצמד את ה-Windows 11 VM לדומיין lab.local. אמת שאתה יכול להיכנס עם חשבון דומיין</li>
+    </ul>
+  </div>
+
+  <div class="lab-card">
+    <div class="lab-header">
+      <div class="lab-num">2</div>
+      <div class="lab-title">יצירת מבנה OU ומשתמשים</div>
+      <span class="badge lab-difficulty diff-easy">קל</span>
+    </div>
+    <ul class="lab-steps">
+      <li class="lab-step">פתח ADUC (dsa.msc) וצור OU structure: IT \ Admins, IT \ Helpdesk, HR, Finance</li>
+      <li class="lab-step">צור 5 משתמשים בכל OU. השתמש ב-PowerShell:<br><code>1..5 | ForEach { New-ADUser -Name "IT User $_" -SamAccountName "it.user$_" -Path "OU=IT,DC=lab,DC=local" -Enabled $true -AccountPassword (ConvertTo-SecureString "Lab@2024!" -AsPlainText -Force) }</code></li>
+      <li class="lab-step">צור Security Groups ב-IT OU: IT-Admins, Helpdesk-Team. הוסף משתמשים לקבוצות המתאימות</li>
+      <li class="lab-step">אמת חברות בקבוצות: <code>Get-ADGroupMember -Identity "IT-Admins" | Select Name</code></li>
+    </ul>
+  </div>
+
+  <div class="lab-card">
+    <div class="lab-header">
+      <div class="lab-num">3</div>
+      <div class="lab-title">יצירת GPO ואכיפתו</div>
+      <span class="badge lab-difficulty diff-med">בינוני</span>
+    </div>
+    <ul class="lab-steps">
+      <li class="lab-step">פתח GPMC (gpmc.msc). צור GPO חדש: "IT Workstations Policy" וקשר אותו ל-OU IT</li>
+      <li class="lab-step">ערוך את ה-GPO: Computer Config → Policies → Windows Settings → Security Settings → Account Policies: הגדר Password Length = 12, Lockout = 5 נסיונות</li>
+      <li class="lab-step">User Config → Policies → Administrative Templates → Control Panel → Prohibit access to Control Panel = Enabled</li>
+      <li class="lab-step">על ה-Client VM: <code>gpupdate /force</code> ואמת שהגדרות הופעלו: <code>gpresult /H c:\gp-report.html</code></li>
+    </ul>
+  </div>
+
+  <div class="lab-card">
+    <div class="lab-header">
+      <div class="lab-num">4</div>
+      <div class="lab-title">ניתוח Replication ואיתור שגיאות</div>
+      <span class="badge lab-difficulty diff-med">בינוני</span>
+    </div>
+    <ul class="lab-steps">
+      <li class="lab-step">הוסף DC שני לדומיין. צור שני VMs נוספים, התקן AD DS על השני, הצרף לדומיין הקיים</li>
+      <li class="lab-step">בדוק Replication: <code>repadmin /showrepl</code>, <code>repadmin /replsummary</code></li>
+      <li class="lab-step">שנה משתמש על DC1 ואמת שהשינוי מופיע על DC2: <code>Get-ADUser -Server DC2 it.user1 -Properties *</code></li>
+      <li class="lab-step">בדוק Sites: אתר Sites and Services (dssite.msc). אמת שה-DCs נמצאים ב-Default-First-Site-Name. הפעל כפיית רפליקציה: <code>repadmin /syncall /AdeP</code></li>
+    </ul>
+  </div>
+
+  <div class="lab-card">
+    <div class="lab-header">
+      <div class="lab-num">5</div>
+      <div class="lab-title">אבטחה — LAPS ו-Protected Users</div>
+      <span class="badge lab-difficulty diff-med">בינוני</span>
+    </div>
+    <ul class="lab-steps">
+      <li class="lab-step">הורד והתקן LAPS (Local Administrator Password Solution) על ה-DC. הרחב את ה-Schema: <code>Update-LapsADSchema</code></li>
+      <li class="lab-step">הגדר הרשאות על OU: <code>Set-LapsADComputerSelfPermission -Identity "OU=IT,DC=lab,DC=local"</code></li>
+      <li class="lab-step">פרוס LAPS Client דרך GPO לכל מחשבי ה-IT. אמת קבלת סיסמה: <code>Get-LapsADPassword -Identity WORKSTATION01</code></li>
+      <li class="lab-step">הוסף את חשבון Administrator שלך ל-Protected Users Group ובדוק שאתה לא יכול לבצע Pass-the-Hash</li>
+    </ul>
+  </div>
+
+  <div class="lab-card">
+    <div class="lab-header">
+      <div class="lab-num">6</div>
+      <div class="lab-title">BloodHound — מיפוי הסביבה</div>
+      <span class="badge lab-difficulty diff-hard">מתקדם</span>
+    </div>
+    <ul class="lab-steps">
+      <li class="lab-step">הורד BloodHound + Neo4j. התקן על מחשב נפרד. הפעל Neo4j ואז BloodHound</li>
+      <li class="lab-step">הרץ את SharpHound (collector) על ה-Client: <code>.\SharpHound.exe -c All</code> — ייצור ZIP של הנתונים</li>
+      <li class="lab-step">העלה את ה-ZIP ל-BloodHound. שחק עם שאילתות: "Find Shortest Paths to Domain Admins", "Find AS-REP Roastable Users"</li>
+      <li class="lab-step">זהה בעיות אבטחה בסביבת ה-Lab ותקן אותן. זו הנקודה — להבין כיצד תוקף רואה את הרשת שלך</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== FLASHCARDS ===== -->
+<div id="flashcards" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 11 — כרטיסי לימוד</span>
+    <h2 class="section-title">Flashcards — <span class="accent">מושגי מפתח</span></h2>
+    <p class="section-desc">לחץ על הכרטיס לגלות את ההגדרה. השתמש בחיצים לניווט</p>
+  </div>
+
+  <div class="flashcard-container">
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard-face flashcard-front">
+        <h3 id="fc-term">FSMO</h3>
+        <p>לחץ לגלות את ההגדרה</p>
+        <div style="position:absolute;bottom:1rem;color:var(--text3);font-size:0.7rem;font-family:'Share Tech Mono',monospace">לחץ לסיבוב 🔄</div>
+      </div>
+      <div class="flashcard-face flashcard-back">
+        <p id="fc-def">Flexible Single Master Operations — חמישה תפקידים ייחודיים ב-AD שחייבים להיות על DC אחד בלבד: Schema Master, Domain Naming Master, PDC Emulator, RID Master, Infrastructure Master</p>
+      </div>
+    </div>
+    <div class="flashcard-nav">
+      <button class="btn btn-outline" onclick="prevCard()" style="padding:0.5rem 1.2rem">◀ קודם</button>
+      <span class="flashcard-counter" id="fc-counter">1 / 20</span>
+      <button class="btn btn-outline" onclick="nextCard()" style="padding:0.5rem 1.2rem">הבא ▶</button>
+    </div>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== QUIZ ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="quiz" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 12 — חידון מקצועי</span>
+    <h2 class="section-title">בחן את <span class="accent">הידע שלך</span></h2>
+    <p class="section-desc">20 שאלות מקיפות על כל נושאי AD</p>
+  </div>
+
+  <div class="quiz-container">
+    <div class="quiz-progress" id="quiz-progress"></div>
+    
+    <div class="quiz-card" id="quiz-card">
+      <div class="quiz-q-num" id="quiz-q-num">שאלה 1 מתוך 20</div>
+      <div class="quiz-question" id="quiz-question"></div>
+      <div class="quiz-options" id="quiz-options"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+    </div>
+    
+    <div class="quiz-nav">
+      <div class="quiz-score" id="quiz-score">ציון: 0 / 0</div>
+      <button class="btn btn-primary" id="quiz-next-btn" onclick="nextQuestion()" style="display:none">השאלה הבאה ▶</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== MATCHING GAME ===== -->
+<div id="match-game" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 13 — משחק</span>
+    <h2 class="section-title">משחק התאמה — <span class="accent">Match!</span></h2>
+    <p class="section-desc">התאם מושג להגדרה — לחץ שני קלפים. 16 זוגות!</p>
+  </div>
+
+  <div style="display:flex; justify-content:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap">
+    <div style="font-family:'Share Tech Mono',monospace; font-size:0.85rem; color:var(--text3)">
+      זוגות: <span id="match-pairs" style="color:var(--cyan)">0 / 8</span>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace; font-size:0.85rem; color:var(--text3)">
+      נסיונות: <span id="match-tries" style="color:var(--yellow)">0</span>
+    </div>
+    <button class="btn btn-outline" onclick="initMatchGame()" style="padding:0.3rem 1rem; font-size:0.8rem">🔄 משחק חדש</button>
+  </div>
+
+  <div class="match-grid" id="match-grid"></div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== GLOSSARY ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 14 — מילון מונחים</span>
+    <h2 class="section-title">מילון <span class="accent">AD</span></h2>
+    <p class="section-desc">כל המונחים והקיצורים חשובים במקום אחד</p>
+  </div>
+
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">AD DS</div><div class="glossary-def">Active Directory Domain Services — שירות הספרייה הראשי</div></div>
+    <div class="glossary-item"><div class="glossary-term">DC</div><div class="glossary-def">Domain Controller — שרת שמריץ AD DS ומבצע אימות</div></div>
+    <div class="glossary-item"><div class="glossary-term">RODC</div><div class="glossary-def">Read-Only Domain Controller — DC לאתרים מרוחקים, ללא כתיבה</div></div>
+    <div class="glossary-item"><div class="glossary-term">GC</div><div class="glossary-def">Global Catalog — שרת עם עותק חלקי של כל אובייקטי היער</div></div>
+    <div class="glossary-item"><div class="glossary-term">GPO</div><div class="glossary-def">Group Policy Object — אובייקט מדיניות קבוצתית</div></div>
+    <div class="glossary-item"><div class="glossary-term">OU</div><div class="glossary-def">Organizational Unit — מיכל לוגי לאובייקטים בדומיין</div></div>
+    <div class="glossary-item"><div class="glossary-term">SID</div><div class="glossary-def">Security Identifier — מזהה אבטחה ייחודי לכל אובייקט</div></div>
+    <div class="glossary-item"><div class="glossary-term">GUID</div><div class="glossary-def">Globally Unique Identifier — מזהה 128-bit ייחודי גלובלי</div></div>
+    <div class="glossary-item"><div class="glossary-term">UPN</div><div class="glossary-def">User Principal Name — user@domain.com</div></div>
+    <div class="glossary-item"><div class="glossary-term">SPN</div><div class="glossary-def">Service Principal Name — מזהה שירות ב-Kerberos</div></div>
+    <div class="glossary-item"><div class="glossary-term">TGT</div><div class="glossary-def">Ticket Granting Ticket — כרטיס Kerberos ראשוני</div></div>
+    <div class="glossary-item"><div class="glossary-term">KDC</div><div class="glossary-def">Key Distribution Center — רכיב Kerberos על ה-DC</div></div>
+    <div class="glossary-item"><div class="glossary-term">LDAP</div><div class="glossary-def">Lightweight Directory Access Protocol — פרוטוקול גישה לספרייה</div></div>
+    <div class="glossary-item"><div class="glossary-term">USN</div><div class="glossary-def">Update Sequence Number — מספר רץ לכל שינוי ב-AD</div></div>
+    <div class="glossary-item"><div class="glossary-term">KCC</div><div class="glossary-def">Knowledge Consistency Checker — בונה טופולוגיית רפליקציה</div></div>
+    <div class="glossary-item"><div class="glossary-term">ACL</div><div class="glossary-def">Access Control List — רשימת הרשאות גישה</div></div>
+    <div class="glossary-item"><div class="glossary-term">DACL</div><div class="glossary-def">Discretionary ACL — מי מורשה לגשת למשאב</div></div>
+    <div class="glossary-item"><div class="glossary-term">SACL</div><div class="glossary-def">System ACL — מה מוקלט ב-Audit Log</div></div>
+    <div class="glossary-item"><div class="glossary-term">PAM</div><div class="glossary-def">Privileged Access Management — ניהול גישה פריבילג'ית</div></div>
+    <div class="glossary-item"><div class="glossary-term">LAPS</div><div class="glossary-def">Local Administrator Password Solution — סיסמאות admin מקומיות ייחודיות</div></div>
+    <div class="glossary-item"><div class="glossary-term">PSO</div><div class="glossary-def">Password Settings Object — מדיניות סיסמאות עדינה</div></div>
+    <div class="glossary-item"><div class="glossary-term">MSA / gMSA</div><div class="glossary-def">Managed Service Account — חשבון שירות עם סיסמה אוטומטית</div></div>
+    <div class="glossary-item"><div class="glossary-term">RID</div><div class="glossary-def">Relative Identifier — חלק מה-SID שמזהה אובייקט בדומיין</div></div>
+    <div class="glossary-item"><div class="glossary-term">SYSVOL</div><div class="glossary-def">תיקיה משותפת על DCs המכילה GPOs ו-scripts</div></div>
+  </div>
+</div>
+</div>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-logo">AD<span style="color:var(--green)">Academy</span></div>
+  <p style="margin-bottom:0.5rem">המדריך המקיף ביותר ל-Active Directory בעברית</p>
+  <p>כל הנושאים: AD DS • Kerberos • LDAP • GPO • Replication • Security • SCCM • ATA/MDI</p>
+  <br>
+  <p style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--text3)">// Stay curious. Keep learning. Secure your domain. //</p>
+</footer>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ===== TABS =====
+function switchTab(tabId, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== ACCORDION =====
+document.querySelectorAll('.accordion-header').forEach(h => {
+  h.addEventListener('click', () => {
+    const acc = h.parentElement;
+    acc.classList.toggle('open');
+  });
+});
+
+// ===== FLASHCARDS =====
+const flashcards = [
+  { term: "FSMO", def: "Flexible Single Master Operations — חמישה תפקידים ייחודיים ב-AD שחייבים להיות על DC אחד בלבד: Schema Master, Domain Naming Master, PDC Emulator, RID Master, Infrastructure Master" },
+  { term: "Kerberos", def: "פרוטוקול אימות מבוסס Tickets. משתמש ב-TGT ו-Service Tickets. פועל על Port 88. דורש סנכרון שעון עד 5 דקות סטייה. הפרוטוקול הראשי לאימות ב-AD." },
+  { term: "LDAP", def: "Lightweight Directory Access Protocol — פרוטוקול לגישה וחיפוש בספריית AD. Port 389 (רגיל) / 636 (LDAPS מוצפן). בסיס לכל אינטראקציה עם AD." },
+  { term: "Global Catalog", def: "שרת DC מיוחד המכיל עותק חלקי של כל אובייקטי היער. נגיש ב-Port 3268. חיוני לכניסת לוגון, Exchange, וחיפוש ביערות מרובי דומיינים." },
+  { term: "Forest", def: "הגבול האבטחתי הגבוה ביותר ב-AD. מכיל עצים ודומיינים. Schema, Configuration ו-GC משותפים לכל היער. Trusts אוטומטיים בין דומיינים ביער." },
+  { term: "GPO", def: "Group Policy Object — אובייקט המכיל הגדרות תצורה למשתמשים ומחשבים. מיושם לפי הסדר: Local → Site → Domain → OU. נרש מ-OU לבן." },
+  { term: "Replication", def: "תהליך סנכרון שינויי AD בין Domain Controllers. Intra-site: מיידי (~15 שניות). Inter-site: מתוזמן (ברירת מחדל 180 דקות). מנוהל ע\"י KCC." },
+  { term: "SID", def: "Security Identifier — מזהה אבטחה ייחודי לכל אובייקט. מבנה: S-1-5-21-[domain]-[RID]. מה שקובע הרשאות, לא השם! SID מחוק לא ניתן לשחזור." },
+  { term: "TGT", def: "Ticket Granting Ticket — כרטיס Kerberos שמתקבל בכניסה ראשונית. תוקף: 10 שעות ברירת מחדל. מאפשר לקבל Service Tickets ללא הקשת סיסמה חוזרת." },
+  { term: "Pass-the-Hash", def: "תקיפה המנצלת NTLM — שימוש ב-Hash של הסיסמה ישירות ללא ידיעת הסיסמה עצמה. הגנה: Credential Guard, Protected Users, Kerberos בלבד." },
+  { term: "Golden Ticket", def: "תקיפה שבה התוקף יוצר TGT מזויף באמצעות KRBTGT Hash. מאפשר גישה לכל משאב ביער. הגנה: איפוס KRBTGT פעמיים ומעקב אחרי Kerberos anomalies." },
+  { term: "DCSync", def: "תקיפה שבה התוקף מחקה DC ומשתמש בפרוטוקול Replication לשליפת Hash של כל חשבון כולל KRBTGT. דורש הרשאות Replication-Get-Changes-All." },
+  { term: "Kerberoasting", def: "תקיפה על חשבונות עם SPN — הכנסת בקשה ל-Service Ticket (מוצפן עם סיסמת השירות) ואז ניסיון פיצוח Offline. הגנה: סיסמאות ארוכות ל-Service Accounts." },
+  { term: "NTDS.dit", def: "קובץ מסד הנתונים של Active Directory. נמצא ב-C:\\Windows\\NTDS\\ntds.dit. מכיל את כל האובייקטים, Attributes, ו-Hashes של סיסמאות. מוגן על ידי DPAPI." },
+  { term: "PDC Emulator", def: "תפקיד FSMO חשוב. אחראי: שעון מאסטר לכל הדומיין, עדכוני סיסמה ראשוניים, נעילות חשבון, Group Policy. DC אחד בכל דומיין." },
+  { term: "Tombstone", def: "אובייקט שנמחק מ-AD לא נמחק מיידית — הוא הופך ל-Tombstone ונשמר 60-180 יום. מאפשר Replication של המחיקה לכל DCs לפני מחיקה סופית." },
+  { term: "SYSVOL", def: "תיקיה משותפת שמשוכפלת בין כל DCs. מכילה: GPO files, Logon Scripts. שוכנת ב-\\\\domain\\SYSVOL. מסונכרנת ע\"י DFSR (לאחר 2008)." },
+  { term: "LSASS", def: "Local Security Authority Subsystem Service — תהליך Windows האחראי לאימות. מחזיק Kerberos Tickets ו-NTLM Hashes בזיכרון. מטרה עיקרית של Mimikatz." },
+  { term: "Credential Guard", def: "תכונת Windows 10+ שמגינה על LSASS באמצעות Virtualization-Based Security. Credentials מאוחסנים ב-Isolated LSA בסביבה מוגנת. מונעת חילוץ מהזיכרון." },
+  { term: "BloodHound", def: "כלי ניתוח גרפי לסביבות AD. ממפה נתיבי תקיפה — מי יכול להגיע להיות Domain Admin? משתמש ב-Neo4j Graph Database. חשוב ל-Purple Team." },
+];
+
+let fcIdx = 0;
+let isFlipped = false;
+
+function renderCard() {
+  isFlipped = false;
+  document.getElementById('flashcard').classList.remove('flipped');
+  document.getElementById('fc-term').textContent = flashcards[fcIdx].term;
+  document.getElementById('fc-def').textContent = flashcards[fcIdx].def;
+  document.getElementById('fc-counter').textContent = `${fcIdx + 1} / ${flashcards.length}`;
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+}
+
+function nextCard() {
+  fcIdx = (fcIdx + 1) % flashcards.length;
+  renderCard();
+}
+
+function prevCard() {
+  fcIdx = (fcIdx - 1 + flashcards.length) % flashcards.length;
+  renderCard();
+}
+
+renderCard();
+
+// ===== QUIZ =====
+const questions = [
+  { q: "מה הפורט של Kerberos?", opts: ["389", "88", "445", "636"], ans: 1, exp: "Kerberos עובד על פורט 88 (TCP/UDP). פורט 389 הוא LDAP, 445 הוא SMB, 636 הוא LDAPS." },
+  { q: "כמה FSMO Roles יש ב-Forest-wide?", opts: ["2", "3", "5", "1"], ans: 0, exp: "ב-Forest-wide יש שני תפקידים: Schema Master ו-Domain Naming Master. שאר שלושת התפקידים (PDC Emulator, RID Master, Infrastructure Master) הם Domain-wide." },
+  { q: "איזה פרוטוקול AD תלוי בו לחלוטין לגילוי DCs?", opts: ["WINS", "DNS", "DHCP", "NTP"], ans: 1, exp: "AD תלוי ב-DNS לחלוטין. SRV Records מאפשרים לקלינטים למצוא Domain Controllers, KDC, Global Catalog ועוד." },
+  { q: "מה קורה אם הפרש השעון בין Client ל-DC גדול מ-5 דקות?", opts: ["Kerberos נכשל", "LDAP נכשל", "DNS נכשל", "SMB נכשל"], ans: 0, exp: "Kerberos דורש סנכרון שעון מדויק. הפרש של יותר מ-5 דקות גורם ל-KRB_AP_ERR_SKEW ומונע אימות." },
+  { q: "מהו NTDS.dit?", opts: ["קובץ Log של Windows", "מסד נתוני AD", "תיקיית SYSVOL", "קובץ Policy"], ans: 1, exp: "NTDS.dit הוא קובץ מסד הנתונים הראשי של Active Directory. הוא מכיל את כל האובייקטים, Attributes, ו-Password Hashes." },
+  { q: "איזה תפקיד FSMO אחראי לשעון הדומיין?", opts: ["Schema Master", "RID Master", "PDC Emulator", "Infrastructure Master"], ans: 2, exp: "ה-PDC Emulator הוא השעון הראשי של הדומיין. כל DC מסתנכרן איתו. חשוב מאוד ל-Kerberos." },
+  { q: "מה ה-Best Practice למבנה קבוצות AD?", opts: ["AGDLP", "GLDA", "DLPGA", "PADGL"], ans: 0, exp: "AGDLP: Accounts → Global Groups → Domain Local Groups → Permissions. זה הסדר המומלץ להרשאות יעילות." },
+  { q: "Kerberoasting תוקף מה?", opts: ["TGT tickets", "חשבונות עם SPN", "כל חשבוני Domain Admin", "KRBTGT"], ans: 1, exp: "Kerberoasting מבקש Service Tickets לחשבונות עם SPN (Service Principal Name) ואז מנסה לפצח אותם Offline." },
+  { q: "מה ה-Tombstone Lifetime ברירת מחדל ב-Windows 2008+?", opts: ["30 יום", "60 יום", "180 יום", "90 יום"], ans: 2, exp: "ב-Windows Server 2008 ואילך, ברירת מחדל Tombstone Lifetime הוא 180 יום. בגרסאות ישנות יותר היה 60 יום." },
+  { q: "מה עושה Global Catalog?", opts: ["מנהל GPOs בלבד", "מכיל עותק חלקי של כל אובייקטי היער", "מנהל DNS בלבד", "משמש כ-DHCP Server"], ans: 1, exp: "Global Catalog מכיל עותק חלקי (Partial) של כל אובייקטי היער. נגיש בפורט 3268 ומשמש לחיפוש ביער ולאימות לוגון." },
+  { q: "מה ה-Port של Global Catalog (LDAP)?", opts: ["389", "636", "3268", "3269"], ans: 2, exp: "GC-LDAP עובד על Port 3268. GC-LDAPS (מוצפן) עובד על 3269. LDAP רגיל הוא 389, LDAPS הוא 636." },
+  { q: "Golden Ticket attack משתמש ב-Hash של?", opts: ["Administrator", "KRBTGT", "Schema Admin", "Guest"], ans: 1, exp: "Golden Ticket משתמש ב-Hash של חשבון KRBTGT — חשבון מיוחד של שירות Kerberos. עם Hash זה ניתן לזייף כל TGT." },
+  { q: "LAPS מה זה ועל מה הוא מגן?", opts: ["אנטי-וירוס מרכזי", "סיסמת Local Admin ייחודית לכל מחשב", "ניהול GPOs", "הגנה על LDAP"], ans: 1, exp: "LAPS (Local Administrator Password Solution) מנהל סיסמאות ייחודיות לחשבון Local Administrator על כל מחשב, ומונע Lateral Movement." },
+  { q: "Intra-Site Replication — כמה זמן לוקח השינוי להתפשט?", opts: ["עד 5 דקות", "כ-15 שניות", "3 שעות", "24 שעות"], ans: 1, exp: "Intra-Site Replication מהיר מאוד — כ-15 שניות. שינויים קריטיים (נעילות, סיסמאות) מטופלים מיידית כ-Urgent Replication." },
+  { q: "DCSync attack דורש הרשאות?", opts: ["Domain User רגיל", "Replication-Get-Changes-All", "Local Admin", "DNS Admin"], ans: 1, exp: "DCSync דורש את ה-Permission: 'Replicating Directory Changes All' על ה-Domain. בדרך כלל נמצא רק אצל Domain Admins." },
+  { q: "Protected Users Group מספק הגנה מפני?", opts: ["DNS attacks בלבד", "Pass-the-Hash ו-Pass-the-Ticket", "GPO bypass בלבד", "Replication attacks"], ans: 1, exp: "Protected Users Group מגביל שימוש ב-NTLM, DES, RC4, מונע delegation, ומקצר TGT lifetime. מגן מפני PtH ו-PtT." },
+  { q: "מה ה-Port של LDAPS?", opts: ["389", "445", "636", "3268"], ans: 2, exp: "LDAPS (LDAP over SSL/TLS) עובד על Port 636. LDAP רגיל הוא 389. מומלץ להשתמש ב-LDAPS לתקשורת מוצפנת." },
+  { q: "KCC — מה הוא עושה?", opts: ["מנהל DNS", "בונה טופולוגיית Replication", "מנהל Kerberos tickets", "מנהל DHCP leases"], ans: 1, exp: "Knowledge Consistency Checker (KCC) הוא תהליך אוטומטי שבונה ומעדכן את טופולוגיית הרפליקציה בין DCs, כולל Ring Topology בתוך Sites." },
+  { q: "gMSA (Group Managed Service Account) שונה מ-MSA ב?", opts: ["gMSA יכול לשמש כמה שרתים", "gMSA מהיר יותר", "gMSA לא צריך AD", "gMSA לא מתחדש"], ans: 0, exp: "gMSA מאפשר לאותו Service Account לרוץ על מספר שרתים (NLB, Web Farm). MSA רגיל מוגבל למחשב אחד בלבד." },
+  { q: "מה ה-Event ID לכניסה מוצלחת ב-Windows Security Log?", opts: ["4625", "4776", "4624", "4688"], ans: 2, exp: "Event ID 4624 = Successful Logon. 4625 = Failed Logon. 4776 = NTLM Auth. 4688 = Process Creation. חשוב לניטור אבטחה." },
+];
+
+let qIdx = 0;
+let score = 0;
+let answered = false;
+
+function initQuiz() {
+  const progress = document.getElementById('quiz-progress');
+  progress.innerHTML = questions.map((_, i) => `<div class="quiz-dot" id="dot-${i}"></div>`).join('');
+  document.getElementById(`dot-0`).classList.add('current');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = questions[qIdx];
+  document.getElementById('quiz-q-num').textContent = `שאלה ${qIdx + 1} מתוך ${questions.length}`;
+  document.getElementById('quiz-question').textContent = q.q;
+  document.getElementById('quiz-feedback').className = 'quiz-feedback';
+  document.getElementById('quiz-next-btn').style.display = 'none';
+  answered = false;
+  const opts = document.getElementById('quiz-options');
+  opts.innerHTML = q.opts.map((o, i) => `<div class="quiz-option" onclick="answerQ(${i})">${o}</div>`).join('');
+  document.getElementById('quiz-score').textContent = `ציון: ${score} / ${qIdx}`;
+}
+
+function answerQ(idx) {
+  if (answered) return;
+  answered = true;
+  const q = questions[qIdx];
+  const opts = document.querySelectorAll('.quiz-option');
+  opts.forEach(o => o.classList.add('disabled'));
+  opts[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
+  opts[q.ans].classList.add('correct');
+  if (idx === q.ans) score++;
+  const fb = document.getElementById('quiz-feedback');
+  fb.className = `quiz-feedback show ${idx === q.ans ? 'correct' : 'wrong'}`;
+  fb.innerHTML = `${idx === q.ans ? '✅' : '❌'} <strong>${idx === q.ans ? 'נכון!' : 'לא נכון.'}</strong> ${q.exp}`;
+  document.getElementById('quiz-score').textContent = `ציון: ${score} / ${qIdx + 1}`;
+  if (qIdx < questions.length - 1) {
+    document.getElementById('quiz-next-btn').style.display = 'block';
+  } else {
+    setTimeout(showResult, 1200);
+  }
+  const dot = document.getElementById(`dot-${qIdx}`);
+  dot.classList.remove('current');
+  dot.classList.add('done');
+  dot.style.background = idx === q.ans ? 'var(--green)' : 'var(--red)';
+}
+
+function nextQuestion() {
+  qIdx++;
+  if (qIdx < questions.length) {
+    document.getElementById(`dot-${qIdx}`).classList.add('current');
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const pct = Math.round((score / questions.length) * 100);
+  const grade = pct >= 90 ? '🏆 מצוין!' : pct >= 70 ? '👍 טוב מאוד!' : pct >= 50 ? '📚 ממוצע, המשך ללמוד' : '💪 יש עוד מה ללמוד';
+  document.getElementById('quiz-card').innerHTML = `
+    <div class="quiz-result">
+      <div class="result-score">${pct}%</div>
+      <div style="font-size:1.5rem; color:#fff; margin:1rem 0">${grade}</div>
+      <div style="color:var(--text2); font-size:1rem; margin-bottom:2rem">ענית נכון על ${score} מתוך ${questions.length} שאלות</div>
+      <button class="btn btn-primary" onclick="restartQuiz()">🔄 נסה שוב</button>
+    </div>
+  `;
+}
+
+function restartQuiz() {
+  qIdx = 0; score = 0; answered = false;
+  document.getElementById('quiz-next-btn').style.display = 'none';
+  document.querySelectorAll('.quiz-dot').forEach(d => { d.classList.remove('done','current'); d.style.background = ''; });
+  initQuiz();
+}
+
+initQuiz();
+
+// ===== MATCHING GAME =====
+const matchPairs = [
+  ["Kerberos", "פרוטוקול אימות מבוסס Tickets"],
+  ["GPO", "מדיניות קבוצתית"],
+  ["LDAP", "פרוטוקול גישה לספרייה"],
+  ["FSMO", "תפקידים ייחודיים ב-AD"],
+  ["SYSVOL", "תיקיית GPO משותפת"],
+  ["PDC Emulator", "שעון מאסטר של דומיין"],
+  ["BloodHound", "כלי מיפוי נתיבי תקיפה"],
+  ["LSASS", "תהליך אימות Windows"],
+];
+
+let matchSelected = null;
+let matchPairsFound = 0;
+let matchTries = 0;
+
+function initMatchGame() {
+  matchSelected = null;
+  matchPairsFound = 0;
+  matchTries = 0;
+  document.getElementById('match-pairs').textContent = `0 / ${matchPairs.length}`;
+  document.getElementById('match-tries').textContent = '0';
+  
+  const cards = [];
+  matchPairs.forEach((pair, i) => {
+    cards.push({ id: i, side: 0, text: pair[0], pairId: i });
+    cards.push({ id: i + matchPairs.length, side: 1, text: pair[1], pairId: i });
+  });
+  
+  // Shuffle
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  
+  const grid = document.getElementById('match-grid');
+  grid.innerHTML = cards.map((c, i) => 
+    `<div class="match-card" data-id="${c.id}" data-pair="${c.pairId}" onclick="selectMatchCard(this)">${c.text}</div>`
+  ).join('');
+}
+
+function selectMatchCard(el) {
+  if (el.classList.contains('matched')) return;
+  
+  if (matchSelected === null) {
+    matchSelected = el;
+    el.classList.add('selected');
+  } else if (matchSelected === el) {
+    el.classList.remove('selected');
+    matchSelected = null;
+  } else {
+    matchTries++;
+    document.getElementById('match-tries').textContent = matchTries;
+    
+    if (matchSelected.dataset.pair === el.dataset.pair && matchSelected !== el) {
+      matchSelected.classList.remove('selected');
+      matchSelected.classList.add('matched');
+      el.classList.add('matched');
+      matchPairsFound++;
+      document.getElementById('match-pairs').textContent = `${matchPairsFound} / ${matchPairs.length}`;
+      matchSelected = null;
+      if (matchPairsFound === matchPairs.length) {
+        setTimeout(() => alert(`🎉 כל הכבוד! סיימת ב-${matchTries} נסיונות!`), 300);
+      }
+    } else {
+      el.classList.add('wrong-flash');
+      matchSelected.classList.add('wrong-flash');
+      const prev = matchSelected;
+      setTimeout(() => {
+        el.classList.remove('wrong-flash', 'selected');
+        prev.classList.remove('wrong-flash', 'selected');
+      }, 700);
+      matchSelected = null;
+    }
+  }
+}
+
+initMatchGame();
+
+// Smooth scroll for nav
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const el = document.querySelector(a.getAttribute('href'));
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+</script>
+</body>
+</html>
