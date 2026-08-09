@@ -1,6 +1,9 @@
 body.admin {
   min-height: 100vh;
   padding-bottom: 3em;
+  background:
+    radial-gradient(ellipse 700px 400px at 100% -10%, var(--primary-soft), transparent),
+    var(--bg);
 }
 
 .admin-header {
@@ -14,7 +17,7 @@ body.admin {
   top: 0;
   z-index: 10;
 }
-.admin-header h1 { font-size: 1.2rem; margin: 0; }
+.admin-header h1 { font-family: var(--font-heading); font-size: 1.25rem; margin: 0; font-weight: 700; }
 
 .tabs {
   display: flex;
@@ -48,10 +51,10 @@ body.admin {
 .login-wrap {
   max-width: 380px;
   margin: 15vh auto;
-  padding: 2em;
+  padding: 2.2em;
   text-align: center;
 }
-.login-wrap h1 { margin-top: 0; }
+.login-wrap h1 { margin-top: 0; font-family: var(--font-heading); font-weight: 700; }
 
 .days-picker { display: flex; gap: 0.3em; flex-wrap: wrap; }
 .days-picker label {

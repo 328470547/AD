@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>לוח ניהול - גבאי</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Frank+Ruhl+Libre:wght@500;700;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/admin.css">
 </head>
@@ -11,18 +14,14 @@
 
   <section id="loginWrap" class="login-wrap card">
     <h1 id="loginTitle">כניסת גבאי</h1>
-    <p id="loginSubtitle" style="color:var(--text2)"></p>
+    <p id="loginSubtitle" style="color:var(--text2)">התחברות עם המייל והסיסמה שהוגדרו עבורך</p>
     <div class="field">
-      <label for="loginUser">שם משתמש</label>
-      <input id="loginUser" autocomplete="username">
+      <label for="loginUser">אימייל</label>
+      <input id="loginUser" type="email" autocomplete="username">
     </div>
     <div class="field">
       <label for="loginPass">סיסמה</label>
       <input id="loginPass" type="password" autocomplete="current-password">
-    </div>
-    <div class="field" id="loginPass2Wrap" style="display:none">
-      <label for="loginPass2">אימות סיסמה</label>
-      <input id="loginPass2" type="password" autocomplete="new-password">
     </div>
     <button id="loginBtn" style="width:100%">כניסה</button>
     <p id="loginError" style="color:#ff8090; min-height:1.4em; margin-top:0.6em"></p>
@@ -156,22 +155,21 @@
     <!-- BACKUP -->
     <section class="tab-panel" id="tab-backup">
       <div class="form-card card">
-        <h3>גיבוי ושחזור</h3>
-        <p style="color:var(--text2)">כל הנתונים שמורים כרגע בדפדפן הזה בלבד. מומלץ להוריד גיבוי מדי פעם.</p>
+        <h3>גיבוי</h3>
+        <p style="color:var(--text2)">כל הנתונים שמורים בענן (Firebase) ומגובים שם אוטומטית. אפשר גם להוריד גיבוי מקומי בכל רגע.</p>
         <button id="exportBtn">הורדת גיבוי</button>
-        <div class="field" style="margin-top:1em">
-          <label>שחזור מקובץ גיבוי</label>
-          <input id="importFile" type="file" accept="application/json">
-        </div>
       </div>
     </section>
+
+    <div class="credit-bar admin-credit">
+      <span class="credit">האתר נבנה ע״י שם + פרטי קשר (למי שמעוניין שאבנה גם עבורו)</span>
+    </div>
   </div>
 
   <div class="toast" id="toast"></div>
 
   <script src="js/utils.js"></script>
-  <script src="js/store.js"></script>
   <script src="js/prayer-times.js"></script>
-  <script src="js/admin.js"></script>
+  <script type="module" src="js/admin.js"></script>
 </body>
 </html>

@@ -1,214 +1,183 @@
 /*
- * Data layer for the synagogue system.
+ * Data layer for the synagogue system, backed by Firebase (Firestore +
+ * Authentication + Storage). This is the real, always-on backend: the
+ * gabbai's phone and the TV display both read/write the same cloud
+ * document, live, over `onSnapshot`.
  *
- * MVP implementation: everything is kept in the browser's localStorage,
- * on a single JSON document that mirrors the Firestore shape the project
- * will eventually move to:
+ * Firestore layout:
+ *   synagogues/{SYNAGOGUE_ID}                    -> { settings: {...} }
+ *   synagogues/{SYNAGOGUE_ID}/prayers/{id}
+ *   synagogues/{SYNAGOGUE_ID}/lessons/{id}
+ *   synagogues/{SYNAGOGUE_ID}/announcements/{id}
+ *   synagogues/{SYNAGOGUE_ID}/halacha/{id}
  *
- *   synagogues/{synagogueId} = { settings, prayers, lessons, announcements, halacha, auth }
- *
- * IMPORTANT LIMITATION: localStorage is per-browser. The admin panel (gabbai's
- * phone) and the display screen (the TV's browser) will NOT see each other's
- * changes unless they share the same browser profile. This is fine for
- * building/testing the first version on one device. To make the gabbai's
- * phone update the TV in real time, this module needs to be swapped for a
- * real backend (Firebase Firestore is the planned one) - see README.md.
- *
- * Every other file talks to the data only through the `Store` object below,
- * so swapping the implementation later means rewriting this file only.
+ * Every UI file (display.js / admin.js) talks to the data only through the
+ * exported `Store` object below - see README.md for the security rules
+ * that keep reads public (for the TV screen) and writes gated to signed-in
+ * gabbaim (Firebase Authentication, Email/Password).
  */
 
-const Store = (() => {
-  const STORAGE_KEY = 'synagogue_v1';
-  const CHANNEL_NAME = 'synagogue_sync_v1';
+import { firebaseConfig, SYNAGOGUE_ID } from './firebase-config.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+import {
+  initializeFirestore,
+  persistentLocalCache,
+  persistentSingleTabManager,
+  doc,
+  collection,
+  onSnapshot,
+  setDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+import {
+  getStorage,
+  ref as storageRef,
+  uploadBytes,
+  getDownloadURL,
+} from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 
-  const DEFAULT_DATA = {
-    settings: {
-      name: 'בית הכנסת',
-      city: 'ירושלים',
-      latitude: 31.7683,
-      longitude: 35.2137,
-      tzid: 'Asia/Jerusalem',
-      nusach: 'ashkenaz',
-      candleLightingMinutes: 20,
-      tzeitMethod: 'tzeit7083deg',
-      showRabbeinuTam: false,
-      fontScale: 1,
-      primaryColor: '#2f6fed',
-      logoUrl: '',
-    },
-    prayers: [],
-    lessons: [],
-    announcements: [],
-    halacha: [],
-    auth: null, // { salt, hash } - set on first admin login
-  };
+const DEFAULT_SETTINGS = {
+  name: 'בית הכנסת',
+  city: 'ירושלים',
+  latitude: 31.7683,
+  longitude: 35.2137,
+  tzid: 'Asia/Jerusalem',
+  nusach: 'ashkenaz',
+  candleLightingMinutes: 20,
+  tzeitMethod: 'tzeit7083deg',
+  showRabbeinuTam: false,
+  fontScale: 1,
+  primaryColor: '#2f6fed',
+  logoUrl: '',
+};
 
-  let cache = null;
-  let channel = null;
-  try {
-    channel = new BroadcastChannel(CHANNEL_NAME);
-  } catch (e) {
-    channel = null; // Safari private mode / very old browsers
-  }
-  const listeners = new Set();
+const app = initializeApp(firebaseConfig);
+const db = initializeFirestore(app, {
+  localCache: persistentLocalCache({ tabManager: persistentSingleTabManager() }),
+});
+const auth = getAuth(app);
+const storage = getStorage(app);
 
-  function load() {
-    if (cache) return cache;
+const synRef = doc(db, 'synagogues', SYNAGOGUE_ID);
+const listRef = (name) => collection(db, 'synagogues', SYNAGOGUE_ID, name);
+
+let settingsCache = { ...DEFAULT_SETTINGS };
+let listsCache = { prayers: [], lessons: [], announcements: [], halacha: [] };
+const changeListeners = new Set();
+const authListeners = new Set();
+
+function notifyChange() {
+  for (const cb of changeListeners) {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      cache = raw ? deepMerge(DEFAULT_DATA, JSON.parse(raw)) : structuredClone(DEFAULT_DATA);
+      cb();
     } catch (e) {
-      console.error('Store: failed to read localStorage, starting fresh', e);
-      cache = structuredClone(DEFAULT_DATA);
-    }
-    return cache;
-  }
-
-  function deepMerge(base, override) {
-    const out = structuredClone(base);
-    for (const key of Object.keys(out)) {
-      if (override && override[key] !== undefined) {
-        if (
-          typeof out[key] === 'object' &&
-          out[key] !== null &&
-          !Array.isArray(out[key]) &&
-          typeof override[key] === 'object'
-        ) {
-          out[key] = { ...out[key], ...override[key] };
-        } else {
-          out[key] = override[key];
-        }
-      }
-    }
-    return out;
-  }
-
-  function persist(notifySelf = true) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(cache));
-    if (channel) channel.postMessage({ type: 'change', at: Date.now() });
-    if (notifySelf) notifyListeners();
-  }
-
-  function notifyListeners() {
-    for (const cb of listeners) {
-      try {
-        cb(cache);
-      } catch (e) {
-        console.error('Store listener error', e);
-      }
+      console.error('Store listener error', e);
     }
   }
+}
 
-  // Cross-tab / cross-window updates (same browser only, see limitation above)
-  if (channel) {
-    channel.onmessage = (ev) => {
-      if (ev.data && ev.data.type === 'change') {
-        cache = null;
-        load();
-        notifyListeners();
-      }
-    };
-  }
-  window.addEventListener('storage', (ev) => {
-    if (ev.key === STORAGE_KEY) {
-      cache = null;
-      load();
-      notifyListeners();
-    }
-  });
+onSnapshot(
+  synRef,
+  (snap) => {
+    settingsCache = { ...DEFAULT_SETTINGS, ...(snap.data()?.settings || {}) };
+    notifyChange();
+  },
+  (err) => console.error('Store: settings snapshot error', err)
+);
 
-  function onChange(cb) {
-    listeners.add(cb);
-    return () => listeners.delete(cb);
-  }
+for (const name of Object.keys(listsCache)) {
+  onSnapshot(
+    listRef(name),
+    (qs) => {
+      listsCache[name] = qs.docs.map((d) => ({ id: d.id, ...d.data() }));
+      notifyChange();
+    },
+    (err) => console.error(`Store: ${name} snapshot error`, err)
+  );
+}
 
-  // ---- Settings ----
-  function getSettings() {
-    return structuredClone(load().settings);
-  }
-  function saveSettings(partial) {
-    load();
-    cache.settings = { ...cache.settings, ...partial };
-    persist();
-    return getSettings();
-  }
+onAuthStateChanged(auth, (user) => {
+  for (const cb of authListeners) cb(user);
+});
 
-  // ---- Generic list helpers (prayers / lessons / announcements / halacha) ----
-  function getList(name) {
-    return structuredClone(load()[name] || []);
-  }
-  function addItem(name, item) {
-    load();
-    const record = { ...item, id: item.id || uid(), createdAt: Date.now() };
-    cache[name].push(record);
-    persist();
-    return record;
-  }
-  function updateItem(name, id, patch) {
-    load();
-    const idx = cache[name].findIndex((it) => it.id === id);
-    if (idx === -1) return null;
-    cache[name][idx] = { ...cache[name][idx], ...patch };
-    persist();
-    return cache[name][idx];
-  }
-  function deleteItem(name, id) {
-    load();
-    cache[name] = cache[name].filter((it) => it.id !== id);
-    persist();
-  }
-  function reorderList(name, orderedIds) {
-    load();
-    const byId = new Map(cache[name].map((it) => [it.id, it]));
-    cache[name] = orderedIds.map((id) => byId.get(id)).filter(Boolean);
-    persist();
-  }
+// ---- Settings ----
+function getSettings() {
+  return { ...settingsCache };
+}
+function saveSettings(patch) {
+  return setDoc(synRef, { settings: { ...settingsCache, ...patch } }, { merge: true });
+}
 
-  // ---- Announcements: drop expired ones automatically ----
-  function getActiveAnnouncements() {
-    const now = Date.now();
-    const all = getList('announcements');
-    return all.filter((a) => !a.expiresAt || a.expiresAt > now);
-  }
+// ---- Generic lists (prayers / lessons / announcements / halacha) ----
+function getList(name) {
+  return [...(listsCache[name] || [])];
+}
+function addItem(name, item) {
+  return addDoc(listRef(name), { ...item, createdAt: Date.now() });
+}
+function updateItem(name, id, patch) {
+  return updateDoc(doc(db, 'synagogues', SYNAGOGUE_ID, name, id), patch);
+}
+function deleteItem(name, id) {
+  return deleteDoc(doc(db, 'synagogues', SYNAGOGUE_ID, name, id));
+}
 
-  // ---- Auth (client-side gate for the admin panel; NOT real security) ----
-  function hasAuth() {
-    return !!load().auth;
-  }
-  function setAuth(salt, hash) {
-    load();
-    cache.auth = { salt, hash };
-    persist();
-  }
-  function getAuth() {
-    return load().auth ? structuredClone(load().auth) : null;
-  }
+function getActiveAnnouncements() {
+  const now = Date.now();
+  return getList('announcements').filter((a) => !a.expiresAt || a.expiresAt > now);
+}
 
-  // ---- Backup / restore ----
-  function exportJSON() {
-    return JSON.stringify(load(), null, 2);
-  }
-  function importJSON(json) {
-    const parsed = JSON.parse(json);
-    cache = deepMerge(DEFAULT_DATA, parsed);
-    persist();
-  }
+// ---- Auth (real Firebase Authentication - gabbai users are created from
+// the Firebase console, see README.md) ----
+function signIn(email, password) {
+  return signInWithEmailAndPassword(auth, email, password);
+}
+function signOutUser() {
+  return signOut(auth);
+}
+function onAuthChange(cb) {
+  authListeners.add(cb);
+  cb(auth.currentUser);
+  return () => authListeners.delete(cb);
+}
+function getCurrentUser() {
+  return auth.currentUser;
+}
 
-  return {
-    getSettings,
-    saveSettings,
-    getList,
-    addItem,
-    updateItem,
-    deleteItem,
-    reorderList,
-    getActiveAnnouncements,
-    hasAuth,
-    setAuth,
-    getAuth,
-    exportJSON,
-    importJSON,
-    onChange,
-  };
-})();
+// ---- Images (logo / announcement photos) go to Firebase Storage; only
+// the resulting https URL is stored in Firestore. ----
+async function uploadImage(file, folder) {
+  const path = `${folder}/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+  const ref = storageRef(storage, path);
+  await uploadBytes(ref, file);
+  return getDownloadURL(ref);
+}
+
+function onChange(cb) {
+  changeListeners.add(cb);
+  return () => changeListeners.delete(cb);
+}
+
+export const Store = {
+  getSettings,
+  saveSettings,
+  getList,
+  addItem,
+  updateItem,
+  deleteItem,
+  getActiveAnnouncements,
+  onChange,
+  signIn,
+  signOutUser,
+  onAuthChange,
+  getCurrentUser,
+  uploadImage,
+};

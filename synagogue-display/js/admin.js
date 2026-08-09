@@ -1,5 +1,6 @@
+import { Store } from './store.js';
+
 (() => {
-  const SESSION_KEY = 'synagogue_admin_authed';
   let editingPrayerId = null;
   let editingLessonId = null;
   let editingAnnouncementId = null;
@@ -13,46 +14,32 @@
   }
 
   function showLogin() {
-    const hasAuth = Store.hasAuth();
-    document.getElementById('loginTitle').textContent = hasAuth ? 'כניסת גבאי' : 'יצירת סיסמת גבאי';
-    document.getElementById('loginSubtitle').textContent = hasAuth
-      ? ''
-      : 'זו הכניסה הראשונה למערכת - צרו סיסמה לניהול בית הכנסת';
-    document.getElementById('loginPass2Wrap').style.display = hasAuth ? 'none' : '';
-    document.getElementById('loginUser').style.display = hasAuth ? 'none' : '';
-    document.getElementById('loginBtn').textContent = hasAuth ? 'כניסה' : 'יצירת סיסמה וכניסה';
     document.getElementById('loginWrap').style.display = '';
     document.getElementById('app').style.display = 'none';
   }
 
+  const AUTH_ERROR_MESSAGES = {
+    'auth/invalid-credential': 'אימייל או סיסמה שגויים',
+    'auth/wrong-password': 'סיסמה שגויה',
+    'auth/user-not-found': 'לא נמצא משתמש עם אימייל זה',
+    'auth/invalid-email': 'כתובת אימייל לא תקינה',
+    'auth/too-many-requests': 'יותר מדי ניסיונות - נסה שוב בעוד כמה דקות',
+    'auth/network-request-failed': 'בעיית תקשורת - בדוק את החיבור לאינטרנט',
+  };
+
   async function handleLogin() {
     const errorEl = document.getElementById('loginError');
     errorEl.textContent = '';
+    const email = document.getElementById('loginUser').value.trim();
     const pass = document.getElementById('loginPass').value;
-    if (!Store.hasAuth()) {
-      const pass2 = document.getElementById('loginPass2').value;
-      if (pass.length < 4) {
-        errorEl.textContent = 'הסיסמה חייבת להכיל לפחות 4 תווים';
-        return;
-      }
-      if (pass !== pass2) {
-        errorEl.textContent = 'הסיסמאות אינן תואמות';
-        return;
-      }
-      const salt = uid();
-      const hash = await sha256Hex(salt + pass);
-      Store.setAuth(salt, hash);
-      sessionStorage.setItem(SESSION_KEY, '1');
-      showApp();
+    if (!email || !pass) {
+      errorEl.textContent = 'נא להזין אימייל וסיסמה';
       return;
     }
-    const auth = Store.getAuth();
-    const hash = await sha256Hex(auth.salt + pass);
-    if (hash === auth.hash) {
-      sessionStorage.setItem(SESSION_KEY, '1');
-      showApp();
-    } else {
-      errorEl.textContent = 'סיסמה שגויה';
+    try {
+      await Store.signIn(email, pass);
+    } catch (e) {
+      errorEl.textContent = AUTH_ERROR_MESSAGES[e.code] || 'שגיאה בהתחברות, נסה שוב';
     }
   }
 
@@ -61,8 +48,12 @@
     if (e.key === 'Enter') handleLogin();
   });
   document.getElementById('logoutBtn').addEventListener('click', () => {
-    sessionStorage.removeItem(SESSION_KEY);
-    showLogin();
+    Store.signOutUser();
+  });
+
+  Store.onAuthChange((user) => {
+    if (user) showApp();
+    else showLogin();
   });
 
   // ---------------- Tabs ----------------
@@ -137,18 +128,21 @@
     return item;
   }
 
-  document.getElementById('pAddBtn').addEventListener('click', () => {
+  document.getElementById('pAddBtn').addEventListener('click', async () => {
     const item = collectPrayerForm();
     if (!item) return;
-    if (editingPrayerId) {
-      Store.updateItem('prayers', editingPrayerId, item);
-      toast('התפילה עודכנה');
-    } else {
-      Store.addItem('prayers', item);
-      toast('התפילה נוספה');
+    try {
+      if (editingPrayerId) {
+        await Store.updateItem('prayers', editingPrayerId, item);
+        toast('התפילה עודכנה');
+      } else {
+        await Store.addItem('prayers', item);
+        toast('התפילה נוספה');
+      }
+      resetPrayerForm();
+    } catch (e) {
+      toast('שגיאה בשמירה: ' + (e.message || e));
     }
-    resetPrayerForm();
-    renderPrayersList();
   });
 
   function describePrayer(p) {
@@ -180,9 +174,8 @@
       el.appendChild(card);
     }
     el.querySelectorAll('[data-del]').forEach((b) =>
-      b.addEventListener('click', () => {
-        Store.deleteItem('prayers', b.dataset.del);
-        renderPrayersList();
+      b.addEventListener('click', async () => {
+        await Store.deleteItem('prayers', b.dataset.del);
         toast('נמחק');
       })
     );
@@ -221,7 +214,7 @@
     document.getElementById('lDate').value = '';
   }
 
-  document.getElementById('lAddBtn').addEventListener('click', () => {
+  document.getElementById('lAddBtn').addEventListener('click', async () => {
     const title = document.getElementById('lTitle').value.trim();
     if (!title) {
       toast('נא להזין שם שיעור');
@@ -236,15 +229,18 @@
       dayOfWeek: recurring ? document.getElementById('lDayOfWeek').value : null,
       date: recurring ? null : document.getElementById('lDate').value,
     };
-    if (editingLessonId) {
-      Store.updateItem('lessons', editingLessonId, item);
-      toast('השיעור עודכן');
-    } else {
-      Store.addItem('lessons', item);
-      toast('השיעור נוסף');
+    try {
+      if (editingLessonId) {
+        await Store.updateItem('lessons', editingLessonId, item);
+        toast('השיעור עודכן');
+      } else {
+        await Store.addItem('lessons', item);
+        toast('השיעור נוסף');
+      }
+      resetLessonForm();
+    } catch (e) {
+      toast('שגיאה בשמירה: ' + (e.message || e));
     }
-    resetLessonForm();
-    renderLessonsList();
   });
 
   function renderLessonsList() {
@@ -269,9 +265,8 @@
       el.appendChild(card);
     }
     el.querySelectorAll('[data-del]').forEach((b) =>
-      b.addEventListener('click', () => {
-        Store.deleteItem('lessons', b.dataset.del);
-        renderLessonsList();
+      b.addEventListener('click', async () => {
+        await Store.deleteItem('lessons', b.dataset.del);
         toast('נמחק');
       })
     );
@@ -293,44 +288,38 @@
   }
 
   // ---------------- Announcements ----------------
-  function readFileAsDataURL(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
   document.getElementById('aAddBtn').addEventListener('click', async () => {
     const text = document.getElementById('aText').value.trim();
     if (!text) {
       toast('נא להזין תוכן הודעה');
       return;
     }
-    const hours = Number(document.getElementById('aExpireHours').value) || 0;
-    const item = { text, expiresAt: hours > 0 ? Date.now() + hours * 3600000 : null, imageUrl: '' };
-    const file = document.getElementById('aImage').files[0];
-    if (file) {
-      try {
-        item.imageUrl = await readFileAsDataURL(file);
-      } catch {
-        toast('שגיאה בקריאת התמונה');
+    const btn = document.getElementById('aAddBtn');
+    btn.disabled = true;
+    try {
+      const hours = Number(document.getElementById('aExpireHours').value) || 0;
+      const item = { text, expiresAt: hours > 0 ? Date.now() + hours * 3600000 : null };
+      const file = document.getElementById('aImage').files[0];
+      if (file) {
+        item.imageUrl = await Store.uploadImage(file, 'announcements');
       }
+      if (editingAnnouncementId) {
+        await Store.updateItem('announcements', editingAnnouncementId, item);
+        toast('ההודעה עודכנה');
+      } else {
+        await Store.addItem('announcements', item);
+        toast('ההודעה נוספה');
+      }
+      editingAnnouncementId = null;
+      document.getElementById('aAddBtn').textContent = 'הוספה';
+      document.getElementById('aText').value = '';
+      document.getElementById('aExpireHours').value = '';
+      document.getElementById('aImage').value = '';
+    } catch (e) {
+      toast('שגיאה בשמירה: ' + (e.message || e));
+    } finally {
+      btn.disabled = false;
     }
-    if (editingAnnouncementId) {
-      Store.updateItem('announcements', editingAnnouncementId, item);
-      toast('ההודעה עודכנה');
-    } else {
-      Store.addItem('announcements', item);
-      toast('ההודעה נוספה');
-    }
-    editingAnnouncementId = null;
-    document.getElementById('aAddBtn').textContent = 'הוספה';
-    document.getElementById('aText').value = '';
-    document.getElementById('aExpireHours').value = '';
-    document.getElementById('aImage').value = '';
-    renderAnnouncementsList();
   });
 
   function renderAnnouncementsList() {
@@ -352,9 +341,8 @@
       el.appendChild(card);
     }
     el.querySelectorAll('[data-del]').forEach((b) =>
-      b.addEventListener('click', () => {
-        Store.deleteItem('announcements', b.dataset.del);
-        renderAnnouncementsList();
+      b.addEventListener('click', async () => {
+        await Store.deleteItem('announcements', b.dataset.del);
         toast('נמחק');
       })
     );
@@ -377,54 +365,51 @@
   }
 
   document.getElementById('sSaveBtn').addEventListener('click', async () => {
-    const patch = {
-      name: document.getElementById('sName').value.trim() || 'בית הכנסת',
-      city: document.getElementById('sCity').value.trim(),
-      latitude: Number(document.getElementById('sLat').value),
-      longitude: Number(document.getElementById('sLon').value),
-      tzid: document.getElementById('sTzid').value.trim() || 'Asia/Jerusalem',
-      nusach: document.getElementById('sNusach').value,
-      candleLightingMinutes: Number(document.getElementById('sCandle').value) || 0,
-      tzeitMethod: document.getElementById('sTzeit').value,
-      showRabbeinuTam: document.getElementById('sRabbeinuTam').checked,
-      fontScale: Number(document.getElementById('sFontScale').value) || 1,
-      primaryColor: document.getElementById('sColor').value,
-    };
-    const file = document.getElementById('sLogo').files[0];
-    if (file) {
-      try {
-        patch.logoUrl = await readFileAsDataURL(file);
-      } catch {
-        toast('שגיאה בקריאת הלוגו');
+    const btn = document.getElementById('sSaveBtn');
+    btn.disabled = true;
+    try {
+      const patch = {
+        name: document.getElementById('sName').value.trim() || 'בית הכנסת',
+        city: document.getElementById('sCity').value.trim(),
+        latitude: Number(document.getElementById('sLat').value),
+        longitude: Number(document.getElementById('sLon').value),
+        tzid: document.getElementById('sTzid').value.trim() || 'Asia/Jerusalem',
+        nusach: document.getElementById('sNusach').value,
+        candleLightingMinutes: Number(document.getElementById('sCandle').value) || 0,
+        tzeitMethod: document.getElementById('sTzeit').value,
+        showRabbeinuTam: document.getElementById('sRabbeinuTam').checked,
+        fontScale: Number(document.getElementById('sFontScale').value) || 1,
+        primaryColor: document.getElementById('sColor').value,
+      };
+      const file = document.getElementById('sLogo').files[0];
+      if (file) {
+        patch.logoUrl = await Store.uploadImage(file, 'logos');
       }
+      await Store.saveSettings(patch);
+      document.getElementById('appSynName').textContent = patch.name;
+      toast('ההגדרות נשמרו');
+    } catch (e) {
+      toast('שגיאה בשמירה: ' + (e.message || e));
+    } finally {
+      btn.disabled = false;
     }
-    Store.saveSettings(patch);
-    document.getElementById('appSynName').textContent = patch.name;
-    toast('ההגדרות נשמרו');
   });
 
-  // ---------------- Backup ----------------
+  // ---------------- Backup (local download only - source of truth lives in Firestore) ----------------
   document.getElementById('exportBtn').addEventListener('click', () => {
-    const blob = new Blob([Store.exportJSON()], { type: 'application/json' });
+    const data = {
+      settings: Store.getSettings(),
+      prayers: Store.getList('prayers'),
+      lessons: Store.getList('lessons'),
+      announcements: Store.getList('announcements'),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `synagogue-backup-${dateToISODate(new Date())}.json`;
     a.click();
     URL.revokeObjectURL(url);
-  });
-
-  document.getElementById('importFile').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      Store.importJSON(text);
-      toast('השחזור הושלם');
-      renderAll();
-    } catch {
-      toast('קובץ גיבוי לא תקין');
-    }
   });
 
   // ---------------- Init ----------------
@@ -439,9 +424,7 @@
   document.getElementById('pTimeType').dispatchEvent(new Event('change'));
   document.getElementById('lRecurring').dispatchEvent(new Event('change'));
 
-  if (sessionStorage.getItem(SESSION_KEY) === '1' && Store.hasAuth()) {
-    showApp();
-  } else {
-    showLogin();
-  }
+  Store.onChange(() => {
+    if (document.getElementById('app').style.display !== 'none') renderAll();
+  });
 })();

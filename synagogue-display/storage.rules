@@ -1,0 +1,14 @@
+rules_version = '2';
+
+// Logo and announcement photos: public read (shown on the TV), writes only
+// from a signed-in gabbai, capped at 5MB and images only.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null
+                    && request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

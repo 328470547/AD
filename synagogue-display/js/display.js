@@ -1,3 +1,5 @@
+import { Store } from './store.js';
+
 (() => {
   let settings = Store.getSettings();
   let today = { dayInfo: null, hebrewDate: null, zmanim: {}, resolvedPrayers: [] };
@@ -182,7 +184,7 @@
   }
 
   function refreshTickerQueue() {
-    const anns = Store.getActiveAnnouncements().map((a) => ({ title: 'הודעה', text: a.text }));
+    const anns = Store.getActiveAnnouncements().map((a) => ({ title: 'הודעה', text: a.text, imageUrl: a.imageUrl }));
     tickerQueue = anns;
     tickerIdx = 0;
     const wrap = document.getElementById('tickerWrap');
@@ -194,7 +196,8 @@
     const el = document.getElementById('tickerItem');
     if (!tickerQueue.length) return;
     const item = tickerQueue[tickerIdx % tickerQueue.length];
-    el.innerHTML = `<span class="title">${escapeHtml(item.title)}</span>${escapeHtml(item.text)}`;
+    const img = item.imageUrl ? `<img src="${escapeHtml(item.imageUrl)}" alt="">` : '';
+    el.innerHTML = `${img}<span class="title">${escapeHtml(item.title)}</span>${escapeHtml(item.text)}`;
     tickerIdx++;
   }
 
