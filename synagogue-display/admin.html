@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לוח ניהול - גבאי</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin">
+
+  <section id="loginWrap" class="login-wrap card">
+    <h1 id="loginTitle">כניסת גבאי</h1>
+    <p id="loginSubtitle" style="color:var(--text2)"></p>
+    <div class="field">
+      <label for="loginUser">שם משתמש</label>
+      <input id="loginUser" autocomplete="username">
+    </div>
+    <div class="field">
+      <label for="loginPass">סיסמה</label>
+      <input id="loginPass" type="password" autocomplete="current-password">
+    </div>
+    <div class="field" id="loginPass2Wrap" style="display:none">
+      <label for="loginPass2">אימות סיסמה</label>
+      <input id="loginPass2" type="password" autocomplete="new-password">
+    </div>
+    <button id="loginBtn" style="width:100%">כניסה</button>
+    <p id="loginError" style="color:#ff8090; min-height:1.4em; margin-top:0.6em"></p>
+  </section>
+
+  <div id="app" style="display:none">
+    <header class="admin-header">
+      <h1>לוח ניהול - <span id="appSynName"></span></h1>
+      <button class="secondary" id="logoutBtn">התנתקות</button>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="prayers">זמני תפילות</button>
+      <button class="tab-btn" data-tab="lessons">שיעורים</button>
+      <button class="tab-btn" data-tab="announcements">הודעות</button>
+      <button class="tab-btn" data-tab="settings">הגדרות</button>
+      <button class="tab-btn" data-tab="backup">גיבוי</button>
+    </nav>
+
+    <!-- PRAYERS -->
+    <section class="tab-panel active" id="tab-prayers">
+      <div class="form-card card">
+        <h3>הוספת תפילה</h3>
+        <div class="row">
+          <div class="field"><label>שם התפילה</label><input id="pName" placeholder="לדוגמה: מנחה"></div>
+          <div class="field"><label>סוג שעה</label>
+            <select id="pTimeType"><option value="fixed">שעה קבועה</option><option value="relative">זמן יחסי</option></select>
+          </div>
+        </div>
+        <div class="row" id="pFixedRow">
+          <div class="field"><label>שעה</label><input id="pFixedTime" type="time"></div>
+        </div>
+        <div class="row" id="pRelativeRow" style="display:none">
+          <div class="field"><label>ביחס ל</label><select id="pAnchor"></select></div>
+          <div class="field"><label>לפני / אחרי</label><select id="pBeforeAfter"><option value="before">לפני</option><option value="after">אחרי</option></select></div>
+          <div class="field"><label>דקות</label><input id="pOffsetMin" type="number" min="0" value="0"></div>
+        </div>
+        <div class="field">
+          <label>ימים (ריק = כל יום)</label>
+          <div class="days-picker" id="pDays"></div>
+        </div>
+        <div class="field"><label>הערה</label><input id="pNote" placeholder="לדוגמה: יום חול בלבד"></div>
+        <button id="pAddBtn">הוספה</button>
+      </div>
+      <div id="prayersList"></div>
+    </section>
+
+    <!-- LESSONS -->
+    <section class="tab-panel" id="tab-lessons">
+      <div class="form-card card">
+        <h3>הוספת שיעור</h3>
+        <div class="row">
+          <div class="field"><label>שם השיעור</label><input id="lTitle"></div>
+          <div class="field"><label>שם הרב</label><input id="lRabbi"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>חוזר כל שבוע?</label>
+            <select id="lRecurring"><option value="1">כן</option><option value="0">לא, חד פעמי</option></select>
+          </div>
+          <div class="field" id="lDayWrap"><label>יום בשבוע</label>
+            <select id="lDayOfWeek">
+              <option value="sun">ראשון</option><option value="mon">שני</option><option value="tue">שלישי</option>
+              <option value="wed">רביעי</option><option value="thu">חמישי</option><option value="fri">שישי</option><option value="sat">שבת</option>
+            </select>
+          </div>
+          <div class="field" id="lDateWrap" style="display:none"><label>תאריך</label><input id="lDate" type="date"></div>
+          <div class="field"><label>שעה</label><input id="lTime" type="time"></div>
+        </div>
+        <button id="lAddBtn">הוספה</button>
+      </div>
+      <div id="lessonsList"></div>
+    </section>
+
+    <!-- ANNOUNCEMENTS -->
+    <section class="tab-panel" id="tab-announcements">
+      <div class="form-card card">
+        <h3>הוספת הודעה</h3>
+        <div class="field"><label>תוכן ההודעה</label><textarea id="aText" rows="3" placeholder="לדוגמה: אזכרה תתקיים ביום ה' אחרי מנחה"></textarea></div>
+        <div class="row">
+          <div class="field"><label>תמונה (אופציונלי)</label><input id="aImage" type="file" accept="image/*"></div>
+          <div class="field"><label>ההודעה תיעלם אחרי (שעות, ריק = לא נעלמת)</label><input id="aExpireHours" type="number" min="1"></div>
+        </div>
+        <button id="aAddBtn">הוספה</button>
+      </div>
+      <div id="announcementsList"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="tab-panel" id="tab-settings">
+      <div class="form-card card">
+        <h3>פרטי בית הכנסת</h3>
+        <div class="row">
+          <div class="field"><label>שם בית הכנסת</label><input id="sName"></div>
+          <div class="field"><label>עיר</label><input id="sCity"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>קו רוחב (latitude)</label><input id="sLat" type="number" step="0.0001"></div>
+          <div class="field"><label>קו אורך (longitude)</label><input id="sLon" type="number" step="0.0001"></div>
+          <div class="field"><label>אזור זמן (tzid)</label><input id="sTzid" placeholder="Asia/Jerusalem"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>נוסח</label>
+            <select id="sNusach">
+              <option value="ashkenaz">אשכנז</option>
+              <option value="sefarad">ספרד</option>
+              <option value="edot-mizrach">עדות המזרח</option>
+              <option value="sefarad-ashkenaz">ספרדי-אשכנזי</option>
+            </select>
+          </div>
+          <div class="field"><label>הדלקת נרות (דקות לפני שקיעה)</label><input id="sCandle" type="number" min="0"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>שיטת צאת הכוכבים</label>
+            <select id="sTzeit">
+              <option value="tzeit7083deg">7.083 מעלות (מנהג מקובל)</option>
+              <option value="tzeit85deg">8.5 מעלות</option>
+              <option value="tzeit42min">42 דקות אחרי השקיעה</option>
+            </select>
+          </div>
+          <div class="field"><label><input id="sRabbeinuTam" type="checkbox" style="width:auto"> הצג גם רבנו תם</label></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>גודל כתב (0.8 - 1.6)</label><input id="sFontScale" type="number" min="0.8" max="1.6" step="0.05"></div>
+          <div class="field"><label>צבע ראשי</label><input id="sColor" type="color"></div>
+          <div class="field"><label>לוגו</label><input id="sLogo" type="file" accept="image/*"></div>
+        </div>
+        <button id="sSaveBtn">שמירת הגדרות</button>
+      </div>
+    </section>
+
+    <!-- BACKUP -->
+    <section class="tab-panel" id="tab-backup">
+      <div class="form-card card">
+        <h3>גיבוי ושחזור</h3>
+        <p style="color:var(--text2)">כל הנתונים שמורים כרגע בדפדפן הזה בלבד. מומלץ להוריד גיבוי מדי פעם.</p>
+        <button id="exportBtn">הורדת גיבוי</button>
+        <div class="field" style="margin-top:1em">
+          <label>שחזור מקובץ גיבוי</label>
+          <input id="importFile" type="file" accept="application/json">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/prayer-times.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

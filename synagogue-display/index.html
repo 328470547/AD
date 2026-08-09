@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>מסך בית הכנסת</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/display.css">
+</head>
+<body class="display">
+  <div class="offline-badge" id="offlineBadge">לא מחובר לאינטרנט — מוצגים נתונים שמורים</div>
+
+  <header class="display-header">
+    <div class="logo-block">
+      <img id="logoImg" src="" alt="" style="display:none">
+      <div>
+        <div class="syn-name" id="synName">בית הכנסת</div>
+        <div class="syn-city" id="synCity"></div>
+      </div>
+    </div>
+    <div class="clock-block">
+      <div class="clock" id="clock">--:--:--</div>
+      <div class="greg-date" id="gregDate"></div>
+    </div>
+  </header>
+
+  <div class="date-strip">
+    <div class="hebrew-date" id="hebrewDate">טוען...</div>
+    <div class="parasha" id="parasha"></div>
+    <span class="omer-tag" id="omerTag"></span>
+    <div id="holidayTags"></div>
+  </div>
+
+  <main class="main-grid">
+    <section class="panel card">
+      <h2>התפילה הבאה</h2>
+      <div class="next-prayer-card">
+        <div class="next-prayer-name" id="nextPrayerName">—</div>
+        <div class="next-prayer-time" id="nextPrayerTime">--:--</div>
+        <div class="countdown" id="countdown">--:--:--</div>
+      </div>
+      <h2 style="margin-top:1em">זמני תפילות היום</h2>
+      <div class="prayer-list" id="prayerList"></div>
+    </section>
+
+    <section class="panel card">
+      <h2>זמני היום</h2>
+      <div class="zman-list" id="zmanList"></div>
+      <div class="shabbat-block" id="shabbatBlock" style="display:none">
+        <div class="shabbat-item">
+          <div class="label">כניסת שבת/חג</div>
+          <div class="value" id="candleTime">--:--</div>
+        </div>
+        <div class="shabbat-item">
+          <div class="label">יציאת שבת/חג</div>
+          <div class="value" id="havdalahTime">--:--</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel card">
+      <h2>שיעורים</h2>
+      <div class="lesson-list" id="lessonList"></div>
+    </section>
+  </main>
+
+  <footer class="ticker-wrap card" id="tickerWrap" style="display:none">
+    <div class="ticker-item" id="tickerItem"></div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/hebcal.js"></script>
+  <script src="js/prayer-times.js"></script>
+  <script src="js/display.js"></script>
+</body>
+</html>
