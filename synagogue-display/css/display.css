@@ -1,0 +1,140 @@
+body.display {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-size: calc(1rem * var(--font-scale));
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -10%, var(--primary-soft), transparent),
+    radial-gradient(ellipse 900px 500px at 100% 110%, rgba(232, 184, 75, 0.08), transparent),
+    var(--bg);
+}
+
+.display-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.4em 2.2em 0.6em;
+}
+
+.logo-block { display: flex; align-items: center; gap: 0.9em; }
+.logo-block img { height: 2.8em; border-radius: 8px; box-shadow: 0 4px 14px -6px rgba(0,0,0,0.6); }
+.syn-name { font-family: var(--font-heading); font-size: 1.7em; font-weight: 700; letter-spacing: 0.2px; }
+.syn-city { color: var(--text2); font-size: 1em; }
+
+.clock-block { text-align: left; }
+.clock { font-size: 2.7em; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 1px; }
+.greg-date { color: var(--text2); font-size: 1em; }
+
+.date-strip {
+  display: flex;
+  gap: 1.2em;
+  padding: 0 2.2em 1em;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.hebrew-date { font-family: var(--font-heading); font-size: 1.7em; font-weight: 700; color: var(--accent); }
+.parasha { font-size: 1.3em; font-weight: 600; }
+.holiday-tag {
+  background: linear-gradient(135deg, var(--primary), #1f4fc9);
+  color: #fff;
+  padding: 0.2em 0.8em;
+  border-radius: 999px;
+  font-size: 0.9em;
+  font-weight: 600;
+  margin-inline-end: 0.3em;
+}
+.omer-tag { color: var(--good); font-size: 1em; font-weight: 600; }
+
+.main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr 1fr;
+  gap: 1.1em;
+  padding: 0 2.2em 1.1em;
+  min-height: 0;
+}
+
+.panel { padding: 1.1em 1.3em; overflow: hidden; display: flex; flex-direction: column; }
+.panel h2 {
+  margin: 0 0 0.6em;
+  font-size: 1.05em;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5em;
+}
+
+.next-prayer-card {
+  text-align: center;
+  padding: 1.3em 1em;
+  background: var(--primary-soft);
+  border-radius: 12px;
+  margin-bottom: 0.3em;
+}
+.next-prayer-name { font-family: var(--font-heading); font-size: 1.5em; font-weight: 700; color: var(--accent); }
+.next-prayer-time { font-size: 2.5em; font-weight: 800; margin: 0.1em 0; }
+.countdown { font-size: 1.6em; font-variant-numeric: tabular-nums; color: var(--good); font-weight: 600; }
+
+.zman-list, .prayer-list, .lesson-list { overflow-y: auto; flex: 1; }
+.zman-row, .prayer-row, .lesson-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5em 0.2em;
+  border-bottom: 1px solid var(--border);
+}
+.zman-row:last-child, .prayer-row:last-child, .lesson-row:last-child { border-bottom: none; }
+.zman-row .name, .prayer-row .name, .lesson-row .name { color: var(--text2); }
+.zman-row .time, .prayer-row .time { font-variant-numeric: tabular-nums; font-weight: 700; }
+.prayer-row.active {
+  background: var(--primary-soft);
+  border-radius: 8px;
+  padding-inline: 0.5em;
+}
+.prayer-row.active .name, .prayer-row.active .time { color: var(--accent); }
+
+.shabbat-block { display: flex; justify-content: space-between; gap: 1em; margin-top: 0.8em; }
+.shabbat-item {
+  text-align: center;
+  flex: 1;
+  padding: 0.6em;
+  background: var(--bg2);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+.shabbat-item .label { color: var(--text2); font-size: 0.82em; }
+.shabbat-item .value { font-size: 1.35em; font-weight: 700; color: var(--accent); }
+
+.ticker-wrap {
+  padding: 0.8em 2.2em;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  min-height: 3em;
+}
+.ticker-item { font-size: 1.15em; display: flex; align-items: center; gap: 0.8em; }
+.ticker-item img { height: 2.4em; border-radius: 6px; }
+.ticker-item .title { font-weight: 700; color: var(--accent); }
+
+.offline-badge {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #d9455f;
+  color: #fff;
+  padding: 0.3em 0.8em;
+  border-radius: 999px;
+  font-size: 0.85em;
+  display: none;
+  z-index: 20;
+}
+.offline-badge.show { display: block; }
+
+@media (max-width: 1100px) {
+  .main-grid { grid-template-columns: 1fr; overflow-y: auto; }
+  body.display { height: auto; overflow: auto; }
+}
