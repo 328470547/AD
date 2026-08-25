@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     llm_provider: Literal["google", "anthropic"] = "google"
 
     google_api_key: str = ""
-    gemini_model: str = "gemini-2.0-flash"
+    gemini_model: str = "gemini-3.6-flash"
 
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-3-5-sonnet-latest"
