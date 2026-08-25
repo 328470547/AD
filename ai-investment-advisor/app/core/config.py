@@ -42,6 +42,25 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-3-5-sonnet-latest"
 
+    # Tickers the AI agents monitor by default (risk alerts, small-cap
+    # screener, daily report analysis) when the caller doesn't supply its
+    # own list. A real deployment would replace this with a proper market
+    # scanner; this is a curated demo universe covering large caps and a
+    # few small-cap/penny names so the screener has something to find.
+    watchlist_tickers: List[str] = Field(
+        default_factory=lambda: [
+            "AAPL", "MSFT", "NVDA", "TSLA", "GME", "PLTR", "SOFI", "IONQ", "RIOT", "MARA",
+        ]
+    )
+    smallcap_market_cap_usd: float = 2_000_000_000  # screener threshold: below this = "small-cap"
+
+    @field_validator("watchlist_tickers", mode="before")
+    @classmethod
+    def _split_watchlist(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [t.strip().upper() for t in value.split(",") if t.strip()]
+        return value
+
     # --- Database ------------------------------------------------------------
     database_url: str = "sqlite+aiosqlite:///./data/app.db"
 

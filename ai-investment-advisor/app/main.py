@@ -13,7 +13,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import news, sec, stocks
+from app.api.routes import analysis, news, sec, stocks
 from app.core.config import get_settings
 from app.core.database import init_db
 from app.core.logging import configure_logging, get_logger
@@ -77,6 +77,7 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> UTF8J
 app.include_router(news.router)
 app.include_router(stocks.router)
 app.include_router(sec.router)
+app.include_router(analysis.router)
 
 
 @app.get("/health")
