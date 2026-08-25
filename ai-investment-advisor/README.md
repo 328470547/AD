@@ -43,7 +43,7 @@ ai-investment-advisor/
 │   │   ├── analysis.py           # GET /api/dashboard/snapshot, /api/analysis/*
 │   │   └── scheduler.py          # GET /api/scheduler/status - background job monitoring
 │   ├── agents/                   # === Phase 3: AI reasoning, Hebrew output ===
-│   │   ├── llm.py                 #   Claude 3.5 Sonnet client factory (langchain-anthropic)
+│   │   ├── llm.py                 #   LLM client factory - Gemini (default, free) or Claude, by config
 │   │   ├── prompts.py             #   Hebrew-only system prompts, one per agent
 │   │   ├── schemas.py             #   Structured Hebrew output schemas (with_structured_output)
 │   │   ├── news_sentiment_agent.py#   Market-impact summaries + sentiment, in Hebrew
@@ -105,7 +105,8 @@ cp .env.example .env
 | `POLYGON_API_KEY` | [polygon.io](https://polygon.io) | Optional | Stock data fallback (yfinance needs no key) |
 | `SEC_API_KEY` | [sec-api.io](https://sec-api.io) | Optional | Falls back to free SEC EDGAR APIs automatically |
 | `SEC_EDGAR_USER_AGENT` | — | **Required** | SEC mandates a descriptive User-Agent (`AppName email@domain.com`) for all EDGAR calls |
-| `ANTHROPIC_API_KEY` | Anthropic | Needed for Phase 3 + the scheduler | Claude 3.5 Sonnet — Hebrew reasoning engine. Without it, the background jobs still run on schedule and log clearly-labeled failures (see `GET /api/scheduler/status`), they just have nothing to save. |
+| `GOOGLE_API_KEY` | [aistudio.google.com/apikey](https://aistudio.google.com/apikey) | **Required** (default provider) | Gemini — free tier, no billing/subscription needed. Powers all 4 agents + the scheduler. Without it, background jobs still run on schedule and log clearly-labeled failures (`GET /api/scheduler/status`), they just have nothing to save. |
+| `ANTHROPIC_API_KEY` | Anthropic | Only if `LLM_PROVIDER=anthropic` | Optional paid alternative to Gemini (Claude, no free tier) — see below |
 
 ## Phase 2 — Run the data API
 
@@ -135,14 +136,25 @@ JSON with both an English `error` field (for logs/devs) and a Hebrew
 
 ## Phase 3 — AI reasoning agents
 
-Each agent (`app/agents/*.py`) wraps Claude 3.5 Sonnet via `langchain-anthropic`,
-using `with_structured_output` (Anthropic tool-calling under the hood) so the
-model returns a validated Pydantic object instead of free-form text. Every
-system prompt (`app/agents/prompts.py`) enforces: fluent professional
-financial Hebrew only, reasoning strictly from the data provided (no
-hallucinated figures), an explicit `reasoning_he` chain-of-thought field on
-every output, and language making clear this is analysis, not licensed
-investment advice.
+Each agent (`app/agents/*.py`) wraps an LLM via LangChain's `with_structured_output`
+(returns a validated Pydantic object instead of free-form text). The
+provider is a config switch (`app/agents/llm.py`, `LLM_PROVIDER` in `.env`):
+
+- **`google`** (default) — Gemini via `langchain-google-genai`. Free tier,
+  no billing required: get a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
+  *(Note: a paid Gemini/Google One subscription does not itself grant free
+  API access — the API's free tier is separate and automatic for any key,
+  subscription or not.)*
+- **`anthropic`** — Claude via `langchain-anthropic`, if you'd rather pay
+  for it (no free tier on the Anthropic API).
+
+Nothing in the agent code depends on which provider is active — both
+implement the same LangChain `with_structured_output` interface, so
+swapping is a `.env` change, not a code change. Every system prompt
+(`app/agents/prompts.py`) enforces: fluent professional financial Hebrew
+only, reasoning strictly from the data provided (no hallucinated figures),
+an explicit `reasoning_he` chain-of-thought field on every output, and
+language making clear this is analysis, not licensed investment advice.
 
 | Agent | Product requirement | Output |
 |---|---|---|

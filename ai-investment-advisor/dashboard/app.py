@@ -3,7 +3,7 @@ AI Investment Advisor - Streamlit dashboard (Phase 4).
 
 Control-room style monitoring dashboard, fully RTL and in Hebrew, that
 consumes the FastAPI backend's aggregated /api/dashboard/snapshot endpoint
-(Phase 2 data services + Phase 3 Claude-powered agents) and renders:
+(Phase 2 data services + Phase 3 AI agents) and renders:
 
   1. A always-on-top "Risk Alerts" zone (st.error) for flagged/high-risk
      names - the single most important thing a user should see first.
@@ -132,7 +132,7 @@ def render_header() -> None:
         """
         <div class="cr-header">
             <h1>📈 יועץ ההשקעות מבוסס בינה מלאכותית</h1>
-            <p>חדר בקרה למעקב שוק בזמן אמת — חדשות, סיכונים, דוחות כספיים והזדמנויות צמיחה, מונע על-ידי Claude</p>
+            <p>חדר בקרה למעקב שוק בזמן אמת — חדשות, סיכונים, דוחות כספיים והזדמנויות צמיחה, מונע על-ידי בינה מלאכותית</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -494,7 +494,7 @@ def main() -> None:
     render_ticker_deep_dive()
 
     st.markdown(
-        '<div class="cr-footer">יועץ השקעות AI &middot; מונע על-ידי Claude &middot; המידע אינו מהווה ייעוץ השקעות</div>',
+        '<div class="cr-footer">יועץ השקעות AI &middot; מונע על-ידי בינה מלאכותית &middot; המידע אינו מהווה ייעוץ השקעות</div>',
         unsafe_allow_html=True,
     )
 

@@ -26,11 +26,15 @@ yfinance==0.2.48
 sec-api==1.0.20
 
 # --- AI Engine (Phase 3 - Hebrew financial reasoning) ---
+# Default provider: Gemini (LLM_PROVIDER=google), free tier at
+# https://aistudio.google.com/apikey. Claude (langchain-anthropic) is kept
+# as an optional paid alternative - see app/agents/llm.py.
 langchain==0.3.7
+langchain-google-genai==2.0.7
 langchain-anthropic==0.3.0
 langchain-community==0.3.7
+google-generativeai==0.8.3
 anthropic==0.39.0
-llama-index==0.11.23
 
 # --- Task scheduling (real-time news polling / daily SEC report scans) ---
 # In-process AsyncIOScheduler - no broker/worker process needed.

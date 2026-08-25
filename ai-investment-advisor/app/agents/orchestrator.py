@@ -93,7 +93,7 @@ async def build_risk_alerts(
         else:
             assessments.append(result)
 
-    # If every single assessment failed (e.g. Claude is misconfigured), that
+    # If every single assessment failed (e.g. the LLM provider is misconfigured), that
     # is an error state - showing an empty "no risk detected" list would be
     # actively misleading for a risk-alerts feature, so surface it as a
     # section error instead of silently returning [].

@@ -8,10 +8,10 @@ pydantic-settings. Nothing here should ever contain a real secret - see
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import List, Literal
+from typing import Annotated, List, Literal
 
 from pydantic import Field, field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -39,6 +39,15 @@ class Settings(BaseSettings):
     sec_edgar_user_agent: str = "AI Investment Advisor contact@example.com"
 
     # --- AI engine (Phase 3) ------------------------------------------------
+    # "google" uses the Gemini API, which has a real free tier (a key from
+    # https://aistudio.google.com/apikey, no billing required) - the
+    # default, since it costs nothing to run. "anthropic" (Claude) is kept
+    # as an optional alternative for anyone who wants to pay for it.
+    llm_provider: Literal["google", "anthropic"] = "google"
+
+    google_api_key: str = ""
+    gemini_model: str = "gemini-2.0-flash"
+
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-3-5-sonnet-latest"
 
@@ -47,7 +56,11 @@ class Settings(BaseSettings):
     # own list. A real deployment would replace this with a proper market
     # scanner; this is a curated demo universe covering large caps and a
     # few small-cap/penny names so the screener has something to find.
-    watchlist_tickers: List[str] = Field(
+    # NoDecode: without it, pydantic-settings tries to JSON-parse this
+    # field's raw .env string before our own comma-split validator ever
+    # runs, and raises on a plain "AAPL,MSFT" value instead of falling
+    # through to the validator.
+    watchlist_tickers: Annotated[List[str], NoDecode] = Field(
         default_factory=lambda: [
             "AAPL", "MSFT", "NVDA", "TSLA", "GME", "PLTR", "SOFI", "IONQ", "RIOT", "MARA",
         ]
@@ -73,7 +86,7 @@ class Settings(BaseSettings):
     daily_scan_minute_utc: int = 0
 
     # --- API server ------------------------------------------------------------
-    cors_origins: List[str] = Field(default_factory=lambda: ["http://localhost:8501"])
+    cors_origins: Annotated[List[str], NoDecode] = Field(default_factory=lambda: ["http://localhost:8501"])
 
     @field_validator("cors_origins", mode="before")
     @classmethod
