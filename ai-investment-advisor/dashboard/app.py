@@ -12,6 +12,12 @@ consumes the FastAPI backend's aggregated /api/dashboard/snapshot endpoint
   4. Small-cap opportunities, highlighted in green (st.success).
   5. An on-demand deep-dive search box for any single ticker.
 
+By default /api/dashboard/snapshot is a fast DB read of whatever the
+background scheduler (app/scheduler/) last computed - not a live API/LLM
+call triggered by loading this page. Each zone shows when its data was
+last refreshed, and the sidebar's "בריאות משימות רקע" panel surfaces the
+scheduler's own job health (next run times, recent success/failure).
+
 Run with:  streamlit run dashboard/app.py
 (the FastAPI backend must be running separately: uvicorn app.main:app)
 """
@@ -20,7 +26,7 @@ from __future__ import annotations
 import sys
 import time
 from collections import Counter
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import plotly.graph_objects as go
@@ -39,6 +45,7 @@ from dashboard.api_client import (
     fetch_health,
     fetch_report_analysis,
     fetch_risk_assessment,
+    fetch_scheduler_status,
 )
 from dashboard.styles import CUSTOM_CSS
 
@@ -81,6 +88,33 @@ def format_time(iso_str: str | None) -> str:
         return iso_str
 
 
+def format_relative_time(iso_str: str | None) -> str:
+    """Renders a section's `*_updated_at` timestamp as Hebrew relative time
+    (e.g. "עודכן לפני 4 דקות") so staleness is obvious at a glance - this is
+    the freshness signal for data now served from the background scheduler
+    instead of computed live on every page load."""
+    if not iso_str:
+        return "טרם עודכן על-ידי משימת הרקע"
+    try:
+        dt = datetime.fromisoformat(iso_str)
+    except ValueError:
+        return iso_str
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+
+    seconds = (datetime.now(timezone.utc) - dt).total_seconds()
+    if seconds < 60:
+        return "עודכן זה עתה"
+    minutes = int(seconds // 60)
+    if minutes < 60:
+        return "עודכן לפני דקה" if minutes == 1 else f"עודכן לפני {minutes} דקות"
+    hours = int(minutes // 60)
+    if hours < 24:
+        return "עודכן לפני שעה" if hours == 1 else f"עודכן לפני {hours} שעות"
+    days = int(hours // 24)
+    return "עודכן לפני יום" if days == 1 else f"עודכן לפני {days} ימים"
+
+
 def badge(text: str, color: str) -> str:
     return f'<span class="cr-badge {color}">{text}</span>'
 
@@ -112,6 +146,8 @@ def render_status_bar(snapshot: dict | None, backend_online: bool) -> None:
     smallcap_count = len(snapshot.get("smallcap_opportunities", [])) if snapshot else 0
     reports_count = len(snapshot.get("company_reports", [])) if snapshot else 0
     updated = format_time(snapshot.get("generated_at")) if snapshot else "—"
+    source = snapshot.get("source") if snapshot else None
+    source_label = {"cache": "🗄️ משימת רקע", "live": "⚡ חישוב חי"}.get(source, "—")
 
     led_class = "online" if backend_online else "offline"
     led_label = "מחובר" if backend_online else "מנותק"
@@ -128,6 +164,7 @@ def render_status_bar(snapshot: dict | None, backend_online: bool) -> None:
                 <div class="cr-lbl">הזדמנויות Small-Cap</div></div>
             <div class="cr-kpi"><div class="cr-val">{reports_count}</div><div class="cr-lbl">דוחות שנותחו</div></div>
             <div class="cr-kpi"><div class="cr-val">{updated}</div><div class="cr-lbl">עדכון אחרון (UTC)</div></div>
+            <div class="cr-kpi"><div class="cr-val">{source_label}</div><div class="cr-lbl">מקור הנתונים</div></div>
         </div>
         """,
         unsafe_allow_html=True,
@@ -174,6 +211,8 @@ def render_risk_alerts_zone(snapshot: dict | None) -> None:
         st.markdown("</div>", unsafe_allow_html=True)
         return
 
+    st.caption(f"🕐 {format_relative_time(snapshot.get('risk_alerts_updated_at'))}")
+
     error_he = snapshot.get("risk_alerts_error_he")
     if error_he:
         st.warning(f"⚠️ {error_he}")
@@ -214,6 +253,8 @@ def render_news_zone(snapshot: dict | None) -> None:
         st.info("אין חיבור לשרת.")
         return
 
+    st.caption(f"🕐 {format_relative_time(snapshot.get('news_updated_at'))}")
+
     news = snapshot.get("news_sentiment")
     error_he = snapshot.get("news_error_he")
     if not news:
@@ -245,6 +286,8 @@ def render_reports_zone(snapshot: dict | None) -> None:
         st.info("אין חיבור לשרת.")
         return
 
+    st.caption(f"🕐 {format_relative_time(snapshot.get('company_reports_updated_at'))}")
+
     reports = snapshot.get("company_reports", [])
     error_he = snapshot.get("company_reports_error_he")
     if not reports:
@@ -273,6 +316,8 @@ def render_smallcap_zone(snapshot: dict | None) -> None:
         st.info("אין חיבור לשרת.")
         return
 
+    st.caption(f"🕐 {format_relative_time(snapshot.get('smallcap_updated_at'))}")
+
     opportunities = snapshot.get("smallcap_opportunities", [])
     error_he = snapshot.get("smallcap_error_he")
     if not opportunities:
@@ -297,6 +342,39 @@ def render_smallcap_zone(snapshot: dict | None) -> None:
         with st.expander(f"שרשרת החשיבה — {o.get('ticker', '')}"):
             st.write(o.get("reasoning_he", ""))
         st.markdown("")
+
+
+def render_scheduler_health() -> None:
+    """Background-job monitoring panel: what's scheduled, when it next
+    runs, and the outcome (success/failure + Hebrew summary) of recent
+    runs - so job health is visible in the UI, not just in the app's
+    timestamped logs."""
+    try:
+        status = fetch_scheduler_status()
+    except BackendError as exc:
+        st.warning(f"⚠️ {exc.message_he}")
+        return
+
+    if not status.get("running"):
+        st.warning("⚠️ תזמון המשימות ברקע אינו פעיל כרגע.")
+
+    job_labels = {job["id"]: job["name_he"] for job in status.get("jobs", [])}
+    for job in status.get("jobs", []):
+        next_run = format_time(job.get("next_run_time")) if job.get("next_run_time") else "לא מתוזמן"
+        st.caption(f"**{job.get('name_he')}** — הרצה הבאה: `{next_run}` UTC")
+
+    runs = status.get("recent_runs", [])
+    if not runs:
+        st.caption("טרם בוצעו הרצות רקע.")
+        return
+
+    st.markdown("**הרצות אחרונות:**")
+    for run in runs[:8]:
+        icon = "✅" if run.get("status") == "success" else "❌"
+        when = format_time(run.get("started_at"))
+        label = job_labels.get(run.get("job_name"), run.get("job_name"))
+        st.markdown(f"{icon} `{when}` — {label}")
+        st.caption(run.get("summary_he") or run.get("error") or "")
 
 
 def render_ticker_deep_dive() -> None:
@@ -375,6 +453,9 @@ def main() -> None:
         if st.button("רענן נתונים עכשיו", use_container_width=True):
             st.cache_data.clear()
             st.rerun()
+        st.markdown("---")
+        with st.expander("🩺 בריאות משימות רקע", expanded=False):
+            render_scheduler_health()
         st.markdown("---")
         st.caption(DISCLAIMER_HE)
 

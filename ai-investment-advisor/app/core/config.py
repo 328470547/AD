@@ -64,8 +64,13 @@ class Settings(BaseSettings):
     # --- Database ------------------------------------------------------------
     database_url: str = "sqlite+aiosqlite:///./data/app.db"
 
-    # --- Scheduling / caching ---------------------------------------------
-    redis_url: str = "redis://localhost:6379/0"
+    # --- Background scheduler (Phase 3.5) ------------------------------------
+    # In-process APScheduler - no broker needed. Disable for tests / one-off
+    # scripts that import the app but shouldn't spin up background jobs.
+    scheduler_enabled: bool = True
+    news_polling_interval_minutes: int = 20  # product spec calls for 15-30 min
+    daily_scan_hour_utc: int = 7
+    daily_scan_minute_utc: int = 0
 
     # --- API server ------------------------------------------------------------
     cors_origins: List[str] = Field(default_factory=lambda: ["http://localhost:8501"])

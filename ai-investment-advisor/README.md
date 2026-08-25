@@ -4,11 +4,12 @@
 סריקת מניות small-cap, תחזיות שוק והתרעות סיכון — כל הפלט למשתמש בעברית מלאה,
 בממשק RTL.
 
-> **מצב נוכחי:** כל 4 השלבים מומשו: תשתית (Phase 1), שירותי אחזור נתונים
-> (Phase 2), סוכני AI מבוססי Claude בעברית (Phase 3), ודשבורד Streamlit
-> RTL בסגנון חדר בקרה (Phase 4). `app/scheduler/` (הרצה תקופתית אוטומטית
-> עם APScheduler/Celery) טרם מומש - כרגע הדשבורד מרענן נתונים על-פי דרישה
-> (ידנית או אוטומטית מהדפדפן), לא באמצעות job מתוזמן בצד השרת.
+> **מצב נוכחי:** כל 4 השלבים מומשו, בתוספת תזמון רקע אוטומטי: תשתית
+> (Phase 1), שירותי אחזור נתונים (Phase 2), סוכני AI מבוססי Claude בעברית
+> (Phase 3), דשבורד Streamlit RTL בסגנון חדר בקרה (Phase 4), ותזמון משימות
+> רקע (`app/scheduler/`) שמריץ את סוכני ה-AI על בסיס קבוע ושומר את
+> התוצאות - הדשבורד קורא נתונים שחושבו מראש במקום להריץ קריאות API/LLM
+> כבדות בכל טעינת עמוד.
 
 ## עקרונות מובילים (חוצי-פרויקט)
 
@@ -38,7 +39,9 @@ ai-investment-advisor/
 │   ├── api/routes/
 │   │   ├── news.py               # GET /api/news/financial
 │   │   ├── stocks.py             # GET /api/stocks/quote/{ticker}, /history/{ticker}
-│   │   └── sec.py                # GET /api/sec/filings/{ticker}, /company-facts/{ticker}
+│   │   ├── sec.py                # GET /api/sec/filings/{ticker}, /company-facts/{ticker}
+│   │   ├── analysis.py           # GET /api/dashboard/snapshot, /api/analysis/*
+│   │   └── scheduler.py          # GET /api/scheduler/status - background job monitoring
 │   ├── agents/                   # === Phase 3: AI reasoning, Hebrew output ===
 │   │   ├── llm.py                 #   Claude 3.5 Sonnet client factory (langchain-anthropic)
 │   │   ├── prompts.py             #   Hebrew-only system prompts, one per agent
@@ -47,9 +50,12 @@ ai-investment-advisor/
 │   │   ├── report_analyzer_agent.py#  10-K/10-Q fundamental analysis, in Hebrew
 │   │   ├── risk_assessor_agent.py #   Explicit Hebrew risk warnings, red-flag detection
 │   │   ├── smallcap_screener_agent.py# Small-cap/penny-stock growth screener
-│   │   └── orchestrator.py        #   Combines all agents + Phase 2 services into one snapshot
-│   ├── scheduler/                # === not yet implemented: background jobs ===
-│   │   └── (planned) tasks.py     #   APScheduler/Celery: periodic news polling, daily filing scans
+│   │   └── orchestrator.py        #   Shared fetch_*/build_* building blocks + live snapshot compute
+│   ├── scheduler/                # === background jobs (in-process APScheduler) ===
+│   │   ├── scheduler.py           #   AsyncIOScheduler start/shutdown, wired into FastAPI's lifespan
+│   │   ├── jobs.py                #   news_polling_job (15-30 min), daily_report_scan_job (once/day)
+│   │   ├── store.py               #   Persists last-known-good sections, job run history, seen filings
+│   │   └── schemas.py             #   API-facing scheduler status schemas
 │   └── utils/
 │       ├── errors.py              # AdvisorError hierarchy (Hebrew + English messages)
 │       └── retry.py               # tenacity-based retry policy for external APIs
@@ -67,7 +73,12 @@ ai-investment-advisor/
 │   ├── test_report_analyzer_agent.py
 │   ├── test_smallcap_screener_agent.py
 │   ├── test_orchestrator.py
-│   └── test_dashboard_smoke.py    #   Streamlit AppTest: renders the dashboard headlessly
+│   ├── test_scheduler_store.py    #   Persistence round-trips, upsert-not-duplicate, new-filing detection
+│   ├── test_scheduler_jobs.py     #   Job success/failure logging, partial-failure handling
+│   ├── test_scheduler_scheduler.py#   Regression test for the next_run_time=None "paused" pitfall
+│   ├── test_analysis_routes.py    #   Snapshot endpoint's cache-vs-live branching
+│   ├── test_dashboard_smoke.py    #   Streamlit AppTest: renders the dashboard headlessly
+│   └── conftest.py                #   Isolated temp-file test DB; scheduler disabled during tests
 ├── data/                          # SQLite DB file lives here (gitignored)
 ├── logs/                          # Rotating UTF-8 log files (gitignored)
 ├── requirements.txt
@@ -94,7 +105,7 @@ cp .env.example .env
 | `POLYGON_API_KEY` | [polygon.io](https://polygon.io) | Optional | Stock data fallback (yfinance needs no key) |
 | `SEC_API_KEY` | [sec-api.io](https://sec-api.io) | Optional | Falls back to free SEC EDGAR APIs automatically |
 | `SEC_EDGAR_USER_AGENT` | — | **Required** | SEC mandates a descriptive User-Agent (`AppName email@domain.com`) for all EDGAR calls |
-| `ANTHROPIC_API_KEY` | Anthropic | Needed for Phase 3 | Claude 3.5 Sonnet — Hebrew reasoning engine |
+| `ANTHROPIC_API_KEY` | Anthropic | Needed for Phase 3 + the scheduler | Claude 3.5 Sonnet — Hebrew reasoning engine. Without it, the background jobs still run on schedule and log clearly-labeled failures (see `GET /api/scheduler/status`), they just have nothing to save. |
 
 ## Phase 2 — Run the data API
 
@@ -155,6 +166,54 @@ Agent calls are bounded per snapshot (`MAX_RISK_ASSESSMENTS`,
 dashboard auto-refresh; the demo watchlist and small-cap market-cap
 threshold are configurable via `WATCHLIST_TICKERS` / `SMALLCAP_MARKET_CAP_USD`.
 
+## Background scheduler — continuous news polling + daily SEC scans
+
+`app/scheduler/` runs two jobs in-process via APScheduler's `AsyncIOScheduler`
+(started/stopped from `app/main.py`'s FastAPI lifespan - no separate worker
+process or broker like Redis/Celery needed for a single-process deployment):
+
+| Job | Cadence | What it does |
+|---|---|---|
+| `news_polling_job` | Every `NEWS_POLLING_INTERVAL_MINUTES` (default 20, product spec: 15-30 min) | Fetches breaking financial news and refreshes the Hebrew market-sentiment analysis |
+| `daily_report_scan_job` | Once a day at `DAILY_SCAN_HOUR_UTC:DAILY_SCAN_MINUTE_UTC` (default 07:00 UTC) | Scans the watchlist's 10-K/10-Q filings for genuinely *new* ones (tracked in a `SeenFiling` table, not just re-fetched blindly), then refreshes risk alerts, company report analyses, and the small-cap screener - all fundamentals-driven, so a daily cadence matches how often the underlying data actually changes |
+
+Both jobs also get an immediate first run on a fresh database, so the
+dashboard isn't empty while waiting for the first scheduled tick.
+
+**Persistence, not just live compute.** Every successful job run is saved
+to a DB table (`AgentSnapshotSection`) as the "last-known-good" result for
+that section. `GET /api/dashboard/snapshot` reads from there by default -
+a fast DB read, not a live API/LLM call triggered by loading the page. A
+failed run does *not* wipe the previous good result (the dashboard keeps
+serving it, visibly stale via its `*_updated_at` timestamp) - only the job's
+own success/failure is recorded separately, so a transient provider outage
+never blanks the UI. An explicit `?tickers=` override on the snapshot
+endpoint (used by the dashboard's watchlist text box) still falls back to
+a live compute, since the scheduler only maintains data for the server's
+configured watchlist.
+
+**Robust, timestamped logging.** Every job run logs `[JOB START]` /
+`[JOB SUCCESS]` / `[JOB FAILURE]` through the app's normal UTF-8 logger
+(timestamped by `app/core/logging.py`'s format), including duration and a
+Hebrew summary; individual API failures within a job (e.g. one ticker's
+quote fetch failing) log separately at their own level. Every run is also
+recorded to a `JobRunLog` DB table, queryable via **`GET
+/api/scheduler/status`** (next run time per job, per-section data
+freshness, recent run history) - this is what the dashboard's sidebar
+"🩺 בריאות משימות רקע" panel renders, so job health is visible in the UI
+without grepping log files.
+
+Config: `SCHEDULER_ENABLED` (set `false` to disable entirely, e.g. for a
+one-off script that imports the app), `NEWS_POLLING_INTERVAL_MINUTES`,
+`DAILY_SCAN_HOUR_UTC`, `DAILY_SCAN_MINUTE_UTC`.
+
+> **Known limitation for a single-process deployment:** APScheduler's
+> in-memory job store means job *definitions* are re-registered fresh on
+> every process restart (cheap and intentional - not designed to survive
+> restarts as a durable queue). If this ever needs multiple worker
+> processes/machines sharing a job queue, Celery+Redis would be the right
+> upgrade; not needed for the current single-process architecture.
+
 ## Phase 4 — Streamlit dashboard (control room, RTL, Hebrew)
 
 ```bash
@@ -170,7 +229,8 @@ By default the dashboard talks to `http://localhost:8000`; override with
 Layout, top to bottom:
 
 1. **Header + status KPI row** - server connection LED, watchlist size,
-   alert/opportunity/report counts, last-updated time.
+   alert/opportunity/report counts, last-updated time, and the data
+   **source** for this load (🗄️ background job vs. ⚡ live compute).
 2. **🚨 התרעות וסיכונים (Risk Alerts)** - always the first content zone.
    Every flagged/high-risk name is rendered as a red `st.error` card with
    its Hebrew warning, concrete red flags, and an expandable chain-of-thought;
@@ -180,9 +240,18 @@ Layout, top to bottom:
    risk found".
 3. **Three-column main content**: 📰 news + sentiment, 📄 SEC report
    analysis / financial health, 🌱 small-cap opportunities (green
-   `st.success` cards with an opportunity-score progress bar).
+   `st.success` cards with an opportunity-score progress bar). Each zone
+   shows a relative-time freshness caption (e.g. "עודכן לפני 4 דקות") from
+   the section's last successful background-job run.
 4. **🔍 On-demand ticker deep-dive** - type any ticker to run the risk +
-   report agents live against it.
+   report agents live against it (the one part of the dashboard that's
+   always a live call, by design - it's not part of the watchlist the
+   scheduler maintains).
+
+The sidebar also has a **🩺 בריאות משימות רקע** panel (background job
+health): each job's next scheduled run and a log of recent runs with
+success/failure status and Hebrew summaries, reading `GET
+/api/scheduler/status`.
 
 RTL/Hebrew is enforced via injected CSS (`dashboard/styles.py`) targeting
 Streamlit's own component `data-testid` attributes (sidebar, metrics,
@@ -214,6 +283,22 @@ pytest
   manual QA: if every risk assessment in a batch fails, the section must
   raise/report an error rather than silently looking like "no risk
   detected".
+- `test_scheduler_store.py` / `test_scheduler_jobs.py` cover the
+  persistence round-trip (including upsert-not-duplicate and new-filing
+  detection) and job success/partial-failure/total-failure logging - e.g.
+  a failed job run must never wipe a section's previous good result.
+- `test_scheduler_scheduler.py` is a regression test for an APScheduler
+  pitfall caught during development: `add_job(next_run_time=None)` means
+  "add the job as paused", not "use the trigger's own schedule" - a naive
+  bootstrap-on-empty-database implementation could accidentally pass that
+  for every non-bootstrapped job and permanently pause it.
+- `test_analysis_routes.py` covers the snapshot endpoint's cache-vs-live
+  branching (default read from the store, live compute for an explicit
+  ticker override or a not-yet-populated store).
+- `tests/conftest.py` points `DATABASE_URL` at an isolated temp-file
+  SQLite DB and disables the scheduler for the whole test session, so
+  tests never share state with (or write to) the real dev database and
+  never trigger a real background job on a timer.
 - `test_dashboard_smoke.py` uses Streamlit's own `AppTest` harness to run
   `dashboard/app.py` headlessly end-to-end (happy path, backend offline,
   partial section failures) with the backend mocked, and asserts the

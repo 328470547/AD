@@ -73,3 +73,8 @@ def fetch_report_analysis(ticker: str) -> dict:
 @st.cache_data(ttl=120, show_spinner=False)
 def fetch_stock_quote(ticker: str) -> dict:
     return _get(f"/api/stocks/quote/{ticker.strip().upper()}")
+
+
+@st.cache_data(ttl=20, show_spinner=False)
+def fetch_scheduler_status() -> dict:
+    return _get("/api/scheduler/status")

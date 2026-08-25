@@ -13,10 +13,11 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api.routes import analysis, news, sec, stocks
+from app.api.routes import analysis, news, scheduler, sec, stocks
 from app.core.config import get_settings
 from app.core.database import init_db
 from app.core.logging import configure_logging, get_logger
+from app.scheduler.scheduler import shutdown_scheduler, start_scheduler
 from app.utils.errors import AdvisorError
 
 configure_logging()
@@ -35,7 +36,11 @@ class UTF8JSONResponse(JSONResponse):
 async def lifespan(app: FastAPI):
     logger.info("Starting AI Investment Advisor API (env=%s)", settings.app_env)
     await init_db()
+    if settings.scheduler_enabled:
+        await start_scheduler()
     yield
+    if settings.scheduler_enabled:
+        await shutdown_scheduler()
     logger.info("Shutting down AI Investment Advisor API")
 
 
@@ -78,6 +83,7 @@ app.include_router(news.router)
 app.include_router(stocks.router)
 app.include_router(sec.router)
 app.include_router(analysis.router)
+app.include_router(scheduler.router)
 
 
 @app.get("/health")

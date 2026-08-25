@@ -32,10 +32,9 @@ langchain-community==0.3.7
 anthropic==0.39.0
 llama-index==0.11.23
 
-# --- Task scheduling (real-time news / daily reports) ---
+# --- Task scheduling (real-time news polling / daily SEC report scans) ---
+# In-process AsyncIOScheduler - no broker/worker process needed.
 apscheduler==3.10.4
-celery==5.4.0
-redis==5.2.0
 
 # --- Frontend dashboard (Phase 4 - RTL / Hebrew UI) ---
 streamlit==1.40.1

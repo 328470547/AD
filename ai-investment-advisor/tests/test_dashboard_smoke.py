@@ -13,9 +13,37 @@ from streamlit.testing.v1 import AppTest
 
 from dashboard.api_client import BackendError
 
+FAKE_SCHEDULER_STATUS = {
+    "enabled": True,
+    "running": True,
+    "jobs": [
+        {"id": "news_polling", "name_he": "סריקת חדשות ועדכון סנטימנט", "next_run_time": datetime.now(timezone.utc).isoformat()},
+        {"id": "daily_report_scan", "name_he": "סריקת דוחות SEC יומית", "next_run_time": datetime.now(timezone.utc).isoformat()},
+    ],
+    "sections": [
+        {"section": "news_sentiment", "has_data": True, "updated_at": datetime.now(timezone.utc).isoformat()},
+    ],
+    "recent_runs": [
+        {
+            "job_name": "news_polling",
+            "started_at": datetime.now(timezone.utc).isoformat(),
+            "finished_at": datetime.now(timezone.utc).isoformat(),
+            "duration_seconds": 1.2,
+            "status": "success",
+            "summary_he": "סנטימנט שוק עודכן (חיובי): השוק במגמת עלייה.",
+            "error": "",
+        }
+    ],
+}
+
 FAKE_SNAPSHOT = {
     "generated_at": datetime.now(timezone.utc).isoformat(),
     "watchlist": ["AAPL", "PENNY"],
+    "source": "cache",
+    "risk_alerts_updated_at": datetime.now(timezone.utc).isoformat(),
+    "news_updated_at": datetime.now(timezone.utc).isoformat(),
+    "company_reports_updated_at": datetime.now(timezone.utc).isoformat(),
+    "smallcap_updated_at": datetime.now(timezone.utc).isoformat(),
     "risk_alerts": [
         {
             "ticker": "PENNY",
@@ -69,16 +97,19 @@ FAKE_SNAPSHOT = {
 def test_dashboard_renders_happy_path_without_exception():
     with patch("dashboard.api_client.fetch_health", return_value={"status": "ok"}), patch(
         "dashboard.api_client.fetch_dashboard_snapshot", return_value=FAKE_SNAPSHOT
-    ):
+    ), patch("dashboard.api_client.fetch_scheduler_status", return_value=FAKE_SCHEDULER_STATUS):
         at = AppTest.from_file("../dashboard/app.py")
         at.run(timeout=30)
     assert not at.exception
     body = "\n".join(md.value for md in at.markdown)
     assert "התרעות וסיכונים" in body
+    assert "סריקת חדשות ועדכון סנטימנט" in body
 
 
 def test_dashboard_renders_backend_offline_state_without_exception():
-    with patch("dashboard.api_client.fetch_health", side_effect=BackendError("השרת אינו זמין")):
+    with patch("dashboard.api_client.fetch_health", side_effect=BackendError("השרת אינו זמין")), patch(
+        "dashboard.api_client.fetch_scheduler_status", side_effect=BackendError("השרת אינו זמין")
+    ):
         at = AppTest.from_file("../dashboard/app.py")
         at.run(timeout=30)
     assert not at.exception
@@ -91,7 +122,7 @@ def test_dashboard_renders_partial_section_failures_without_exception():
     partial_snapshot["risk_alerts_error_he"] = "לא ניתן היה להפיק הערכות סיכון עבור אף אחד מהניירות ברשימת המעקב."
     with patch("dashboard.api_client.fetch_health", return_value={"status": "ok"}), patch(
         "dashboard.api_client.fetch_dashboard_snapshot", return_value=partial_snapshot
-    ):
+    ), patch("dashboard.api_client.fetch_scheduler_status", return_value=FAKE_SCHEDULER_STATUS):
         at = AppTest.from_file("../dashboard/app.py")
         at.run(timeout=30)
     assert not at.exception

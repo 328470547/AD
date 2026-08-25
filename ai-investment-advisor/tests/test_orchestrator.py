@@ -2,7 +2,7 @@ from unittest.mock import AsyncMock, patch
 
 import pytest
 
-from app.agents.orchestrator import _build_risk_alerts
+from app.agents.orchestrator import build_risk_alerts
 from app.agents.schemas import RiskAssessment
 from app.utils.errors import DataProviderConfigError
 
@@ -26,7 +26,7 @@ async def test_build_risk_alerts_raises_when_every_assessment_fails():
         new=AsyncMock(side_effect=DataProviderConfigError("anthropic")),
     ):
         with pytest.raises(Exception):
-            await _build_risk_alerts(["AAPL", "MSFT"], quotes={}, facts={})
+            await build_risk_alerts(["AAPL", "MSFT"], quotes={}, facts={})
 
 
 @pytest.mark.asyncio
@@ -37,7 +37,7 @@ async def test_build_risk_alerts_returns_partial_results_on_partial_failure():
         raise DataProviderConfigError("anthropic")
 
     with patch("app.agents.orchestrator.risk_assessor_agent.assess", new=AsyncMock(side_effect=fake_assess)):
-        results = await _build_risk_alerts(["AAPL", "MSFT"], quotes={}, facts={})
+        results = await build_risk_alerts(["AAPL", "MSFT"], quotes={}, facts={})
 
     assert len(results) == 1
     assert results[0].ticker == "AAPL"

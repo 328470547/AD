@@ -7,6 +7,7 @@ from app.agents.orchestrator import build_dashboard_snapshot
 from app.agents.report_analyzer_agent import report_analyzer_agent
 from app.agents.risk_assessor_agent import risk_assessor_agent
 from app.agents.schemas import CompanyReportAnalysis, DashboardSnapshot, NewsSentimentAnalysis, RiskAssessment
+from app.scheduler import store as snapshot_store
 from app.services.news_service import news_service
 from app.services.sec_service import sec_service
 from app.services.stock_service import stock_service
@@ -16,12 +17,29 @@ router = APIRouter(prefix="/api", tags=["analysis"])
 
 @router.get("/dashboard/snapshot", response_model=DashboardSnapshot)
 async def get_dashboard_snapshot(
-    tickers: str | None = Query(None, description="Comma-separated tickers; defaults to the server watchlist"),
+    tickers: str | None = Query(
+        None, description="Comma-separated ticker override; triggers a live compute instead of the cached snapshot"
+    ),
 ) -> DashboardSnapshot:
-    """Single aggregated call for the Streamlit dashboard: risk alerts, news
-    sentiment, company report analyses and small-cap opportunities."""
-    watchlist = [t.strip().upper() for t in tickers.split(",") if t.strip()] if tickers else None
-    return await build_dashboard_snapshot(watchlist)
+    """The one call the Streamlit dashboard needs: risk alerts, news
+    sentiment, company report analyses and small-cap opportunities.
+
+    By default this reads the background scheduler's last saved results
+    (fast, no live API/LLM calls in the request path - see
+    app/scheduler/jobs.py). Passing an explicit `tickers` override falls
+    back to a live compute for that one request, since the scheduler only
+    maintains data for the server's configured watchlist. If no job has
+    completed yet (fresh install), it also falls back to a live compute so
+    the dashboard isn't empty while waiting for the first scheduled run.
+    """
+    if tickers:
+        watchlist = [t.strip().upper() for t in tickers.split(",") if t.strip()]
+        return await build_dashboard_snapshot(watchlist)
+
+    cached = await snapshot_store.load_latest()
+    if cached is not None:
+        return cached
+    return await build_dashboard_snapshot()
 
 
 @router.get("/analysis/news-sentiment", response_model=NewsSentimentAnalysis)

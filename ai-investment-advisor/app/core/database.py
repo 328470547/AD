@@ -92,6 +92,56 @@ class SecFilingCache(Base):
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
 
 
+class AgentSnapshotSection(Base):
+    """Last-known-good output of one dashboard section, written by the
+    background scheduler jobs (app/scheduler/jobs.py) and read by the
+    dashboard/API instead of recomputing live on every page load.
+
+    A failed job run does NOT clear this row - see app/scheduler/store.py:
+    the dashboard keeps serving the last successful result (clearly stale
+    via `updated_at`) rather than going blank on a transient provider
+    outage. Job health/failures are tracked separately in JobRunLog.
+    """
+
+    __tablename__ = "agent_snapshot_section"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    section: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    payload_json: Mapped[str] = mapped_column(Text)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
+class JobRunLog(Base):
+    """History of every scheduled job execution, for monitoring background
+    job health (surfaced via GET /api/scheduler/status and the dashboard's
+    system-health panel) in addition to the timestamped application logs."""
+
+    __tablename__ = "job_run_log"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    job_name: Mapped[str] = mapped_column(String(64), index=True)
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    status: Mapped[str] = mapped_column(String(16))  # "success" | "failure"
+    summary_he: Mapped[str] = mapped_column(Text, default="")
+    error: Mapped[str] = mapped_column(Text, default="")
+
+
+class SeenFiling(Base):
+    """Tracks SEC filings the daily scan job has already seen, so it can
+    report genuinely *new* 10-K/10-Q filings instead of silently re-fetching
+    the same ones every day."""
+
+    __tablename__ = "seen_filing"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    ticker: Mapped[str] = mapped_column(String(16), index=True)
+    accession_no: Mapped[str] = mapped_column(String(32), unique=True, index=True)
+    form_type: Mapped[str] = mapped_column(String(16))
+    filed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    first_seen_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow)
+
+
 async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)

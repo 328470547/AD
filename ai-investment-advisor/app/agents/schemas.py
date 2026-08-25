@@ -90,14 +90,23 @@ class DashboardSnapshot(BaseModel):
     generated_at: datetime
     watchlist: list[str] = Field(default_factory=list)
 
+    # "cache" = read from the background scheduler's last saved results
+    # (the normal, fast path); "live" = computed on-demand for this request
+    # (e.g. a custom ticker override that the scheduler doesn't cover).
+    source: Literal["cache", "live"] = "live"
+
     risk_alerts: list[RiskAssessment] = Field(default_factory=list)
     risk_alerts_error_he: Optional[str] = None
+    risk_alerts_updated_at: Optional[datetime] = None
 
     news_sentiment: Optional[NewsSentimentAnalysis] = None
     news_error_he: Optional[str] = None
+    news_updated_at: Optional[datetime] = None
 
     company_reports: list[CompanyReportAnalysis] = Field(default_factory=list)
     company_reports_error_he: Optional[str] = None
+    company_reports_updated_at: Optional[datetime] = None
 
     smallcap_opportunities: list[SmallCapOpportunity] = Field(default_factory=list)
     smallcap_error_he: Optional[str] = None
+    smallcap_updated_at: Optional[datetime] = None

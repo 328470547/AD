@@ -1,10 +1,19 @@
 """
 Combines the Phase 2 data services with the Phase 3 agents into a single
-DashboardSnapshot - the one call the Streamlit dashboard (Phase 4) needs to
-render every zone. Each of the four sections (risk alerts, news sentiment,
+DashboardSnapshot. Each of the four sections (risk alerts, news sentiment,
 company reports, small-cap screener) is fetched independently and degrades
 gracefully: a failure in one never blocks the others, it just attaches a
 Hebrew error message to that section.
+
+The individual `fetch_*`/`build_*` functions here are the shared building
+blocks for two different callers:
+  * `build_dashboard_snapshot()` - computes everything live, on demand
+    (used for an explicit ticker override that the scheduler doesn't cover).
+  * app/scheduler/jobs.py - calls the same functions on a schedule (news
+    sentiment every ~20 min, the SEC-fundamentals-driven sections once a
+    day) and persists the results, so the dashboard's normal/default load
+    reads pre-computed data instead of triggering these live LLM calls
+    inline in a UI request.
 """
 from __future__ import annotations
 
@@ -39,13 +48,13 @@ MAX_RISK_ASSESSMENTS = 8
 MAX_COMPANY_REPORTS = 5
 
 
-def _error_he(exc: BaseException) -> str:
+def error_he(exc: BaseException) -> str:
     if isinstance(exc, AdvisorError):
         return exc.message_he
     return "אירעה שגיאה בלתי צפויה בעת יצירת הניתוח."
 
 
-async def _fetch_quotes(tickers: list[str]) -> dict[str, StockQuote]:
+async def fetch_quotes(tickers: list[str]) -> dict[str, StockQuote]:
     results = await asyncio.gather(*(stock_service.get_quote(t) for t in tickers), return_exceptions=True)
     quotes: dict[str, StockQuote] = {}
     for ticker, result in zip(tickers, results):
@@ -56,7 +65,7 @@ async def _fetch_quotes(tickers: list[str]) -> dict[str, StockQuote]:
     return quotes
 
 
-async def _fetch_facts(tickers: list[str]) -> dict[str, CompanyFinancialFacts]:
+async def fetch_facts(tickers: list[str]) -> dict[str, CompanyFinancialFacts]:
     results = await asyncio.gather(*(sec_service.get_company_facts(t) for t in tickers), return_exceptions=True)
     facts: dict[str, CompanyFinancialFacts] = {}
     for ticker, result in zip(tickers, results):
@@ -67,7 +76,7 @@ async def _fetch_facts(tickers: list[str]) -> dict[str, CompanyFinancialFacts]:
     return facts
 
 
-async def _build_risk_alerts(
+async def build_risk_alerts(
     tickers: list[str], quotes: dict[str, StockQuote], facts: dict[str, CompanyFinancialFacts]
 ) -> list[RiskAssessment]:
     subset = tickers[:MAX_RISK_ASSESSMENTS]
@@ -99,12 +108,12 @@ async def _build_risk_alerts(
     return sorted(assessments, key=lambda a: (not a.is_flagged, a.risk_level != "גבוה"))
 
 
-async def _build_news_sentiment() -> NewsSentimentAnalysis:
+async def build_news_sentiment() -> NewsSentimentAnalysis:
     news = await news_service.get_financial_news()
     return await news_sentiment_agent.analyze(news.articles)
 
 
-async def _build_company_reports(
+async def build_company_reports(
     tickers: list[str], facts: dict[str, CompanyFinancialFacts]
 ) -> list[CompanyReportAnalysis]:
     subset = [t for t in tickers if t in facts][:MAX_COMPANY_REPORTS]
@@ -131,7 +140,7 @@ async def _build_company_reports(
     return reports
 
 
-async def _build_smallcap_opportunities(
+async def build_smallcap_opportunities(
     tickers: list[str], quotes: dict[str, StockQuote], facts: dict[str, CompanyFinancialFacts], threshold: float
 ) -> list[SmallCapOpportunity]:
     candidates = [
@@ -146,41 +155,47 @@ async def build_dashboard_snapshot(watchlist: Optional[list[str]] = None) -> Das
     settings = get_settings()
     tickers = [t.strip().upper() for t in (watchlist or settings.watchlist_tickers)]
 
-    quotes, facts = await asyncio.gather(_fetch_quotes(tickers), _fetch_facts(tickers))
+    quotes, facts = await asyncio.gather(fetch_quotes(tickers), fetch_facts(tickers))
 
-    snapshot = DashboardSnapshot(generated_at=datetime.now(timezone.utc), watchlist=tickers)
+    snapshot = DashboardSnapshot(generated_at=datetime.now(timezone.utc), watchlist=tickers, source="live")
 
     section_results = await asyncio.gather(
-        _build_risk_alerts(tickers, quotes, facts),
-        _build_news_sentiment(),
-        _build_company_reports(tickers, facts),
-        _build_smallcap_opportunities(tickers, quotes, facts, settings.smallcap_market_cap_usd),
+        build_risk_alerts(tickers, quotes, facts),
+        build_news_sentiment(),
+        build_company_reports(tickers, facts),
+        build_smallcap_opportunities(tickers, quotes, facts, settings.smallcap_market_cap_usd),
         return_exceptions=True,
     )
     risk_result, news_result, reports_result, smallcap_result = section_results
 
+    now = datetime.now(timezone.utc)
+
     if isinstance(risk_result, Exception):
-        snapshot.risk_alerts_error_he = _error_he(risk_result)
+        snapshot.risk_alerts_error_he = error_he(risk_result)
         logger.warning("dashboard risk alerts section failed: %s", risk_result)
     else:
         snapshot.risk_alerts = risk_result
+        snapshot.risk_alerts_updated_at = now
 
     if isinstance(news_result, Exception):
-        snapshot.news_error_he = _error_he(news_result)
+        snapshot.news_error_he = error_he(news_result)
         logger.warning("dashboard news sentiment section failed: %s", news_result)
     else:
         snapshot.news_sentiment = news_result
+        snapshot.news_updated_at = now
 
     if isinstance(reports_result, Exception):
-        snapshot.company_reports_error_he = _error_he(reports_result)
+        snapshot.company_reports_error_he = error_he(reports_result)
         logger.warning("dashboard company reports section failed: %s", reports_result)
     else:
         snapshot.company_reports = reports_result
+        snapshot.company_reports_updated_at = now
 
     if isinstance(smallcap_result, Exception):
-        snapshot.smallcap_error_he = _error_he(smallcap_result)
+        snapshot.smallcap_error_he = error_he(smallcap_result)
         logger.warning("dashboard smallcap section failed: %s", smallcap_result)
     else:
         snapshot.smallcap_opportunities = smallcap_result
+        snapshot.smallcap_updated_at = now
 
     return snapshot
