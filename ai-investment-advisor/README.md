@@ -81,6 +81,9 @@ ai-investment-advisor/
 │   └── conftest.py                #   Isolated temp-file test DB; scheduler disabled during tests
 ├── data/                          # SQLite DB file lives here (gitignored)
 ├── logs/                          # Rotating UTF-8 log files (gitignored)
+├── Dockerfile                     # One image, run as both services (see docker-compose.yml)
+├── docker-compose.yml             # backend + dashboard wired together, for 24/7 deployment
+├── .dockerignore
 ├── requirements.txt
 ├── .env.example
 └── .gitignore
@@ -317,3 +320,60 @@ pytest
   script never raises. This caught two real bugs during development: a
   `sys.path` import error when launched via `streamlit run`, and the
   silent-risk-section bug above.
+
+## Deployment — running this 24/7 with a public URL
+
+`Dockerfile` + `docker-compose.yml` package the whole stack (backend with
+the scheduler, and the dashboard) as two containers sharing one image,
+wired together on Docker's internal network. This runs on any Docker host
+- a paid VPS, a PaaS like Railway/Render, or a genuinely free-forever
+option: a **free-tier cloud VM**, since PaaS free tiers universally either
+sleep when idle (which would silently stop the scheduled jobs from firing)
+or expire after a trial period.
+
+### Option: Oracle Cloud "Always Free" VM (no time limit, no charge)
+
+1. Create an account at [oracle.com/cloud/free](https://www.oracle.com/cloud/free/)
+   (a card is required for identity verification but the Always Free
+   resources are never billed).
+2. Create a Compute instance using an **Always Free-eligible shape** (an
+   Ampere A1 or VM.Standard.E2.1.Micro) - Ubuntu image, default settings
+   are fine.
+3. In the instance's **Virtual Cloud Network → Security List**, add
+   ingress rules for TCP ports `8501` (dashboard) and optionally `8000`
+   (backend API/docs), source `0.0.0.0/0`.
+4. Open **Cloud Shell** (top-right icon in the OCI console - a terminal in
+   your browser, no local terminal or SSH client needed) or SSH in, then:
+   ```bash
+   # on the VM
+   sudo apt-get update && sudo apt-get install -y docker.io docker-compose-plugin git
+   sudo usermod -aG docker $USER && newgrp docker
+   git clone <this-repo-url>
+   cd ai-investment-advisor
+   cp .env.example .env
+   nano .env   # paste your real API keys, save (Ctrl+O, Enter, Ctrl+X)
+   docker compose up -d --build
+   ```
+5. The Ubuntu instance also has its own firewall (`iptables`/`ufw`) in
+   addition to the OCI Security List from step 3 - if the dashboard isn't
+   reachable after step 4, also run `sudo iptables -I INPUT -p tcp --dport 8501 -j ACCEPT`
+   (and `8000` if you opened that port too).
+6. Visit `http://<the instance's public IP>:8501` - that's your permanent
+   URL. Find the IP in the OCI console's instance details page.
+
+```bash
+docker compose logs -f          # watch both services, timestamped
+docker compose ps               # check both are healthy/running
+docker compose down             # stop (add -v to also delete the DB volume)
+docker compose up -d --build    # redeploy after a `git pull`
+```
+
+The named volumes (`app_data`, `app_logs`) persist the SQLite DB and logs
+across restarts and redeploys - only `docker compose down -v` removes them.
+
+**Optional next step - a real domain + HTTPS** instead of `http://<ip>:8501`:
+point a domain's DNS A record at the instance's IP, put a reverse proxy
+(e.g. [Caddy](https://caddyserver.com/), which handles TLS certificates
+automatically) in front of the `dashboard` service, and open ports 80/443
+instead of 8501 in both firewalls from steps 3 and 5. Not required to get
+a working public link - only for a proper HTTPS URL on your own domain.
