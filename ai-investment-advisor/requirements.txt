@@ -29,7 +29,13 @@ sec-api==1.0.20
 # Default provider: Gemini (LLM_PROVIDER=google), free tier at
 # https://aistudio.google.com/apikey. Claude (langchain-anthropic) is kept
 # as an optional paid alternative - see app/agents/llm.py.
-langchain==0.3.7
+# Note: the top-level `langchain` package is deliberately NOT listed here -
+# nothing in this codebase imports it (only langchain_core, pulled in
+# transitively by the two packages below), and langchain==0.3.7 hard-pins
+# numpy<2.0.0, which has no Windows wheel for Python 3.13+ and breaks
+# installation with a "no C compiler" build error. Don't add it back
+# without checking its numpy pin against the Python versions this project
+# supports.
 langchain-google-genai==2.0.7
 langchain-anthropic==0.3.0
 google-generativeai==0.8.3
