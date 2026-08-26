@@ -1,0 +1,55 @@
+# Runs the whole stack: the FastAPI backend (with the in-process
+# scheduler - news polling + daily SEC scan) and the Streamlit dashboard,
+# wired together over Docker's internal network.
+#
+# Usage:
+#   cp .env.example .env   # fill in real keys - never commit this file
+#   docker compose up -d --build
+#   docker compose logs -f          # watch both services, timestamped
+#
+# The dashboard is the one meant to be reached externally
+# (http://<server-ip>:8501); the backend's port is also published so you
+# can hit /docs or /api/scheduler/status directly, but nothing requires
+# that to be open to the internet - restrict it in your firewall/security
+# group if you only want the dashboard public.
+services:
+  backend:
+    build: .
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  dashboard:
+    build: .
+    command: streamlit run dashboard/app.py --server.address 0.0.0.0 --server.port 8501 --server.headless true
+    env_file: .env
+    environment:
+      # Docker Compose gives each service a DNS name matching its key
+      # above - "backend" resolves to the backend container on the
+      # internal network, no hardcoded IP needed.
+      - API_BASE_URL=http://backend:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  # Named volumes persist across `docker compose down` / container
+  # restarts (only `docker compose down -v` would remove them) - this is
+  # what keeps the SQLite DB (scheduler results, job history) and logs
+  # alive across deploys.
+  app_data:
+  app_logs:

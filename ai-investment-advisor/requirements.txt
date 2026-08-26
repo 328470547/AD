@@ -1,0 +1,55 @@
+# ==============================================================================
+# AI Investment Advisor - Python dependencies
+# ==============================================================================
+
+# --- Backend / API (Phase 1-2) ---
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.9.2
+pydantic-settings==2.7.0  # 2.6.1 lacks NoDecode, needed by app/core/config.py
+httpx==0.27.2
+tenacity==9.0.0
+cachetools==5.5.0
+orjson==3.10.11
+python-dotenv==1.0.1
+python-multipart==0.0.17
+
+# --- Database (UTF-8 native storage / caching layer) ---
+SQLAlchemy==2.0.36
+aiosqlite==0.20.0
+asyncpg==0.30.0
+
+# --- Market data ---
+yfinance==0.2.48
+
+# --- SEC filings ---
+sec-api==1.0.20
+
+# --- AI Engine (Phase 3 - Hebrew financial reasoning) ---
+# Default provider: Gemini (LLM_PROVIDER=google), free tier at
+# https://aistudio.google.com/apikey. Claude (langchain-anthropic) is kept
+# as an optional paid alternative - see app/agents/llm.py.
+# Note: the top-level `langchain` package is deliberately NOT listed here -
+# nothing in this codebase imports it (only langchain_core, pulled in
+# transitively by the two packages below), and langchain==0.3.7 hard-pins
+# numpy<2.0.0, which has no Windows wheel for Python 3.13+ and breaks
+# installation with a "no C compiler" build error. Don't add it back
+# without checking its numpy pin against the Python versions this project
+# supports.
+langchain-google-genai==2.0.7
+langchain-anthropic==0.3.0
+google-generativeai==0.8.3
+anthropic==0.39.0
+
+# --- Task scheduling (real-time news polling / daily SEC report scans) ---
+# In-process AsyncIOScheduler - no broker/worker process needed.
+apscheduler==3.10.4
+
+# --- Frontend dashboard (Phase 4 - RTL / Hebrew UI) ---
+streamlit==1.40.1
+plotly==5.24.1
+
+# --- Testing ---
+pytest==8.3.3
+pytest-asyncio==0.24.0
+respx==0.21.1
