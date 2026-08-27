@@ -1227,6 +1227,10 @@ footer a:hover { text-decoration: underline; }
   <ul class="nav-links">
     <li><a href="#what-is-cloud">מה זה ענן</a></li>
     <li><a href="#azure-structure">מבנה Azure</a></li>
+    <li><a href="#azure-management">ניהול Azure</a></li>
+    <li><a href="#security-identity">אבטחה וזהויות</a></li>
+    <li><a href="#compute">מחשוב</a></li>
+    <li><a href="#storage-db">אחסון ומסדי נתונים</a></li>
     <li><a href="#net-basics">יסודות רשת</a></li>
     <li><a href="#vnet">VNet</a></li>
     <li><a href="#nsg">NSG</a></li>
@@ -1268,16 +1272,17 @@ footer a:hover { text-decoration: underline; }
     <span class="az-letters">Azure ורשתות הענן</span>
   </h1>
   <p class="hero-sub">
-    המדריך שמסביר את כל עולם Azure ורשתות הענן שלו ממש מהיסוד — בלי לדעת מה זה שרת, מה זה IP או מה זה ענן מראש.
-    מהמושג "ענן" ועד Hub-Spoke, Azure Firewall ו-Private Link.
+    המדריך שמסביר את כל עולם Azure — ניהול, אבטחה וזהויות, מחשוב, אחסון, ורשתות — ממש מהיסוד,
+    בלי לדעת מה זה שרת, מה זה IP או מה זה ענן מראש.
+    מהמושג "ענן" ועד Hub-Spoke, Microsoft Entra ID ו-Azure Firewall.
   </p>
   <div class="hero-stats">
     <div class="stat">
-      <span class="stat-num">13</span>
+      <span class="stat-num">17</span>
       <span class="stat-label">נושאים מהיסוד</span>
     </div>
     <div class="stat">
-      <span class="stat-num">20</span>
+      <span class="stat-num">30</span>
       <span class="stat-label">שאלות חידון</span>
     </div>
     <div class="stat">
@@ -1451,10 +1456,283 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 3: יסודות רשת ===== -->
+<!-- ===== SECTION 3: ניהול Azure ===== -->
+<div id="azure-management" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 03 — הכלים לניהול</span>
+    <h2 class="section-title">איך <span class="accent">מנהלים</span> את כל זה?</h2>
+    <p class="section-desc">ארבע דרכים שונות "לדבר" עם Azure, ושתי שכבות ממשל ששומרות על סדר כשהארגון גדל.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🖱️ Azure Portal</h4>
+      <p>
+        ממשק האינטרנט הגרפי הרשמי לניהול Azure — לוחות בקרה (Dashboards), אשפים ליצירת משאבים,
+        גרפים לניטור וניהול משתמשים. הכי נוח למי שרק מתחיל או לבדיקה חד-פעמית, אבל לא מתאים לפעולות חוזרות בקנה מידה גדול.
+      </p>
+    </div>
+    <div class="info-block">
+      <h4>⌨️ Azure CLI ו-Azure PowerShell</h4>
+      <p>
+        שתי דרכים "לתכנת" את הניהול מתוך טרמינל: <strong>Azure CLI</strong> (פקודות בסגנון <code>az ...</code>,
+        חוצה מערכות הפעלה) ו-<strong>Azure PowerShell</strong> (מודול <code>Az</code>, מתאים למי שכבר מכיר PowerShell).
+        שניהם מאפשרים לכתוב סקריפטים ולחזור על אותה פעולה במדויק פעמים רבות — בדיוק כמו הפקודות שראיתם כבר בכל המדריך הזה.
+      </p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>⚙️ Azure Resource Manager (ARM) — המנוע שמאחורי הכל</h4>
+    <p>
+      בין אם משתמשים בפורטל, ב-CLI או ב-PowerShell — כולם בסוף פונים לאותה שכבה: <strong>ARM</strong>.
+      זהו המנוע שמקבל בקשה ("תיצור לי VNet כזה") ומבצע אותה בפועל. אפשר גם לכתוב את כל התצורה הרצויה
+      מראש בקובץ (<strong>ARM Template</strong> בפורמט JSON, או <strong>Bicep</strong> — שפה נוחה יותר שמתורגמת ל-ARM)
+      ולהריץ אותו — גישה שנקראת <strong>Infrastructure as Code (IaC)</strong>: הרשת והמשאבים שלכם מתועדים כקוד,
+      ניתנים לשחזור ולביקורת בדיוק כמו כל קוד אחר.
+    </p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>📜 Azure Policy — שומר הסדר הארגוני</h4>
+      <p>
+        מנגנון שאוכף חוקים על כל מה שנוצר ב-Subscription — למשל: "אסור ליצור משאבים מחוץ ל-Israel Central",
+        "כל VM חייב תגית Owner", או "אסור ליצור Public IP מסוג Basic". פוליסה יכולה רק להתריע (Audit) או
+        גם לחסום יצירה בפועל (Deny) — כלי הממשל (Governance) המרכזי של Azure.
+      </p>
+    </div>
+    <div class="info-block">
+      <h4>🏢 Tenant מול Subscription — לא לבלבל!</h4>
+      <p>
+        <strong>Tenant</strong> הוא גבול הזהות של הארגון — ספרייה יחידה ב-Microsoft Entra ID שמכילה את כל
+        המשתמשים וההרשאות שלכם. <strong>Subscription</strong> הוא גבול החיוב וההרשאות למשאבים, וחי <em>בתוך</em> Tenant אחד.
+        ארגון אחד = בדרך כלל Tenant אחד, אך יכול להכיל בתוכו הרבה Subscriptions (לפי מחלקות, סביבות וכו').
+      </p>
+    </div>
+  </div>
+
+  <div class="highlight-box orange">
+    <h4>📦 Azure Blueprints — היה, ולאן זה עבר</h4>
+    <p>
+      בעבר, <strong>Azure Blueprints</strong> שימש לארוז יחד תבניות ARM, פוליסות והרשאות לפריסה אחידה של סביבות
+      תואמות-רגולציה. מיקרוסופט <strong>הוציאה את השירות משימוש (Retired)</strong>, וכיום הדרך המומלצת היא שילוב של
+      <strong>Template Specs</strong> ו-<strong>Deployment Stacks</strong> יחד עם Azure Policy — שווה לדעת את השם הישן
+      אם נתקלים בו בתיעוד או בסביבות ותיקות.
+    </p>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 4: אבטחה וזהויות ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="security-identity" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 04 — מי אתה ומה מותר לך</span>
+    <h2 class="section-title">אבטחה <span class="accent">וניהול זהויות</span></h2>
+    <p class="section-desc">מי מורשה להיכנס, מאיפה, ומה קורה אם משהו חשוד קורה.</p>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🪪 Microsoft Entra ID (לשעבר Azure AD)</h4>
+      <p>
+        שירות ניהול הזהויות המרכזי של Azure — הוא ה"ספר הטלפונים" שיודע מי המשתמשים, הקבוצות
+        והאפליקציות בארגון, ומה מותר לכל אחד מהם. הוא זה שמאמת אתכם כשאתם נכנסים לפורטל, ומה שמאפשר
+        <strong>Single Sign-On (SSO)</strong> ו-<strong>MFA</strong> (אימות דו-שלבי) בכל שירותי מיקרוסופט וגם באפליקציות חיצוניות.
+        (השם שונה מ-"Azure Active Directory" ל-Microsoft Entra ID — אותו שירות, שם חדש.)
+      </p>
+    </div>
+    <div class="info-block">
+      <h4>🚦 Conditional Access</h4>
+      <p>
+        מנגנון חוקים שמחליט <strong>בזמן אמת</strong> אם להתיר כניסה — לא רק לפי סיסמה נכונה, אלא גם לפי
+        מאיפה מתחברים (מדינה), מאיזה מכשיר (מנוהל/לא מנוהל), ורמת סיכון ההתחברות. לדוגמה: "דרוש MFA
+        אם ההתחברות מגיעה ממדינה לא מוכרת", או "חסום גישה ממכשירים שלא עומדים במדיניות הארגון".
+      </p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🌍 Microsoft Entra External ID (לשעבר Azure AD B2C)</h4>
+      <p>
+        בעוד Entra ID "הרגיל" מנהל עובדים פנימיים, <strong>External ID</strong> מנהל זהויות של
+        <strong>לקוחות חיצוניים</strong> — למשל משתמשים שנרשמים לאפליקציית מובייל או לאתר מסחר. מאפשר התחברות
+        עם Google, Facebook או אימייל רגיל, בלי לתת להם גישה לשום דבר פנימי בארגון.
+      </p>
+    </div>
+    <div class="info-block">
+      <h4>🔗 Microsoft Entra Domain Services (AAD DS)</h4>
+      <p>
+        שירות מנוהל שנותן יכולות בסגנון Active Directory מוכר — <strong>Kerberos, NTLM, LDAP ומדיניות דמויות GPO</strong> —
+        בלי להקים ולתחזק Domain Controllers בעצמכם. שימושי בעיקר להעברת אפליקציות ותיקות (Legacy) לענן
+        מבלי לשכתב אותן מחדש, ובתרחישים היברידיים יחד עם ה-AD המקומי (On-Prem) שלכם.
+      </p>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="info-block">
+      <h4>🛡️ Microsoft Defender for Cloud</h4>
+      <p>
+        פלטפורמת אבטחה שסורקת את כל הסביבה (וגם היברידית/רב-ענן) ונותנת <strong>Secure Score</strong> — ציון
+        המשקף כמה אתם חשופים, עם המלצות קונקרטיות לתיקון. כוללת גם הגנת זמן-ריצה (Workload Protection)
+        על VMs, מאגרי מידע ומכולות.
+      </p>
+    </div>
+    <div class="info-block">
+      <h4>🔑 Azure Key Vault</h4>
+      <p>
+        כספת דיגיטלית מרכזית לאחסון <strong>סודות, מפתחות הצפנה ותעודות (Certificates)</strong> — כדי שאפליקציות
+        לא ישמרו סיסמאות או API Keys בקוד המקור. גישה נשלטת בהרשאות מדויקות, וכל שימוש נרשם ביומן ביקורת.
+      </p>
+    </div>
+  </div>
+
+  <div class="highlight-box purple">
+    <h4>🕵️ Microsoft Sentinel — ה"חדר בקרה" הביטחוני</h4>
+    <p>
+      <strong>SIEM/SOAR</strong> מבוסס ענן — אוסף לוגים והתראות מכל הסביבה (Azure, On-Prem, ואפילו עננים אחרים),
+      מזהה דפוסי התקפה חשודים באמצעות ניתוח וכללים חכמים, ויכול אף להפעיל תגובה אוטומטית (למשל: לנתק
+      אוטומטית משתמש שנחשד בפריצה). זהו הכלי שרואה את "התמונה המלאה" מכל שאר כלי האבטחה יחד.
+    </p>
+  </div>
+
+  <div class="highlight-box green">
+    <h4>💡 איך כל זה מתחבר יחד</h4>
+    <p>
+      <strong>Entra ID</strong> קובע מי אתם. <strong>Conditional Access</strong> קובע באילו תנאים מותר לכם להיכנס.
+      <strong>Key Vault</strong> שומר את הסודות שהאפליקציות שלכם צריכות. <strong>Defender for Cloud</strong> בודק
+      שההגדרות שלכם תקינות. <strong>Sentinel</strong> צופה על הכל ומתריע אם משהו חורג. זו הגנה בשכבות (Defense in Depth).
+    </p>
+  </div>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 5: מחשוב ===== -->
+<div id="compute" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 05 — היכן הקוד באמת רץ</span>
+    <h2 class="section-title"><span class="accent">מחשוב</span> ב-Azure — Compute</h2>
+    <p class="section-desc">מ"שרת וירטואלי רגיל" ועד קוד שרץ לשניות בודדות בלי שרת בכלל.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🖥️</div>
+      <h3>Azure Virtual Machines</h3>
+      <p>שרת וירטואלי מלא (IaaS) — שליטה מוחלטת על מערכת ההפעלה, בדיוק כמו שרת פיזי, רק בענן.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📈</div>
+      <h3>Virtual Machine Scale Sets</h3>
+      <p>קבוצת VMs זהים שגדלה ומצטמצמת אוטומטית לפי עומס (Auto Scaling) — בסיס לאתרים גדולים.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">☸️</div>
+      <h3>Azure Kubernetes Service (AKS)</h3>
+      <p>Kubernetes מנוהל — מריץ אפליקציות ארוזות במכולות (Containers) בקנה מידה, בלי לנהל את השרתים בעצמכם.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Azure App Service</h3>
+      <p>PaaS להרצת אתרים ו-APIs (.NET, Node.js, Python, Java...) — מעלים קוד, Azure מטפל בשרת, בגיבוי ובקנה המידה.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h3>Azure Functions</h3>
+      <p>קוד "חסר שרת" (Serverless) שרץ רק כשמפעילים אותו (למשל בקשת HTTP או קובץ חדש) — משלמים רק על זמן ריצה בפועל.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔀</div>
+      <h3>Azure Logic Apps</h3>
+      <p>בניית תהליכים אוטומטיים בגרירה-והשלכה בין עשרות שירותים, כמעט בלי לכתוב קוד בכלל.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🧮</div>
+      <h3>Azure Batch</h3>
+      <p>הרצת עבודות חישוב מקבילות בקנה מידה ענק (HPC) — למשל עיבוד וידאו או סימולציות מדעיות על אלפי ליבות בו-זמנית.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <h4>🍕 חזרה לאנלוגיית הפיצה — איפה כל שירות נמצא</h4>
+    <p>
+      <strong>Virtual Machines</strong> = IaaS (אתם אחראים כמעט על הכל). <strong>App Service ו-AKS</strong> = PaaS
+      (הפלטפורמה מוכנה, אתם רק מריצים עליה). <strong>Azure Functions ו-Logic Apps</strong> = Serverless
+      (הקצה הכי "משוחרר" — אין בכלל שרת לחשוב עליו, רק הקוד/התהליך עצמו).
+    </p>
+  </div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 6: אחסון ומסדי נתונים ===== -->
+<div style="background:var(--bg2); padding: 1px 0;">
+<div id="storage-db" class="section-wrapper">
+  <div class="section-header">
+    <span class="section-tag">// 06 — איפה המידע נשמר</span>
+    <h2 class="section-title">אחסון <span class="accent">ומסדי נתונים</span></h2>
+    <p class="section-desc">מקבצים גולמיים ועד מסדי נתונים גלובליים בקנה מידה ענק.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-icon">🗄️</div>
+      <h3>Azure Storage Account</h3>
+      <p>ה"מיכל" העל שמאחד תחתיו את שירותי האחסון: Blob, Files, Queues ו-Tables. כל דבר שנשמר ב-Azure שאינו מסד נתונים מובנה — עובר דרכו.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📦</div>
+      <h3>Azure Blob Storage</h3>
+      <p>אחסון לקבצים לא-מובְנים בכמויות עצומות — תמונות, וידאו, גיבויים, לוגים. בעל שכבות מחיר (Hot/Cool/Archive) לפי תדירות הגישה.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📁</div>
+      <h3>Azure Files</h3>
+      <p>שיתוף קבצים מנוהל בענן, נגיש כמו כונן רשת רגיל (פרוטוקול SMB/NFS) — מצוין להחלפת שרת קבצים ישן.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🗃️</div>
+      <h3>Azure SQL Database</h3>
+      <p>מסד נתונים יחסי מנוהל, מבוסס SQL Server — טבלאות, קשרים, שאילתות SQL רגילות, בלי לתחזק שרת בעצמכם.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🌐</div>
+      <h3>Azure Cosmos DB</h3>
+      <p>מסד נתונים NoSQL גלובלי ומבוזר, עם תמיכה במספר מודלים (MongoDB, Cassandra ועוד) והשהיה נמוכה בכל העולם.</p>
+    </div>
+  </div>
+
+  <div class="highlight-box orange">
+    <h4>🌡️ שכבות מחיר ב-Blob Storage</h4>
+    <p>
+      <strong>Hot</strong> — לגישה תכופה, יקר יותר לאחסון וזול לגישה. <strong>Cool</strong> — לנתונים שנגישים לעיתים רחוקות
+      (חודש ומעלה). <strong>Archive</strong> — לארכיון ארוך טווח, הכי זול לאחסון אך לוקח שעות לשחזר קובץ ממנו.
+      בחירה נכונה בין השכבות חוסכת עלויות משמעותיות.
+    </p>
+  </div>
+
+  <table class="compare-table">
+    <tr><th>מאפיין</th><th>Azure SQL Database</th><th>Cosmos DB</th></tr>
+    <tr><td>סוג מודל</td><td>יחסי (טבלאות, SQL)</td><td>NoSQL (מסמכים/מפתח-ערך/גרף)</td></tr>
+    <tr><td>סכמה (Schema)</td><td>קבועה מראש</td><td>גמישה, ללא סכמה נוקשה</td></tr>
+    <tr><td>פיזור גלובלי</td><td>מוגבל</td><td>מובנה — שכפול לעשרות רג'ינים בלחיצה</td></tr>
+    <tr><td>מתאים ל</td><td>מערכות עסקיות מסורתיות (ERP, CRM)</td><td>אפליקציות גלובליות בקנה מידה ענק</td></tr>
+  </table>
+</div>
+</div>
+
+<div class="separator"></div>
+
+<!-- ===== SECTION 7: יסודות רשת ===== -->
 <div id="net-basics" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 03 — יסודות שכל אחד חייב</span>
+    <span class="section-tag">// 07 — יסודות שכל אחד חייב</span>
     <h2 class="section-title">יסודות <span class="accent">רשתות מחשבים</span> — בלי לדעת כלום מראש</h2>
     <p class="section-desc">לפני שנדבר על Azure ספציפית — בואו נבין מה זה בכלל IP, כתובת, פורט ו-DNS.</p>
   </div>
@@ -1548,11 +1826,11 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 4: VNet ===== -->
+<!-- ===== SECTION 8: VNet ===== -->
 <div style="background:var(--bg2); padding: 1px 0;">
 <div id="vnet" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 04 — הרכיב המרכזי</span>
+    <span class="section-tag">// 08 — הרכיב המרכזי</span>
     <h2 class="section-title">Virtual Network — <span class="accent">VNet</span></h2>
     <p class="section-desc">ה-"בניין המשרדים הפרטי" שלכם בתוך הענן — הבסיס שעליו נבנה כל מה שאחר.</p>
   </div>
@@ -1612,10 +1890,10 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 5: NSG ===== -->
+<!-- ===== SECTION 9: NSG ===== -->
 <div id="nsg" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 05 — אבטחת רשת</span>
+    <span class="section-tag">// 09 — אבטחת רשת</span>
     <h2 class="section-title"><span class="accent">Network Security Group</span> — ה"מאבטח" של הרשת</h2>
     <p class="section-desc">מי מותר לו להיכנס ולצאת מכל Subnet או כרטיס רשת.</p>
   </div>
@@ -1688,11 +1966,11 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 6: Peering & Routing ===== -->
+<!-- ===== SECTION 10: Peering & Routing ===== -->
 <div style="background:var(--bg2); padding: 1px 0;">
 <div id="routing" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 06 — חיבור בין רשתות</span>
+    <span class="section-tag">// 10 — חיבור בין רשתות</span>
     <h2 class="section-title"><span class="accent">Peering</span> ו-<span class="accent">Routing</span></h2>
     <p class="section-desc">איך שתי VNets מדברות ביניהן, ואיך שולטים בדיוק לאן התעבורה הולכת.</p>
   </div>
@@ -1775,10 +2053,10 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 7: חיבור לעולם החוץ ===== -->
+<!-- ===== SECTION 11: חיבור לעולם החוץ ===== -->
 <div id="connectivity" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 07 — חיבור מחוץ ל-Azure</span>
+    <span class="section-tag">// 11 — חיבור מחוץ ל-Azure</span>
     <h2 class="section-title">חיבור <span class="accent">On-Prem ↔ Azure</span></h2>
     <p class="section-desc">איך מחברים משרד פיזי, בית או מרכז נתונים קיים לרשת שב-Azure.</p>
   </div>
@@ -1839,11 +2117,11 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 8: איזון עומסים ===== -->
+<!-- ===== SECTION 12: איזון עומסים ===== -->
 <div style="background:var(--bg2); padding: 1px 0;">
 <div id="load-balancing" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 08 — פיזור תעבורה</span>
+    <span class="section-tag">// 12 — פיזור תעבורה</span>
     <h2 class="section-title">איזון עומסים — <span class="accent">מי מכוון לאן</span></h2>
     <p class="section-desc">כשיש כמה שרתים זהים, מי מחליט לאיזה מהם תגיע כל בקשה?</p>
   </div>
@@ -1894,10 +2172,10 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 9: Private Link ===== -->
+<!-- ===== SECTION 13: Private Link ===== -->
 <div id="private-link" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 09 — גישה פרטית לשירותים</span>
+    <span class="section-tag">// 13 — גישה פרטית לשירותים</span>
     <h2 class="section-title"><span class="accent">Private Link</span> ו-Service Endpoints</h2>
     <p class="section-desc">איך ניגשים לשירותי PaaS (כמו Storage או SQL) בלי לצאת בכלל לאינטרנט הציבורי.</p>
   </div>
@@ -1947,11 +2225,11 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 10: DNS ===== -->
+<!-- ===== SECTION 14: DNS ===== -->
 <div style="background:var(--bg2); padding: 1px 0;">
 <div id="dns" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 10 — פתרון שמות</span>
+    <span class="section-tag">// 14 — פתרון שמות</span>
     <h2 class="section-title"><span class="accent">Azure DNS</span></h2>
     <p class="section-desc">איך שמות דומיין מתורגמים לכתובות IP — גם בציבור וגם בתוך הרשת הפרטית.</p>
   </div>
@@ -1986,10 +2264,10 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 11: Firewall ===== -->
+<!-- ===== SECTION 15: Firewall ===== -->
 <div id="firewall" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 11 — הגנה מתקדמת</span>
+    <span class="section-tag">// 15 — הגנה מתקדמת</span>
     <h2 class="section-title"><span class="accent">Azure Firewall</span>, WAF ו-DDoS</h2>
     <p class="section-desc">כשה-NSG הפשוט לא מספיק — כלי האבטחה המתקדמים יותר של Azure.</p>
   </div>
@@ -2035,11 +2313,11 @@ footer a:hover { text-decoration: underline; }
 
 <div class="separator"></div>
 
-<!-- ===== SECTION 12: מעבדה ===== -->
+<!-- ===== SECTION 16: מעבדה ===== -->
 <div style="background:var(--bg2); padding: 1px 0;">
 <div id="lab" class="section-wrapper">
   <div class="section-header">
-    <span class="section-tag">// 12 — תרגול</span>
+    <span class="section-tag">// 16 — תרגול</span>
     <h2 class="section-title">מעבדה — <span class="accent">Hands-On</span></h2>
     <p class="section-desc">שישה תרגילים הדרגתיים, מהבסיס ועד טופולוגיה ארגונית מלאה.</p>
   </div>
@@ -2249,6 +2527,35 @@ footer a:hover { text-decoration: underline; }
     <div class="glossary-item"><div class="glossary-term">Availability Zone</div><div class="glossary-def">מיקום פיזי עצמאי בתוך רג'ין, להגנה מתקלות</div></div>
     <div class="glossary-item"><div class="glossary-term">Hub-Spoke</div><div class="glossary-def">טופולוגיית רשת מרכזית: כל ה-Spokes מתחברים ל-Hub אחד לבדיקה ושליטה</div></div>
     <div class="glossary-item"><div class="glossary-term">Virtual WAN</div><div class="glossary-def">שירות Azure לניהול קישוריות גלובלית ורב-אתרית ברמת ארגון</div></div>
+    <div class="glossary-item"><div class="glossary-term">Management Group</div><div class="glossary-def">שכבת ניהול מעל Subscriptions, לאכיפת מדיניות על כל הארגון</div></div>
+    <div class="glossary-item"><div class="glossary-term">Subscription</div><div class="glossary-def">גבול חיוב והרשאות למשאבים, חי בתוך Tenant אחד</div></div>
+    <div class="glossary-item"><div class="glossary-term">Resource Group</div><div class="glossary-def">תיקייה לוגית לקיבוץ משאבים ששייכים יחד</div></div>
+    <div class="glossary-item"><div class="glossary-term">Tenant</div><div class="glossary-def">גבול הזהות של הארגון ב-Microsoft Entra ID</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure Portal</div><div class="glossary-def">ממשק האינטרנט הגרפי הרשמי לניהול Azure</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure CLI / PowerShell</div><div class="glossary-def">כלי שורת פקודה לניהול וסקריפטים אוטומטיים</div></div>
+    <div class="glossary-item"><div class="glossary-term">ARM</div><div class="glossary-def">Azure Resource Manager — המנוע שמבצע כל פעולת ניהול בפועל</div></div>
+    <div class="glossary-item"><div class="glossary-term">ARM Template / Bicep</div><div class="glossary-def">קובץ המתאר תשתית כקוד (IaC) לפריסה חוזרת ועקבית</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure Policy</div><div class="glossary-def">מנגנון ממשל שאוכף או מתריע על חוקים במשאבים</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure Blueprints</div><div class="glossary-def">שירות ישן ומיושן (Retired) לאריזת תבניות ופוליסות; הוחלף ב-Template Specs</div></div>
+    <div class="glossary-item"><div class="glossary-term">Microsoft Entra ID</div><div class="glossary-def">לשעבר Azure AD — ניהול זהויות מרכזי: משתמשים, SSO, MFA</div></div>
+    <div class="glossary-item"><div class="glossary-term">Conditional Access</div><div class="glossary-def">חוקי כניסה בזמן אמת לפי מיקום, מכשיר וסיכון</div></div>
+    <div class="glossary-item"><div class="glossary-term">Entra External ID</div><div class="glossary-def">לשעבר Azure AD B2C — ניהול זהויות ללקוחות חיצוניים</div></div>
+    <div class="glossary-item"><div class="glossary-term">Entra Domain Services</div><div class="glossary-def">לשעבר Azure AD DS — Kerberos/NTLM/LDAP כשירות מנוהל</div></div>
+    <div class="glossary-item"><div class="glossary-term">Key Vault</div><div class="glossary-def">כספת מרכזית לסודות, מפתחות הצפנה ותעודות</div></div>
+    <div class="glossary-item"><div class="glossary-term">Defender for Cloud</div><div class="glossary-def">פלטפורמת אבטחה עם Secure Score והגנת זמן-ריצה</div></div>
+    <div class="glossary-item"><div class="glossary-term">Microsoft Sentinel</div><div class="glossary-def">SIEM/SOAR מבוסס ענן לזיהוי ותגובה לאיומים</div></div>
+    <div class="glossary-item"><div class="glossary-term">Virtual Machine (VM)</div><div class="glossary-def">שרת וירטואלי מלא (IaaS) עם שליטה מוחלטת על מערכת ההפעלה</div></div>
+    <div class="glossary-item"><div class="glossary-term">VMSS</div><div class="glossary-def">Virtual Machine Scale Set — קבוצת VMs שגדלה/מצטמצמת אוטומטית</div></div>
+    <div class="glossary-item"><div class="glossary-term">AKS</div><div class="glossary-def">Azure Kubernetes Service — Kubernetes מנוהל להרצת קונטיינרים</div></div>
+    <div class="glossary-item"><div class="glossary-term">App Service</div><div class="glossary-def">PaaS להרצת אתרים ו-APIs בלי לנהל שרת בעצמכם</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure Functions</div><div class="glossary-def">קוד Serverless שרץ רק כשמפעילים אותו</div></div>
+    <div class="glossary-item"><div class="glossary-term">Logic Apps</div><div class="glossary-def">בניית תהליכים אוטומטיים בין שירותים כמעט בלי קוד</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure Batch</div><div class="glossary-def">הרצת עבודות חישוב מקבילות בקנה מידה ענק (HPC)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Storage Account</div><div class="glossary-def">המיכל העל של שירותי האחסון: Blob, Files, Queues, Tables</div></div>
+    <div class="glossary-item"><div class="glossary-term">Blob Storage</div><div class="glossary-def">אחסון קבצים לא-מובנים עם שכבות מחיר Hot/Cool/Archive</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure Files</div><div class="glossary-def">שיתוף קבצים מנוהל, נגיש כמו כונן רשת (SMB/NFS)</div></div>
+    <div class="glossary-item"><div class="glossary-term">Azure SQL Database</div><div class="glossary-def">מסד נתונים יחסי מנוהל, מבוסס SQL Server</div></div>
+    <div class="glossary-item"><div class="glossary-term">Cosmos DB</div><div class="glossary-def">מסד נתונים NoSQL גלובלי ומבוזר בהשהיה נמוכה</div></div>
   </div>
 </div>
 </div>
@@ -2304,6 +2611,20 @@ const flashcards = [
   { term: "Service Endpoint", def: "מרחיב את זהות ה-VNet לשירות ציבורי, בלי לתת לו כתובת פרטית ייעודית." },
   { term: "Azure Firewall", def: "חומת אש מנוהלת ברמת Hub, כולל סינון לפי שם דומיין (FQDN) ומודיעין איומים." },
   { term: "Hub-Spoke", def: "טופולוגיה שבה כל ה-VNets (Spokes) מתחברים ל-VNet מרכזי אחד (Hub) לבדיקה ושליטה." },
+  { term: "Azure Resource Manager (ARM)", def: "המנוע שמבצע בפועל כל פעולת ניהול ב-Azure, בין אם דרך הפורטל, CLI, PowerShell או תבנית." },
+  { term: "Azure Policy", def: "מנגנון ממשל שאוכף חוקים על משאבים — יכול להתריע (Audit) או לחסום (Deny) יצירת משאב לא תואם." },
+  { term: "Tenant", def: "גבול הזהות של הארגון ב-Microsoft Entra ID. מכיל בתוכו את כל ה-Subscriptions של הארגון." },
+  { term: "Microsoft Entra ID", def: "לשעבר Azure AD — שירות ניהול הזהויות המרכזי: משתמשים, קבוצות, SSO ו-MFA." },
+  { term: "Conditional Access", def: "מנגנון שמחליט בזמן אמת אם להתיר כניסה, לפי מיקום, מכשיר ורמת סיכון." },
+  { term: "Microsoft Entra Domain Services", def: "שירות מנוהל שנותן Kerberos/NTLM/LDAP בלי להקים Domain Controllers בעצמכם." },
+  { term: "Azure Key Vault", def: "כספת דיגיטלית מרכזית לאחסון סודות, מפתחות הצפנה ותעודות." },
+  { term: "Microsoft Defender for Cloud", def: "פלטפורמת אבטחה שנותנת Secure Score והגנת זמן-ריצה על המשאבים." },
+  { term: "Microsoft Sentinel", def: "SIEM/SOAR מבוסס ענן — אוסף לוגים מכל הסביבה ומזהה דפוסי התקפה." },
+  { term: "Azure Virtual Machine", def: "שרת וירטואלי מלא (IaaS) עם שליטה מוחלטת על מערכת ההפעלה." },
+  { term: "Azure App Service", def: "PaaS להרצת אתרים ו-APIs בלי לתחזק שרת — Azure מטפל בקנה המידה ובגיבוי." },
+  { term: "Azure Functions", def: "קוד Serverless שרץ רק כשמפעילים אותו — משלמים רק על זמן ריצה בפועל." },
+  { term: "Azure Blob Storage", def: "אחסון לקבצים לא-מובנים בכמויות עצומות, עם שכבות מחיר Hot/Cool/Archive." },
+  { term: "Azure Cosmos DB", def: "מסד נתונים NoSQL גלובלי ומבוזר עם השהיה נמוכה בכל העולם." },
 ];
 
 let fcIdx = 0;
@@ -2356,6 +2677,16 @@ const questions = [
   { q: "WAF (Web Application Firewall) מגן בעיקר מפני...", opts: ["תקלות חומרה פיזיות", "התקפות ברמת אפליקציית ווב כמו SQL Injection ו-XSS", "בעיות תצורת DNS", "אזילת פורטי SNAT"], ans: 1, exp: "WAF מיועד להגן על אפליקציות ווב מפני התקפות נפוצות ברמת האפליקציה, לפי כללי OWASP." },
   { q: "מה ההבדל בין DDoS Protection Basic ל-Standard?", opts: ["אין הבדל ביניהם", "Basic פעיל אוטומטית לכולם בחינם; Standard בתשלום עם מדיניות מותאמת והגנת עלויות", "Standard חינמי ו-Basic בתשלום", "שניהם דורשים הגדרה ידנית מלאה מראש"], ans: 1, exp: "Basic מגן אוטומטית ובחינם ברמת בסיס; Standard מוסיף התאמה אישית, ניטור מפורט והגנה כספית." },
   { q: "מהי Availability Zone?", opts: ["רג'ין שלם ב-Azure", "מיקום פיזי נפרד בתוך רג'ין, עם חשמל/קירור/רשת עצמאיים", "סוג מיוחד של VNet", "שרת גיבוי בודד"], ans: 1, exp: "Availability Zone היא מרכז נתונים פיזי נפרד בתוך אותו רג'ין, המאפשר עמידות בתקלות." },
+  { q: "מה תפקידו של Azure Resource Manager (ARM)?", opts: ["ניטור עלויות בלבד", "המנוע שמבצע בפועל כל פעולת ניהול, בין אם דרך הפורטל, CLI או PowerShell", "ניהול משתמשים בלבד", "אחסון קבצים"], ans: 1, exp: "כל דרכי הניהול ב-Azure (פורטל, CLI, PowerShell, תבניות) פונות בסופו של דבר לאותה שכבה — ARM." },
+  { q: "מה ההבדל בין Tenant ל-Subscription?", opts: ["אין הבדל", "Tenant הוא גבול הזהות של הארגון, Subscription הוא גבול החיוב וההרשאות למשאבים וחי בתוך Tenant", "Subscription גדול יותר מ-Tenant", "Tenant משמש רק ל-Storage"], ans: 1, exp: "Tenant הוא ה'ספרייה' הארגונית ב-Microsoft Entra ID; בתוכו יכולים לחיות כמה Subscriptions." },
+  { q: "מה קרה לשירות Azure Blueprints?", opts: ["הוא עדיין השירות המומלץ ביותר", "הוא הוצא משימוש (Retired), והוחלף ב-Template Specs ו-Deployment Stacks", "הוא הוחלף ב-Azure Policy בלבד", "הוא שירות חדש שהושק לאחרונה"], ans: 1, exp: "מיקרוסופט הוציאה את Azure Blueprints משימוש, וממליצה כיום על שילוב Template Specs, Deployment Stacks ו-Azure Policy." },
+  { q: "מהו Microsoft Entra ID?", opts: ["שירות אחסון קבצים", "השם הנוכחי של Azure Active Directory — שירות ניהול הזהויות המרכזי", "כלי לניטור עלויות", "שירות רשת בלבד"], ans: 1, exp: "Azure Active Directory שונה שמו ל-Microsoft Entra ID — אך זהו עדיין אותו שירות ניהול זהויות מרכזי." },
+  { q: "Conditional Access מחליט אם להתיר כניסה על בסיס...", opts: ["סיסמה נכונה בלבד", "מיקום, סוג המכשיר ורמת הסיכון של ההתחברות, מעבר לסיסמה בלבד", "מספר טלפון בלבד", "שם המשתמש בלבד"], ans: 1, exp: "Conditional Access בודק תנאים נוספים בזמן אמת — כמו מיקום גיאוגרפי, תאימות המכשיר ורמת סיכון — ולא רק סיסמה נכונה." },
+  { q: "למה משמש Microsoft Entra Domain Services?", opts: ["אחסון קבצים גדולים", "מתן יכולות Kerberos/NTLM/LDAP כשירות מנוהל, בלי להקים Domain Controllers בעצמכם", "פיזור עומסים", "ניטור רשת בלבד"], ans: 1, exp: "AAD DS נותן יכולות בסגנון Active Directory מוכר כשירות מנוהל — שימושי במיוחד להעברת אפליקציות ותיקות לענן." },
+  { q: "מה שומר Azure Key Vault?", opts: ["גיבויי VM שלמים", "סודות, מפתחות הצפנה ותעודות (Certificates)", "לוגים של רשת בלבד", "תמונות ווידאו"], ans: 1, exp: "Key Vault הוא כספת דיגיטלית לאחסון בטוח של סודות, מפתחות ותעודות, כדי שלא יישמרו בקוד המקור." },
+  { q: "מה ההבדל העיקרי בין Azure VM ל-Azure Functions?", opts: ["אין הבדל", "VM הוא שרת מלא שרץ תמיד (IaaS), Functions הוא קוד Serverless שרץ רק כשמפעילים אותו", "Functions יקר יותר תמיד", "VM לא תומך ב-Windows"], ans: 1, exp: "VM נותן שליטה מלאה על שרת שרץ ברציפות; Azure Functions מריץ קטע קוד רק כשיש טריגר, ומחייב רק על זמן הריצה בפועל." },
+  { q: "מה ההבדל המרכזי בין Azure SQL Database ל-Cosmos DB?", opts: ["אין הבדל", "Azure SQL הוא מסד נתונים יחסי עם סכמה קבועה, Cosmos DB הוא NoSQL גמיש ומבוזר גלובלית", "Cosmos DB תמיד יקר יותר", "Azure SQL לא תומך ב-SQL"], ans: 1, exp: "Azure SQL Database מתאים למערכות עסקיות מסורתיות עם טבלאות וקשרים; Cosmos DB מתאים לאפליקציות גלובליות עם דרישת השהיה נמוכה בכל העולם." },
+  { q: "מה תפקידו של Microsoft Sentinel?", opts: ["ניהול חשבוניות ותשלומים", "SIEM/SOAR מבוסס ענן שאוסף לוגים מכל הסביבה ומזהה דפוסי התקפה, כולל תגובה אוטומטית", "אחסון קבצים גדולים בלבד", "ניהול רשומות DNS בלבד"], ans: 1, exp: "Microsoft Sentinel רואה את 'התמונה המלאה' מכל כלי האבטחה יחד, מזהה איומים ויכול אף להפעיל תגובה אוטומטית." },
 ];
 
 let qIdx = 0;
