@@ -1217,36 +1217,337 @@ footer a:hover { text-decoration: underline; }
 .ip-octet .lbl { color: var(--text3); font-size: 0.65rem; display: block; margin-top: 0.2rem; }
 .ip-octet.host .val { color: var(--green); }
 .ip-dot { color: var(--text3); font-size: 1.4rem; align-self: center; }
+
+
+/* ===================================================================
+   APP SHELL — multi-page course layout (added on top of original design)
+   =================================================================== */
+
+.topbar {
+  position: fixed;
+  top: 0; right: 0; left: 0;
+  z-index: 1000;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.5rem;
+  background: rgba(5,10,15,0.95);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-logo {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 1.15rem;
+  color: var(--cyan);
+  text-shadow: var(--glow);
+  letter-spacing: 2px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.topbar-logo span { color: var(--green); }
+
+.topbar-actions { display: flex; align-items: center; gap: 0.6rem; }
+
+.topbar-link {
+  font-size: 0.8rem;
+  color: var(--text2);
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: none;
+  font-family: 'Noto Sans Hebrew', sans-serif;
+}
+.topbar-link:hover { color: var(--cyan); border-color: var(--border2); background: rgba(0,212,255,0.05); }
+
+.sidebar-toggle {
+  display: none;
+  width: 38px; height: 38px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--cyan);
+  font-size: 1.1rem;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  max-width: 1440px;
+  margin: 60px auto 0;
+  display: flex;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 270px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 60px;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  padding: 1.5rem 1.2rem 3rem;
+  border-left: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+.sidebar-group { margin-bottom: 1.6rem; }
+
+.sidebar-group-title {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.68rem;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  padding-right: 0.4rem;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  color: var(--text2);
+  text-decoration: none;
+  font-size: 0.86rem;
+  margin-bottom: 0.15rem;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+
+.sidebar-link:hover { color: #fff; background: rgba(0,212,255,0.05); }
+
+.sidebar-link.active {
+  color: var(--cyan);
+  background: rgba(0,212,255,0.1);
+  border-color: rgba(0,212,255,0.25);
+  font-weight: 600;
+}
+
+.sidebar-link .ico { font-size: 0.95rem; width: 1.3em; text-align: center; flex-shrink: 0; }
+
+.content-pane {
+  flex: 1;
+  min-width: 0;
+  padding: 0 3rem 2rem;
+}
+
+@media (max-width: 1000px) {
+  .content-pane { padding: 0 1.2rem 2rem; }
+  .sidebar { width: 230px; }
+}
+
+@media (max-width: 860px) {
+  .sidebar-toggle { display: flex; }
+  .app-shell { flex-direction: column; margin-top: 60px; }
+  .sidebar {
+    position: fixed;
+    top: 60px; right: 0; left: 0;
+    height: auto;
+    max-height: calc(100vh - 60px);
+    width: auto;
+    border-left: none;
+    border-bottom: 1px solid var(--border);
+    z-index: 900;
+    transform: translateY(-120%);
+    transition: transform 0.25s ease;
+  }
+  body.sidebar-open .sidebar { transform: translateY(0); }
+  .content-pane { padding: 1.2rem 1.2rem 2rem; width: 100%; }
+}
+
+/* pages: only the active one is shown */
+.page { display: none; max-width: 1100px; margin: 0 auto; }
+.page.active { display: block; animation: fadeInUp 0.35s ease; }
+.page[data-page="home"] { max-width: none; }
+
+.page-hero {
+  padding: 3rem 0 2rem;
+}
+
+.page-topbar-spacer { height: 0; }
+
+/* prev/next lesson footer nav */
+.page-footer-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 3rem 0 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.pfn-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text);
+  text-decoration: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  max-width: 46%;
+  transition: all 0.2s;
+}
+.pfn-btn:hover { border-color: var(--cyan); box-shadow: var(--glow); }
+.pfn-btn .pfn-label { font-size: 0.68rem; color: var(--text3); font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+.pfn-btn .pfn-title { color: #fff; font-weight: 600; }
+.pfn-btn.pfn-next { text-align: left; margin-right: auto; align-items: flex-end; }
+.pfn-btn.pfn-prev { text-align: right; }
+
+/* ===== real-world example callout ===== */
+.example-box {
+  background: rgba(255,215,0,0.05);
+  border: 1px solid rgba(255,215,0,0.25);
+  border-radius: 12px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.8rem 0 0.5rem;
+}
+.example-box h4 {
+  font-family: 'Exo 2', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--yellow);
+  margin-bottom: 0.7rem;
+}
+.example-box p { font-size: 0.9rem; color: var(--text2); line-height: 1.8; }
+
+/* ===== exam hub & runner ===== */
+.exam-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.exam-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  transition: all 0.25s;
+}
+.exam-card:hover { border-color: var(--border2); box-shadow: var(--glow); transform: translateY(-3px); }
+
+.exam-card-top { display: flex; align-items: center; justify-content: space-between; }
+.exam-card h3 { font-family: 'Exo 2', sans-serif; font-size: 1.15rem; color: #fff; }
+.exam-card p { font-size: 0.85rem; color: var(--text2); line-height: 1.7; }
+
+.diff-final { background: rgba(157,78,221,0.15); color: var(--purple); }
+
+.exam-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text3);
+  font-family: 'Share Tech Mono', monospace;
+  border-top: 1px solid var(--border);
+  padding-top: 0.7rem;
+  margin-top: auto;
+}
+.exam-meta .best-score { color: var(--green); }
+.exam-meta .best-score.none { color: var(--text3); }
+
+#exam-runner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.exam-note {
+  font-size: 0.78rem;
+  color: var(--text3);
+  margin-top: 0.6rem;
+}
+
+/* mobile overlay backdrop when sidebar open */
+.sidebar-backdrop {
+  display: none;
+}
+@media (max-width: 860px) {
+  body.sidebar-open .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 60px 0 0 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 850;
+  }
+}
+
 </style>
 </head>
 <body>
 
-<!-- ===== NAVIGATION ===== -->
-<nav>
-  <div class="nav-logo">Azure<span>Networks</span></div>
-  <ul class="nav-links">
-    <li><a href="#what-is-cloud">מה זה ענן</a></li>
-    <li><a href="#azure-structure">מבנה Azure</a></li>
-    <li><a href="#azure-management">ניהול Azure</a></li>
-    <li><a href="#security-identity">אבטחה וזהויות</a></li>
-    <li><a href="#compute">מחשוב</a></li>
-    <li><a href="#storage-db">אחסון ומסדי נתונים</a></li>
-    <li><a href="#net-basics">יסודות רשת</a></li>
-    <li><a href="#vnet">VNet</a></li>
-    <li><a href="#nsg">NSG</a></li>
-    <li><a href="#routing">Peering</a></li>
-    <li><a href="#connectivity">חיבור החוצה</a></li>
-    <li><a href="#load-balancing">איזון עומסים</a></li>
-    <li><a href="#private-link">Private Link</a></li>
-    <li><a href="#dns">DNS</a></li>
-    <li><a href="#firewall">Firewall</a></li>
-    <li><a href="#lab">מעבדה</a></li>
-    <li><a href="#quiz">חידון</a></li>
-  </ul>
-</nav>
+<div class="topbar">
+  <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="תפריט">☰</button>
+  <a href="#home" class="topbar-logo">Azure<span>Networks</span></a>
+  <div class="topbar-actions">
+    <a href="#exams" class="topbar-link">📝 מבחנים</a>
+    <a href="index.html" class="topbar-link">AD Academy →</a>
+  </div>
+</div>
+<div class="sidebar-backdrop" onclick="toggleSidebar()"></div>
 
-<!-- ===== TICKER ===== -->
-<div style="height:60px"></div>
+<div class="app-shell">
+<aside class="sidebar" id="sidebar">
+<a href="#home" class="sidebar-link" data-page="home" style="margin-bottom:1.2rem"><span class="ico">🏠</span> בית</a>
+<div class="sidebar-group">
+  <div class="sidebar-group-title">יסודות</div>
+  <a href="#what-is-cloud" class="sidebar-link" data-page="what-is-cloud"><span class="ico">☁️</span> מה זה ענן</a>
+  <a href="#azure-structure" class="sidebar-link" data-page="azure-structure"><span class="ico">🏗️</span> מבנה Azure</a>
+</div>
+<div class="sidebar-group">
+  <div class="sidebar-group-title">ניהול ואבטחה</div>
+  <a href="#azure-management" class="sidebar-link" data-page="azure-management"><span class="ico">⚙️</span> ניהול Azure</a>
+  <a href="#security-identity" class="sidebar-link" data-page="security-identity"><span class="ico">🔐</span> אבטחה וזהויות</a>
+</div>
+<div class="sidebar-group">
+  <div class="sidebar-group-title">מחשוב ואחסון</div>
+  <a href="#compute" class="sidebar-link" data-page="compute"><span class="ico">🖥️</span> מחשוב</a>
+  <a href="#storage-db" class="sidebar-link" data-page="storage-db"><span class="ico">🗄️</span> אחסון ומסדי נתונים</a>
+</div>
+<div class="sidebar-group">
+  <div class="sidebar-group-title">רשתות</div>
+  <a href="#net-basics" class="sidebar-link" data-page="net-basics"><span class="ico">📡</span> יסודות רשת</a>
+  <a href="#vnet" class="sidebar-link" data-page="vnet"><span class="ico">🏢</span> VNet ותתי-רשת</a>
+  <a href="#nsg" class="sidebar-link" data-page="nsg"><span class="ico">🛡️</span> NSG ואבטחת רשת</a>
+  <a href="#routing" class="sidebar-link" data-page="routing"><span class="ico">🔗</span> Peering ו-Routing</a>
+  <a href="#connectivity" class="sidebar-link" data-page="connectivity"><span class="ico">🚪</span> חיבור לעולם החוץ</a>
+  <a href="#load-balancing" class="sidebar-link" data-page="load-balancing"><span class="ico">⚖️</span> איזון עומסים</a>
+  <a href="#private-link" class="sidebar-link" data-page="private-link"><span class="ico">🔒</span> Private Link</a>
+  <a href="#dns" class="sidebar-link" data-page="dns"><span class="ico">📖</span> DNS</a>
+  <a href="#firewall" class="sidebar-link" data-page="firewall"><span class="ico">🔥</span> Firewall, WAF ו-DDoS</a>
+</div>
+<div class="sidebar-group">
+  <div class="sidebar-group-title">תרגול ובחינה</div>
+  <a href="#lab" class="sidebar-link" data-page="lab"><span class="ico">🧪</span> מעבדה מעשית</a>
+  <a href="#exams" class="sidebar-link" data-page="exams"><span class="ico">📝</span> מבחנים</a>
+  <a href="#flashcards" class="sidebar-link" data-page="flashcards"><span class="ico">🃏</span> כרטיסי למידה</a>
+  <a href="#match-game" class="sidebar-link" data-page="match-game"><span class="ico">🎮</span> משחק התאמה</a>
+  <a href="#glossary" class="sidebar-link" data-page="glossary"><span class="ico">📚</span> מילון מונחים</a>
+</div>
+</aside>
+<main class="content-pane" id="content-pane">
+<section class="page active" data-page="home">
 <div class="ticker-wrap">
   <div class="ticker">
     <div class="ticker-item">☁️ <span>Azure</span> — הענן הציבורי של מיקרוסופט</div>
@@ -1263,9 +1564,7 @@ footer a:hover { text-decoration: underline; }
     <div class="ticker-item">🔒 <span>Private Link</span> — גישה פרטית לשירותי PaaS</div>
   </div>
 </div>
-
-<!-- ===== HERO ===== -->
-<div class="hero">
+<div class="hero page-hero">
   <div class="hero-badge">☁️ AZURE NETWORKING — מאפס, בלי רקע קודם</div>
   <h1>
     הכל על<br>
@@ -1278,12 +1577,12 @@ footer a:hover { text-decoration: underline; }
   </p>
   <div class="hero-stats">
     <div class="stat">
-      <span class="stat-num">17</span>
-      <span class="stat-label">נושאים מהיסוד</span>
+      <span class="stat-num">15</span>
+      <span class="stat-label">נושאי לימוד</span>
     </div>
     <div class="stat">
-      <span class="stat-num">30</span>
-      <span class="stat-label">שאלות חידון</span>
+      <span class="stat-num">4</span>
+      <span class="stat-label">רמות מבחן</span>
     </div>
     <div class="stat">
       <span class="stat-num">6</span>
@@ -1296,14 +1595,13 @@ footer a:hover { text-decoration: underline; }
   </div>
   <div class="hero-btns">
     <a href="#what-is-cloud" class="btn btn-primary">🚀 התחל מאפס</a>
-    <a href="#quiz" class="btn btn-outline">🎯 קח חידון</a>
+    <a href="#exams" class="btn btn-outline">🎯 למבחנים</a>
   </div>
 </div>
+</section>
 
-<div class="separator"></div>
+<section class="page" data-page="what-is-cloud">
 
-<!-- ===== SECTION 1: מה זה ענן ===== -->
-<div id="what-is-cloud" class="section-wrapper">
   <div class="section-header">
     <span class="section-tag">// 01 — ממש מהיסוד</span>
     <h2 class="section-title">מה זה בכלל <span class="accent">"ענן"</span>?</h2>
@@ -1380,13 +1678,20 @@ footer a:hover { text-decoration: underline; }
       שקובעים מי יכול לדבר עם מי, מאיפה ולאן. זה הבסיס לכל דבר אחר שתבנו בענן.
     </p>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      סטארטאפ ישראלי קטן שרוצה להשיק אתר לא צריך לקנות שרת ב-20,000 ₪ ולחכות שבועיים להתקנה —
+      הוא פותח חשבון Azure, מקים שרת וירטואלי תוך חמש דקות, ומשלם רק על השעות שבהן הוא פעיל.
+      וכשהאתר מצליח וביום ההשקה מגיע פי 10 יותר תנועה מהצפוי — אפשר להגדיל את השרת (Scale Up) תוך דקות, בלי לקנות חומרה חדשה.
+    </p>
+  </div>
 
-<!-- ===== SECTION 2: מבנה Azure ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="azure-structure" class="section-wrapper">
+</section>
+
+<section class="page" data-page="azure-structure">
+
   <div class="section-header">
     <span class="section-tag">// 02 — ארגון וניהול</span>
     <h2 class="section-title">איך <span class="accent">Azure</span> מאורגן?</h2>
@@ -1451,13 +1756,20 @@ footer a:hover { text-decoration: underline; }
     <div class="cmd"># הצגת כל ה-Subscriptions הזמינים:</div>
     <div class="cmd">az account list --output table</div>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      חברת פינטק מקימה שלושה Subscriptions נפרדים תחת אותו Tenant — אחד ל-Dev, אחד ל-Test ואחד ל-Production —
+      כדי שמפתח שטועה בסביבת הפיתוח לא יוכל בטעות למחוק משאב בסביבת הייצור. כל המשאבים שלה יושבים ברג'ין West Europe
+      בגלל רגולציית GDPR שמחייבת לשמור מידע לקוחות אירופאים בתוך אירופה בלבד.
+    </p>
+  </div>
 
-<!-- ===== SECTION 3: ניהול Azure ===== -->
-<div id="azure-management" class="section-wrapper">
+</section>
+
+<section class="page" data-page="azure-management">
+
   <div class="section-header">
     <span class="section-tag">// 03 — הכלים לניהול</span>
     <h2 class="section-title">איך <span class="accent">מנהלים</span> את כל זה?</h2>
@@ -1521,13 +1833,20 @@ footer a:hover { text-decoration: underline; }
       אם נתקלים בו בתיעוד או בסביבות ותיקות.
     </p>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      צוות תשתיות שמנהל 40 סביבות זהות ללקוחות שונים כותב את כל התצורה (VNet, NSG, VM) כקובץ Bicep אחד.
+      כשצריך לעדכן חוק אבטחה בכל הסביבות — במקום להיכנס ידנית ל-40 מקומות בפורטל, משנים שורה אחת בקוד ומריצים
+      Deployment אחד לכולם. Azure Policy חוסם כל ניסיון של מפתח ליצור משאב מחוץ לרג'ין המאושר.
+    </p>
+  </div>
 
-<!-- ===== SECTION 4: אבטחה וזהויות ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="security-identity" class="section-wrapper">
+</section>
+
+<section class="page" data-page="security-identity">
+
   <div class="section-header">
     <span class="section-tag">// 04 — מי אתה ומה מותר לך</span>
     <h2 class="section-title">אבטחה <span class="accent">וניהול זהויות</span></h2>
@@ -1608,13 +1927,20 @@ footer a:hover { text-decoration: underline; }
       שההגדרות שלכם תקינות. <strong>Sentinel</strong> צופה על הכל ומתריע אם משהו חורג. זו הגנה בשכבות (Defense in Depth).
     </p>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      בנק מחייב MFA לכל עובד שמתחבר מרשת שאינה רשת הבנק, וחוסם לחלוטין גישה ממדינות בסיכון גבוה באמצעות
+      Conditional Access. כשעובד עוזב את הארגון, מנטרלים את החשבון שלו ב-Entra ID — ומיידית הוא מאבד גישה
+      לכל 200 האפליקציות שהיו מחוברות אליו דרך Single Sign-On, במקום לבטל גישה ידנית בכל מערכת בנפרד.
+    </p>
+  </div>
 
-<!-- ===== SECTION 5: מחשוב ===== -->
-<div id="compute" class="section-wrapper">
+</section>
+
+<section class="page" data-page="compute">
+
   <div class="section-header">
     <span class="section-tag">// 05 — היכן הקוד באמת רץ</span>
     <h2 class="section-title"><span class="accent">מחשוב</span> ב-Azure — Compute</h2>
@@ -1667,13 +1993,20 @@ footer a:hover { text-decoration: underline; }
       (הקצה הכי "משוחרר" — אין בכלל שרת לחשוב עליו, רק הקוד/התהליך עצמו).
     </p>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      אתר איקומרס שמקבל 90% מהתנועה השנתית שלו ב"יום שישי השחור" משתמש ב-VMSS כדי להוסיף אוטומטית עשרות
+      שרתים בזמן העומס ולהוריד אותם בחזרה למחרת. לעומתו, חברה קטנה ששולחת התראת מייל פעם ביום מריצה זאת
+      ב-Azure Functions ומשלמת אגורות בודדות בחודש — במקום להחזיק שרת שרץ 24/7 בשביל פעולה של שנייה אחת.
+    </p>
+  </div>
 
-<!-- ===== SECTION 6: אחסון ומסדי נתונים ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="storage-db" class="section-wrapper">
+</section>
+
+<section class="page" data-page="storage-db">
+
   <div class="section-header">
     <span class="section-tag">// 06 — איפה המידע נשמר</span>
     <h2 class="section-title">אחסון <span class="accent">ומסדי נתונים</span></h2>
@@ -1724,13 +2057,20 @@ footer a:hover { text-decoration: underline; }
     <tr><td>פיזור גלובלי</td><td>מוגבל</td><td>מובנה — שכפול לעשרות רג'ינים בלחיצה</td></tr>
     <tr><td>מתאים ל</td><td>מערכות עסקיות מסורתיות (ERP, CRM)</td><td>אפליקציות גלובליות בקנה מידה ענק</td></tr>
   </table>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      חברת ביטוח שמחויבת רגולטורית לשמור הקלטות שיחות שירות במשך 7 שנים שומרת את החודש האחרון ב-Hot Tier
+      לגישה מהירה, ומעבירה אוטומטית כל מה שמעל 90 יום ל-Archive Tier — וחוסכת כך עשרות אחוזים בעלויות אחסון.
+      אפליקציית משחק גלובלית משתמשת ב-Cosmos DB כדי שכל שחקן, בכל מדינה, יקבל תגובה תוך אלפיות שנייה מהשרת הקרוב אליו.
+    </p>
+  </div>
 
-<!-- ===== SECTION 7: יסודות רשת ===== -->
-<div id="net-basics" class="section-wrapper">
+</section>
+
+<section class="page" data-page="net-basics">
+
   <div class="section-header">
     <span class="section-tag">// 07 — יסודות שכל אחד חייב</span>
     <h2 class="section-title">יסודות <span class="accent">רשתות מחשבים</span> — בלי לדעת כלום מראש</h2>
@@ -1822,13 +2162,19 @@ footer a:hover { text-decoration: underline; }
     <h4>🎯 סיכום לפני שממשיכים</h4>
     <p>ברגע שהמושגים האלה ברורים — <strong>IP, Private/Public, CIDR, Port, Firewall, DNS</strong> — אפשר להבין כל שירות רשת ב-Azure, כי כולם בנויים סביבם.</p>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      מנהל IT שרוצה לחסום גישה לאתר מסוים בכל המשרד לא חוסם כל כתובת IP של השרת (יש לו הרבה, והן משתנות) —
+      הוא חוסם לפי שם הדומיין (DNS), שהרבה יותר יציב, או משתמש בפורט ובפרוטוקול הרלוונטיים.
+    </p>
+  </div>
 
-<!-- ===== SECTION 8: VNet ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="vnet" class="section-wrapper">
+</section>
+
+<section class="page" data-page="vnet">
+
   <div class="section-header">
     <span class="section-tag">// 08 — הרכיב המרכזי</span>
     <h2 class="section-title">Virtual Network — <span class="accent">VNet</span></h2>
@@ -1885,13 +2231,20 @@ footer a:hover { text-decoration: underline; }
     <div class="cmd">  --resource-group MyRG --vnet-name MyVNet \</div>
     <div class="cmd">  --name Backend --address-prefix 10.0.2.0/24</div>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      בית חולים בונה VNet אחד לכל הקמפוס, עם Subnet נפרד למכשור רפואי מחובר-רשת (IoT), Subnet נפרד לתחנות
+      העבודה של הצוות, ו-Subnet מבודד לגמרי למאגר רשומות המטופלים הרגיש — כך שגם אם מחשב עובד נדבק בווירוס,
+      הוא לא יכול להגיע ישירות למאגר הרשומות הרפואיות.
+    </p>
+  </div>
 
-<!-- ===== SECTION 9: NSG ===== -->
-<div id="nsg" class="section-wrapper">
+</section>
+
+<section class="page" data-page="nsg">
+
   <div class="section-header">
     <span class="section-tag">// 09 — אבטחת רשת</span>
     <h2 class="section-title"><span class="accent">Network Security Group</span> — ה"מאבטח" של הרשת</h2>
@@ -1962,13 +2315,20 @@ footer a:hover { text-decoration: underline; }
     <div class="cmd">  --destination-port-ranges 3389 \</div>
     <div class="cmd">  --protocol Tcp --access Allow</div>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      חברת הייטק מגלה בלוגים שכולם בעולם מנסים להתחבר לפורט RDP (3389) של השרתים שלה. היא יוצרת כלל NSG
+      שמתיר RDP רק מכתובת ה-IP הציבורית של משרדי החברה, וחוסמת את כל השאר. בתוך שבוע, ניסיונות ההתחברות
+      הזדוניים מהאינטרנט צונחים לאפס.
+    </p>
+  </div>
 
-<!-- ===== SECTION 10: Peering & Routing ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="routing" class="section-wrapper">
+</section>
+
+<section class="page" data-page="routing">
+
   <div class="section-header">
     <span class="section-tag">// 10 — חיבור בין רשתות</span>
     <h2 class="section-title"><span class="accent">Peering</span> ו-<span class="accent">Routing</span></h2>
@@ -2048,13 +2408,20 @@ footer a:hover { text-decoration: underline; }
     <div class="cmd">  --address-prefix 0.0.0.0/0 --next-hop-type VirtualAppliance \</div>
     <div class="cmd">  --next-hop-ip-address 10.0.3.4</div>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      רשת בתי מלונות עם 30 סניפים (VNet נפרד לכל מלון) מחברת את כולם בטופולוגיית Hub-Spoke ל-VNet מרכזי אחד
+      עם Azure Firewall. כל תעבורה בין מלון למלון, ובין מלון לאינטרנט, עוברת דרך ה-Hub ונבדקת במקום אחד —
+      במקום להגדיר 30 חומות אש נפרדות ולתחזק את כולן.
+    </p>
+  </div>
 
-<!-- ===== SECTION 11: חיבור לעולם החוץ ===== -->
-<div id="connectivity" class="section-wrapper">
+</section>
+
+<section class="page" data-page="connectivity">
+
   <div class="section-header">
     <span class="section-tag">// 11 — חיבור מחוץ ל-Azure</span>
     <h2 class="section-title">חיבור <span class="accent">On-Prem ↔ Azure</span></h2>
@@ -2113,13 +2480,20 @@ footer a:hover { text-decoration: underline; }
     <div class="cmd">az network vnet subnet update --resource-group MyRG --vnet-name MyVNet \</div>
     <div class="cmd">  --name Backend --nat-gateway MyNAT</div>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      חברת ביטוח עם משרד ראשי בתל אביב מקימה ExpressRoute כי היא זקוקה לחיבור אמין ומהיר במיוחד לרפליקציית
+      ה-Active Directory שלה מול הענן, 24/7. לעומתה, סניף קטן עם חמישה עובדים מסתפק ב-VPN Gateway רגיל —
+      הרבה יותר זול, ומספיק לצרכים שלו.
+    </p>
+  </div>
 
-<!-- ===== SECTION 12: איזון עומסים ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="load-balancing" class="section-wrapper">
+</section>
+
+<section class="page" data-page="load-balancing">
+
   <div class="section-header">
     <span class="section-tag">// 12 — פיזור תעבורה</span>
     <h2 class="section-title">איזון עומסים — <span class="accent">מי מכוון לאן</span></h2>
@@ -2167,13 +2541,20 @@ footer a:hover { text-decoration: underline; }
       </p>
     </div>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      אתר חדשות גלובלי משתמש ב-Azure Front Door כדי שגולש מיפן יקבל את דף הבית מרג'ין קרוב באסיה תוך
+      מילישניות, בעוד גולש מגרמניה מקבל אותו מרג'ין באירופה — ושניהם רואים תמונות ששמורות כבר ב-CDN הפנימי,
+      במקום שהן ייטענו מחדש מהשרת המקורי בכל פעם.
+    </p>
+  </div>
 
-<!-- ===== SECTION 13: Private Link ===== -->
-<div id="private-link" class="section-wrapper">
+</section>
+
+<section class="page" data-page="private-link">
+
   <div class="section-header">
     <span class="section-tag">// 13 — גישה פרטית לשירותים</span>
     <h2 class="section-title"><span class="accent">Private Link</span> ו-Service Endpoints</h2>
@@ -2221,13 +2602,20 @@ footer a:hover { text-decoration: underline; }
     <div class="cmd">  --private-connection-resource-id $STORAGE_ID \</div>
     <div class="cmd">  --group-id blob --connection-name MyStorageConnection</div>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      חברת פינטק ששומרת נתוני כרטיסי אשראי ב-Azure SQL Database מתחברת אליו רק דרך Private Endpoint,
+      וחוסמת גישה ציבורית לגמרי — כך שגם אם מישהו יגלה את שם השרת, הוא פיזית לא יכול להגיע אליו מהאינטרנט.
+      זו דרישה נפוצה בביקורות תאימות כמו PCI-DSS.
+    </p>
+  </div>
 
-<!-- ===== SECTION 14: DNS ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="dns" class="section-wrapper">
+</section>
+
+<section class="page" data-page="dns">
+
   <div class="section-header">
     <span class="section-tag">// 14 — פתרון שמות</span>
     <h2 class="section-title"><span class="accent">Azure DNS</span></h2>
@@ -2259,13 +2647,20 @@ footer a:hover { text-decoration: underline; }
       אחד לעולם החיצון (Public Zone) ואחד פנימי לרשת הפרטית שלכם (Private Zone).
     </p>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      אתר איקומרס קונה דומיין (shop.com) ומנהל אותו ב-Azure DNS הציבורי, בעוד שבתוך ה-VNet הפנימי שלו
+      Private DNS Zone מאפשר לשרתים לקרוא זה לזה בשמות פשוטים כמו db-primary.internal — במקום לזכור כתובות
+      IP שמשתנות מדי פעם.
+    </p>
+  </div>
 
-<!-- ===== SECTION 15: Firewall ===== -->
-<div id="firewall" class="section-wrapper">
+</section>
+
+<section class="page" data-page="firewall">
+
   <div class="section-header">
     <span class="section-tag">// 15 — הגנה מתקדמת</span>
     <h2 class="section-title"><span class="accent">Azure Firewall</span>, WAF ו-DDoS</h2>
@@ -2309,13 +2704,19 @@ footer a:hover { text-decoration: underline; }
       <tr><td>DDoS Protection</td><td>רשת</td><td>הצפת תעבורה שמטרתה להפיל את השירות</td></tr>
     </table>
   </div>
-</div>
 
-<div class="separator"></div>
+  <div class="example-box">
+    <h4>💼 דוגמה מהעולם האמיתי</h4>
+    <p>
+      רשת בתי קפה שהאתר שלה נפגע פעמיים בהתקפות SQL Injection מציבה WAF מול Application Gateway — מאותו
+      רגע, ניסיונות ההזרקה נחסמים אוטומטית לפני שהם מגיעים לשרת בכלל, בלי לשנות שורת קוד אחת באתר.
+    </p>
+  </div>
 
-<!-- ===== SECTION 16: מעבדה ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div id="lab" class="section-wrapper">
+</section>
+
+<section class="page" data-page="lab">
+
   <div class="section-header">
     <span class="section-tag">// 16 — תרגול</span>
     <h2 class="section-title">מעבדה — <span class="accent">Hands-On</span></h2>
@@ -2411,13 +2812,63 @@ footer a:hover { text-decoration: underline; }
       <li class="lab-step">מתוך VM בתוך ה-VNet, בדקו ששם ה-Storage Account פונה לכתובת פרטית — ושגישה מבחוץ נחסמת</li>
     </ul>
   </div>
-</div>
-</div>
 
-<div class="separator"></div>
+</section>
 
-<!-- ===== FLASHCARDS ===== -->
-<div id="flashcards" class="section-wrapper">
+<section class="page" data-page="exams">
+  <div class="section-header">
+    <span class="section-tag">// תרגול ובחינה</span>
+    <h2 class="section-title">בחרו <span class="accent">רמת קושי</span></h2>
+    <p class="section-desc">
+      כל מבחן בוחר שאלות אקראיות מתוך מאגר רחב, ומערבב גם את סדר התשובות בכל שאלה —
+      כך שאי אפשר פשוט לשנן "איזה כפתור נכון". כל ניסיון חוזר הוא בפועל מבחן חדש.
+    </p>
+  </div>
+
+  <div id="exam-hub">
+    <div class="exam-grid">
+<div class="exam-card">
+  <div class="exam-card-top"><h3>מתחילים</h3><span class="badge exam-badge diff-easy">מתחילים</span></div>
+  <p>10 שאלות אקראיות מתוך מאגר של 14, על המושגים הבסיסיים ביותר.</p>
+  <div class="exam-meta"><span>סף מעבר: 60%</span><span class="best-score none" id="best-easy">עדיין לא נבחנת</span></div>
+  <button class="btn btn-primary" onclick="startExam('easy')" style="width:100%">▶ התחל מבחן</button>
+</div>
+<div class="exam-card">
+  <div class="exam-card-top"><h3>בינוני</h3><span class="badge exam-badge diff-med">בינוני</span></div>
+  <p>12 שאלות אקראיות מתוך מאגר של 15, כולל השוואות בין שירותים.</p>
+  <div class="exam-meta"><span>סף מעבר: 70%</span><span class="best-score none" id="best-medium">עדיין לא נבחנת</span></div>
+  <button class="btn btn-primary" onclick="startExam('medium')" style="width:100%">▶ התחל מבחן</button>
+</div>
+<div class="exam-card">
+  <div class="exam-card-top"><h3>קשה</h3><span class="badge exam-badge diff-hard">קשה</span></div>
+  <p>12 שאלות אקראיות מתוך מאגר של 15 — פרטים עדינים ומקרי קצה.</p>
+  <div class="exam-meta"><span>סף מעבר: 80%</span><span class="best-score none" id="best-hard">עדיין לא נבחנת</span></div>
+  <button class="btn btn-primary" onclick="startExam('hard')" style="width:100%">▶ התחל מבחן</button>
+</div>
+<div class="exam-card">
+  <div class="exam-card-top"><h3>מבחן מסכם</h3><span class="badge exam-badge diff-final">סיכום</span></div>
+  <p>20 שאלות אקראיות מכל הרמות יחד — הבוחן האמיתי לפני שאתם קוראים לעצמכם מומחים.</p>
+  <div class="exam-meta"><span>סף מעבר: 75%</span><span class="best-score none" id="best-final">עדיין לא נבחנת</span></div>
+  <button class="btn btn-primary" onclick="startExam('final')" style="width:100%">▶ התחל מבחן</button>
+</div>
+    </div>
+    <p class="exam-note">💾 השיא שלכם בכל רמה נשמר בדפדפן שלכם, ונשאר גם אם תסגרו ותפתחו מחדש את הדף.</p>
+  </div>
+
+  <div id="exam-runner" style="display:none">
+    <div id="exam-runner-header">
+      <h3 id="exam-runner-title" style="font-family:'Exo 2',sans-serif; color:#fff; font-size:1.2rem"></h3>
+      <button class="btn btn-outline" onclick="backToExamHub()">⬅ חזרה למבחנים</button>
+    </div>
+    <div class="quiz-container" style="margin:0">
+      <div class="quiz-progress" id="exam-progress"></div>
+      <div class="quiz-card" id="exam-card"></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" data-page="flashcards">
+
   <div class="section-header">
     <span class="section-tag">// כלי תרגול</span>
     <h2 class="section-title">Flashcards — <span class="accent">מושגי מפתח</span></h2>
@@ -2440,39 +2891,11 @@ footer a:hover { text-decoration: underline; }
       <button class="btn btn-outline" onclick="event.stopPropagation(); nextCard()">הבא ▶</button>
     </div>
   </div>
-</div>
 
-<div class="separator"></div>
+</section>
 
-<!-- ===== QUIZ ===== -->
-<div id="quiz-section">
-<div id="quiz" class="section-wrapper">
-  <div class="section-header">
-    <span class="section-tag">// כלי תרגול</span>
-    <h2 class="section-title">בחן את <span class="accent">הידע שלך</span></h2>
-    <p class="section-desc">20 שאלות על כל מה שלמדתם עד עכשיו</p>
-  </div>
+<section class="page" data-page="match-game">
 
-  <div class="quiz-container">
-    <div class="quiz-progress" id="quiz-progress"></div>
-    <div class="quiz-card" id="quiz-card">
-      <div class="quiz-q-num" id="quiz-q-num">שאלה 1 מתוך 20</div>
-      <div class="quiz-question" id="quiz-question"></div>
-      <div class="quiz-options" id="quiz-options"></div>
-      <div class="quiz-feedback" id="quiz-feedback"></div>
-      <div class="quiz-nav">
-        <div class="quiz-score" id="quiz-score">ציון: 0 / 0</div>
-        <button class="btn btn-primary" id="quiz-next-btn" onclick="nextQuestion()" style="display:none">השאלה הבאה ▶</button>
-      </div>
-    </div>
-  </div>
-</div>
-</div>
-
-<div class="separator"></div>
-
-<!-- ===== MATCHING GAME ===== -->
-<div id="match-game" class="section-wrapper">
   <div class="section-header">
     <span class="section-tag">// כלי תרגול</span>
     <h2 class="section-title">משחק התאמה — <span class="accent">Match!</span></h2>
@@ -2482,13 +2905,11 @@ footer a:hover { text-decoration: underline; }
     </p>
   </div>
   <div class="match-grid" id="match-grid"></div>
-</div>
 
-<div class="separator"></div>
+</section>
 
-<!-- ===== GLOSSARY ===== -->
-<div style="background:var(--bg2); padding: 1px 0;">
-<div class="section-wrapper">
+<section class="page" data-page="glossary">
+
   <div class="section-header">
     <span class="section-tag">// מילון מונחים</span>
     <h2 class="section-title">מילון <span class="accent">Azure Networking</span></h2>
@@ -2557,23 +2978,23 @@ footer a:hover { text-decoration: underline; }
     <div class="glossary-item"><div class="glossary-term">Azure SQL Database</div><div class="glossary-def">מסד נתונים יחסי מנוהל, מבוסס SQL Server</div></div>
     <div class="glossary-item"><div class="glossary-term">Cosmos DB</div><div class="glossary-def">מסד נתונים NoSQL גלובלי ומבוזר בהשהיה נמוכה</div></div>
   </div>
-</div>
-</div>
 
-<!-- ===== FOOTER ===== -->
+</section>
+
+<div class="page-footer-nav" id="page-footer-nav"></div>
 <footer>
   <div class="footer-logo">Azure<span style="color:var(--green)">Networks</span></div>
   <p style="margin-bottom:0.5rem">המדריך המקיף ביותר לרשתות Azure בעברית — מאפס ובלי רקע קודם</p>
-  <p>כל הנושאים: ענן ו-Azure • VNet • NSG • Peering • VPN/ExpressRoute • Load Balancing • Private Link • DNS • Firewall</p>
+  <p>כל הנושאים: ענן ו-Azure • ניהול • אבטחה וזהויות • מחשוב • אחסון • VNet • NSG • Peering • VPN/ExpressRoute • Load Balancing • Private Link • DNS • Firewall</p>
   <br>
   <p><a href="index.html">← בחזרה ל-AD Academy</a></p>
   <br>
   <p style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--text3)">// Stay curious. Keep learning. Secure your network. //</p>
 </footer>
 
-<!-- ===== JAVASCRIPT ===== -->
+</main>
+</div>
 <script>
-// ===== TABS =====
 function switchTab(tabId, btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2655,120 +3076,7 @@ function prevCard() {
 
 renderCard();
 
-// ===== QUIZ =====
-const questions = [
-  { q: "מהו VNet?", opts: ["שירות גיבוי בענן", "רשת פרטית מבודדת בענן Azure", "כלי לניטור ביצועים", "מסד נתונים מנוהל"], ans: 1, exp: "VNet (Virtual Network) הוא הרשת הפרטית הבסיסית שאתם בונים בתוכה בענן — כל שאר משאבי הרשת חיים בתוכה." },
-  { q: "כמה כתובות IP Azure שומר לעצמו בכל Subnet?", opts: ["2", "3", "5", "10"], ans: 2, exp: "Azure שומר 5 כתובות בכל Subnet: כתובת הרשת, שער ברירת מחדל, שתי כתובות DNS פנימיות, וכתובת Broadcast." },
-  { q: "איזו קומפוננטה קובעת אילו חיבורים מותרים לתת-רשת או לכרטיס רשת?", opts: ["Load Balancer", "NSG", "DNS Zone", "Route Table"], ans: 1, exp: "Network Security Group (NSG) הוא זה שמכיל את חוקי ה-Allow/Deny." },
-  { q: "מה קורה כברירת מחדל לתעבורה נכנסת מהאינטרנט לתת-רשת חדשה?", opts: ["מותרת אוטומטית", "חסומה עד שתאשרו אותה במפורש", "מנותבת אוטומטית ל-Front Door", "מוצפנת אוטומטית ב-VPN"], ans: 1, exp: "חוק ה-DenyAllInBound (Priority 65500) חוסם כברירת מחדל כל תעבורה נכנסת שלא הותרה מפורשות." },
-  { q: "מה אומר מספר Priority נמוך בכלל NSG?", opts: ["עדיפות נמוכה יותר, נבדק אחרון", "עדיפות גבוהה יותר — נבדק ראשון", "לא רלוונטי לבדיקה", "החוק חסום אוטומטית"], ans: 1, exp: "ככל שמספר ה-Priority נמוך יותר, החוק נבדק מוקדם יותר. ברגע שנמצאה התאמה, החיפוש נעצר." },
-  { q: "VNet Peering מעביר תעבורה...", opts: ["רק דרך האינטרנט הציבורי", "פרטית, דרך הרשת הפנימית (Backbone) של מיקרוסופט", "רק בין VNets באותו רג'ין", "רק דרך ExpressRoute"], ans: 1, exp: "Peering מנתב תעבורה ישירות ברשת הפנימית של מיקרוסופט, ולא דרך האינטרנט. אפשר גם בין רג'ינים שונים (Global Peering)." },
-  { q: "Peering הוא כברירת מחדל...", opts: ["טרנזיטיבי (A מגיע ל-C דרך B)", "לא טרנזיטיבי", "זמין רק עם ExpressRoute", "דורש VPN Gateway תמיד"], ans: 1, exp: "Peering אינו טרנזיטיבי — אם A מחובר ל-B ו-B מחובר ל-C, A לא יכול להגיע ל-C אוטומטית דרך B." },
-  { q: "מה עושה Route Table (UDR)?", opts: ["יוצר כתובות IP חדשות", "דורס את ניתוב ברירת המחדל של Azure", "מנטר תעבורת רשת", "יוצר NSG אוטומטית"], ans: 1, exp: "UDR מאפשר להגדיר ניתוב מותאם אישית שדורס את ה-System Routes של Azure." },
-  { q: "הדרך הנפוצה להעביר את כל התעבורה דרך Firewall מרכזי היא...", opts: ["חוק ניתוב 0.0.0.0/0 שמצביע על ה-Firewall", "שינוי הגדרות DNS", "יצירת Peering חדש", "הוספת ASG"], ans: 0, exp: "מוסיפים UDR עם יעד 0.0.0.0/0 (כל התעבורה) שמנותב אל הכתובת הפרטית של ה-Firewall." },
-  { q: "מה ההבדל המרכזי בין VPN Gateway ל-ExpressRoute?", opts: ["אין הבדל ביניהם", "VPN רץ מעל האינטרנט הציבורי (מוצפן), ExpressRoute הוא קו פרטי ייעודי", "ExpressRoute תמיד זול יותר", "VPN Gateway לא תומך בהצפנה כלל"], ans: 1, exp: "VPN Gateway מקים מנהרה מוצפנת מעל האינטרנט הרגיל, בעוד ExpressRoute הוא חיבור פיזי פרטי שלא עובר באינטרנט הציבורי כלל." },
-  { q: "חיבור Point-to-Site (P2S) VPN משמש בעיקר לחיבור...", opts: ["שתי VNets שלמות", "מחשב בודד (למשל עובד מהבית) לרשת הארגונית", "שני מרכזי נתונים פיזיים", "שתי חברות שונות זו לזו"], ans: 1, exp: "P2S מיועד לחיבור מכשיר בודד ישירות ל-VNet, בניגוד ל-Site-to-Site שמחבר רשתות שלמות." },
-  { q: "NAT Gateway משמש בעיקר כדי...", opts: ["לתת ל-VM כתובת IP ציבורית קבועה משלו", "לאפשר יציאה לאינטרנט בלי לחשוף כל VM עם IP ציבורי", "לחסום תעבורה נכנסת מהאינטרנט", "ליצור NSG אוטומטי לכל Subnet"], ans: 1, exp: "NAT Gateway מרכז את היציאה לאינטרנט של VMs פרטיים דרך כתובת ציבורית משותפת, ומונע גם אזילת פורטים (SNAT exhaustion)." },
-  { q: "איזה שירות עובד בשכבה 7 (HTTP/HTTPS), תומך ב-WAF וב-Path-Based Routing?", opts: ["Azure Load Balancer", "Application Gateway", "NAT Gateway", "ExpressRoute"], ans: 1, exp: "Application Gateway פועל בשכבה 7, מבין HTTP ותומך בניתוב לפי נתיב/דומיין וב-WAF מובנה." },
-  { q: "Traffic Manager עובד ברמת...", opts: ["DNS בלבד — הוא רק מכוון לאן לפנות ולא רואה את התעבורה עצמה", "Load Balancing בשכבה 4", "Firewall מרכזי", "VPN מוצפן"], ans: 0, exp: "Traffic Manager פותר רק שאלות DNS ('לאן לפנות'), ואינו נמצא בנתיב התעבורה בפועל." },
-  { q: "מה ההבדל בין Private Endpoint ל-Service Endpoint?", opts: ["אין הבדל ביניהם", "Private Endpoint נותן כתובת IP פרטית ייעודית לשירות בתוך ה-VNet, Service Endpoint רק מרחיב את זהות ה-VNet לשירות שנשאר ציבורי", "Service Endpoint מאובטח יותר תמיד", "Private Endpoint עובד רק עם Storage Account"], ans: 1, exp: "Private Endpoint מקצה כתובת פרטית ממש בתוך ה-VNet לשירות, בעוד Service Endpoint משאיר את השירות עם כתובת ציבורית." },
-  { q: "מה תפקידו של Azure Private DNS Zone?", opts: ["חסימת אתרים מסוכנים", "פתרון שמות פנימי בתוך VNet בלי לצאת לאינטרנט", "האצת תעבורת רשת", "יצירת גיבויים אוטומטיים"], ans: 1, exp: "Private DNS Zone מאפשר לתת שמות קריאים למשאבים פנימיים ברשת הפרטית, ולעבוד נכון עם Private Endpoint." },
-  { q: "Azure Firewall הוא בעיקרו...", opts: ["שירות מנוהל של חומת אש stateful ברמת רשת/אפליקציה", "כלי לניטור ביצועים בלבד", "סוג של Load Balancer", "תחליף מלא ל-DNS"], ans: 0, exp: "Azure Firewall הוא שירות חומת אש מנוהל (SaaS), ממוקם לרוב במרכז טופולוגיית Hub-Spoke." },
-  { q: "WAF (Web Application Firewall) מגן בעיקר מפני...", opts: ["תקלות חומרה פיזיות", "התקפות ברמת אפליקציית ווב כמו SQL Injection ו-XSS", "בעיות תצורת DNS", "אזילת פורטי SNAT"], ans: 1, exp: "WAF מיועד להגן על אפליקציות ווב מפני התקפות נפוצות ברמת האפליקציה, לפי כללי OWASP." },
-  { q: "מה ההבדל בין DDoS Protection Basic ל-Standard?", opts: ["אין הבדל ביניהם", "Basic פעיל אוטומטית לכולם בחינם; Standard בתשלום עם מדיניות מותאמת והגנת עלויות", "Standard חינמי ו-Basic בתשלום", "שניהם דורשים הגדרה ידנית מלאה מראש"], ans: 1, exp: "Basic מגן אוטומטית ובחינם ברמת בסיס; Standard מוסיף התאמה אישית, ניטור מפורט והגנה כספית." },
-  { q: "מהי Availability Zone?", opts: ["רג'ין שלם ב-Azure", "מיקום פיזי נפרד בתוך רג'ין, עם חשמל/קירור/רשת עצמאיים", "סוג מיוחד של VNet", "שרת גיבוי בודד"], ans: 1, exp: "Availability Zone היא מרכז נתונים פיזי נפרד בתוך אותו רג'ין, המאפשר עמידות בתקלות." },
-  { q: "מה תפקידו של Azure Resource Manager (ARM)?", opts: ["ניטור עלויות בלבד", "המנוע שמבצע בפועל כל פעולת ניהול, בין אם דרך הפורטל, CLI או PowerShell", "ניהול משתמשים בלבד", "אחסון קבצים"], ans: 1, exp: "כל דרכי הניהול ב-Azure (פורטל, CLI, PowerShell, תבניות) פונות בסופו של דבר לאותה שכבה — ARM." },
-  { q: "מה ההבדל בין Tenant ל-Subscription?", opts: ["אין הבדל", "Tenant הוא גבול הזהות של הארגון, Subscription הוא גבול החיוב וההרשאות למשאבים וחי בתוך Tenant", "Subscription גדול יותר מ-Tenant", "Tenant משמש רק ל-Storage"], ans: 1, exp: "Tenant הוא ה'ספרייה' הארגונית ב-Microsoft Entra ID; בתוכו יכולים לחיות כמה Subscriptions." },
-  { q: "מה קרה לשירות Azure Blueprints?", opts: ["הוא עדיין השירות המומלץ ביותר", "הוא הוצא משימוש (Retired), והוחלף ב-Template Specs ו-Deployment Stacks", "הוא הוחלף ב-Azure Policy בלבד", "הוא שירות חדש שהושק לאחרונה"], ans: 1, exp: "מיקרוסופט הוציאה את Azure Blueprints משימוש, וממליצה כיום על שילוב Template Specs, Deployment Stacks ו-Azure Policy." },
-  { q: "מהו Microsoft Entra ID?", opts: ["שירות אחסון קבצים", "השם הנוכחי של Azure Active Directory — שירות ניהול הזהויות המרכזי", "כלי לניטור עלויות", "שירות רשת בלבד"], ans: 1, exp: "Azure Active Directory שונה שמו ל-Microsoft Entra ID — אך זהו עדיין אותו שירות ניהול זהויות מרכזי." },
-  { q: "Conditional Access מחליט אם להתיר כניסה על בסיס...", opts: ["סיסמה נכונה בלבד", "מיקום, סוג המכשיר ורמת הסיכון של ההתחברות, מעבר לסיסמה בלבד", "מספר טלפון בלבד", "שם המשתמש בלבד"], ans: 1, exp: "Conditional Access בודק תנאים נוספים בזמן אמת — כמו מיקום גיאוגרפי, תאימות המכשיר ורמת סיכון — ולא רק סיסמה נכונה." },
-  { q: "למה משמש Microsoft Entra Domain Services?", opts: ["אחסון קבצים גדולים", "מתן יכולות Kerberos/NTLM/LDAP כשירות מנוהל, בלי להקים Domain Controllers בעצמכם", "פיזור עומסים", "ניטור רשת בלבד"], ans: 1, exp: "AAD DS נותן יכולות בסגנון Active Directory מוכר כשירות מנוהל — שימושי במיוחד להעברת אפליקציות ותיקות לענן." },
-  { q: "מה שומר Azure Key Vault?", opts: ["גיבויי VM שלמים", "סודות, מפתחות הצפנה ותעודות (Certificates)", "לוגים של רשת בלבד", "תמונות ווידאו"], ans: 1, exp: "Key Vault הוא כספת דיגיטלית לאחסון בטוח של סודות, מפתחות ותעודות, כדי שלא יישמרו בקוד המקור." },
-  { q: "מה ההבדל העיקרי בין Azure VM ל-Azure Functions?", opts: ["אין הבדל", "VM הוא שרת מלא שרץ תמיד (IaaS), Functions הוא קוד Serverless שרץ רק כשמפעילים אותו", "Functions יקר יותר תמיד", "VM לא תומך ב-Windows"], ans: 1, exp: "VM נותן שליטה מלאה על שרת שרץ ברציפות; Azure Functions מריץ קטע קוד רק כשיש טריגר, ומחייב רק על זמן הריצה בפועל." },
-  { q: "מה ההבדל המרכזי בין Azure SQL Database ל-Cosmos DB?", opts: ["אין הבדל", "Azure SQL הוא מסד נתונים יחסי עם סכמה קבועה, Cosmos DB הוא NoSQL גמיש ומבוזר גלובלית", "Cosmos DB תמיד יקר יותר", "Azure SQL לא תומך ב-SQL"], ans: 1, exp: "Azure SQL Database מתאים למערכות עסקיות מסורתיות עם טבלאות וקשרים; Cosmos DB מתאים לאפליקציות גלובליות עם דרישת השהיה נמוכה בכל העולם." },
-  { q: "מה תפקידו של Microsoft Sentinel?", opts: ["ניהול חשבוניות ותשלומים", "SIEM/SOAR מבוסס ענן שאוסף לוגים מכל הסביבה ומזהה דפוסי התקפה, כולל תגובה אוטומטית", "אחסון קבצים גדולים בלבד", "ניהול רשומות DNS בלבד"], ans: 1, exp: "Microsoft Sentinel רואה את 'התמונה המלאה' מכל כלי האבטחה יחד, מזהה איומים ויכול אף להפעיל תגובה אוטומטית." },
-];
-
-let qIdx = 0;
-let score = 0;
-let answered = false;
-
-function initQuiz() {
-  const progress = document.getElementById('quiz-progress');
-  progress.innerHTML = questions.map((_, i) => `<div class="quiz-dot" id="dot-${i}"></div>`).join('');
-  document.getElementById(`dot-0`).classList.add('current');
-  renderQuestion();
-}
-
-function renderQuestion() {
-  const q = questions[qIdx];
-  document.getElementById('quiz-q-num').textContent = `שאלה ${qIdx + 1} מתוך ${questions.length}`;
-  document.getElementById('quiz-question').textContent = q.q;
-  document.getElementById('quiz-feedback').className = 'quiz-feedback';
-  document.getElementById('quiz-next-btn').style.display = 'none';
-  answered = false;
-  const opts = document.getElementById('quiz-options');
-  opts.innerHTML = q.opts.map((o, i) => `<div class="quiz-option" onclick="answerQ(${i})">${o}</div>`).join('');
-  document.getElementById('quiz-score').textContent = `ציון: ${score} / ${qIdx}`;
-}
-
-function answerQ(idx) {
-  if (answered) return;
-  answered = true;
-  const q = questions[qIdx];
-  const opts = document.querySelectorAll('.quiz-option');
-  opts.forEach(o => o.classList.add('disabled'));
-  opts[idx].classList.add(idx === q.ans ? 'correct' : 'wrong');
-  opts[q.ans].classList.add('correct');
-  if (idx === q.ans) score++;
-  const fb = document.getElementById('quiz-feedback');
-  fb.className = `quiz-feedback show ${idx === q.ans ? 'correct' : 'wrong'}`;
-  fb.innerHTML = `${idx === q.ans ? '✅' : '❌'} <strong>${idx === q.ans ? 'נכון!' : 'לא נכון.'}</strong> ${q.exp}`;
-  document.getElementById('quiz-score').textContent = `ציון: ${score} / ${qIdx + 1}`;
-  if (qIdx < questions.length - 1) {
-    document.getElementById('quiz-next-btn').style.display = 'block';
-  } else {
-    setTimeout(showResult, 1200);
-  }
-  const dot = document.getElementById(`dot-${qIdx}`);
-  dot.classList.remove('current');
-  dot.classList.add('done');
-  dot.style.background = idx === q.ans ? 'var(--green)' : 'var(--red)';
-}
-
-function nextQuestion() {
-  qIdx++;
-  if (qIdx < questions.length) {
-    document.getElementById(`dot-${qIdx}`).classList.add('current');
-    renderQuestion();
-  } else {
-    showResult();
-  }
-}
-
-function showResult() {
-  const pct = Math.round((score / questions.length) * 100);
-  const grade = pct >= 90 ? '🏆 מצוין!' : pct >= 70 ? '👍 טוב מאוד!' : pct >= 50 ? '📚 ממוצע, המשך ללמוד' : '💪 יש עוד מה ללמוד';
-  document.getElementById('quiz-card').innerHTML = `
-    <div class="quiz-result">
-      <div class="result-score">${pct}%</div>
-      <div style="font-size:1.5rem; color:#fff; margin:1rem 0">${grade}</div>
-      <div style="color:var(--text2); font-size:1rem; margin-bottom:2rem">ענית נכון על ${score} מתוך ${questions.length} שאלות</div>
-      <button class="btn btn-primary" onclick="restartQuiz()">🔄 נסה שוב</button>
-    </div>
-  `;
-}
-
-function restartQuiz() {
-  qIdx = 0; score = 0; answered = false;
-  document.getElementById('quiz-next-btn').style.display = 'none';
-  document.querySelectorAll('.quiz-dot').forEach(d => { d.classList.remove('done','current'); d.style.background = ''; });
-  initQuiz();
-}
-
-initQuiz();
-
-// ===== MATCHING GAME =====
+// ===== MATCH GAME =====
 const matchPairs = [
   ["VNet", "רשת פרטית מבודדת בענן"],
   ["NSG", "רשימת כללי אבטחה לרשת"],
@@ -2846,14 +3154,262 @@ function selectMatchCard(el) {
 
 initMatchGame();
 
-// Smooth scroll for nav
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    e.preventDefault();
-    const el = document.querySelector(a.getAttribute('href'));
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+// ===== EXAM ENGINE =====
+const EASY_QUESTIONS = [
+  { q: "מהו VNet?", opts: ["שירות גיבוי בענן", "רשת פרטית מבודדת בענן Azure", "כלי לניטור ביצועים", "מסד נתונים מנוהל"], ans: 1, exp: "VNet (Virtual Network) הוא הרשת הפרטית הבסיסית שאתם בונים בתוכה בענן — כל שאר משאבי הרשת חיים בתוכה." },
+  { q: "איזו קומפוננטה קובעת אילו חיבורים מותרים לתת-רשת או לכרטיס רשת?", opts: ["Load Balancer", "NSG", "DNS Zone", "Route Table"], ans: 1, exp: "Network Security Group (NSG) הוא זה שמכיל את חוקי ה-Allow/Deny." },
+  { q: "מה קורה כברירת מחדל לתעבורה נכנסת מהאינטרנט לתת-רשת חדשה?", opts: ["מותרת אוטומטית", "חסומה עד שתאשרו אותה במפורש", "מנותבת אוטומטית ל-Front Door", "מוצפנת אוטומטית ב-VPN"], ans: 1, exp: "חוק ה-DenyAllInBound (Priority 65500) חוסם כברירת מחדל כל תעבורה נכנסת שלא הותרה מפורשות." },
+  { q: "חיבור Point-to-Site (P2S) VPN משמש בעיקר לחיבור...", opts: ["שתי VNets שלמות", "מחשב בודד (למשל עובד מהבית) לרשת הארגונית", "שני מרכזי נתונים פיזיים", "שתי חברות שונות זו לזו"], ans: 1, exp: "P2S מיועד לחיבור מכשיר בודד ישירות ל-VNet, בניגוד ל-Site-to-Site שמחבר רשתות שלמות." },
+  { q: "מה תפקידו של Azure Private DNS Zone?", opts: ["חסימת אתרים מסוכנים", "פתרון שמות פנימי בתוך VNet בלי לצאת לאינטרנט", "האצת תעבורת רשת", "יצירת גיבויים אוטומטיים"], ans: 1, exp: "Private DNS Zone מאפשר לתת שמות קריאים למשאבים פנימיים ברשת הפרטית, ולעבוד נכון עם Private Endpoint." },
+  { q: "WAF (Web Application Firewall) מגן בעיקר מפני...", opts: ["תקלות חומרה פיזיות", "התקפות ברמת אפליקציית ווב כמו SQL Injection ו-XSS", "בעיות תצורת DNS", "אזילת פורטי SNAT"], ans: 1, exp: "WAF מיועד להגן על אפליקציות ווב מפני התקפות נפוצות ברמת האפליקציה, לפי כללי OWASP." },
+  { q: "מהי Availability Zone?", opts: ["רג'ין שלם ב-Azure", "מיקום פיזי נפרד בתוך רג'ין, עם חשמל/קירור/רשת עצמאיים", "סוג מיוחד של VNet", "שרת גיבוי בודד"], ans: 1, exp: "Availability Zone היא מרכז נתונים פיזי נפרד בתוך אותו רג'ין, המאפשר עמידות בתקלות." },
+  { q: "מה תפקידו של Azure Resource Manager (ARM)?", opts: ["ניטור עלויות בלבד", "המנוע שמבצע בפועל כל פעולת ניהול, בין אם דרך הפורטל, CLI או PowerShell", "ניהול משתמשים בלבד", "אחסון קבצים"], ans: 1, exp: "כל דרכי הניהול ב-Azure (פורטל, CLI, PowerShell, תבניות) פונות בסופו של דבר לאותה שכבה — ARM." },
+  { q: "מהו Microsoft Entra ID?", opts: ["שירות אחסון קבצים", "השם הנוכחי של Azure Active Directory — שירות ניהול הזהויות המרכזי", "כלי לניטור עלויות", "שירות רשת בלבד"], ans: 1, exp: "Azure Active Directory שונה שמו ל-Microsoft Entra ID — אך זהו עדיין אותו שירות ניהול זהויות מרכזי." },
+  { q: "מה שומר Azure Key Vault?", opts: ["גיבויי VM שלמים", "סודות, מפתחות הצפנה ותעודות (Certificates)", "לוגים של רשת בלבד", "תמונות ווידאו"], ans: 1, exp: "Key Vault הוא כספת דיגיטלית לאחסון בטוח של סודות, מפתחות ותעודות, כדי שלא יישמרו בקוד המקור." },
+  { q: "מה תפקידו של Microsoft Sentinel?", opts: ["ניהול חשבוניות ותשלומים", "SIEM/SOAR מבוסס ענן שאוסף לוגים מכל הסביבה ומזהה דפוסי התקפה, כולל תגובה אוטומטית", "אחסון קבצים גדולים בלבד", "ניהול רשומות DNS בלבד"], ans: 1, exp: "Microsoft Sentinel רואה את 'התמונה המלאה' מכל כלי האבטחה יחד, מזהה איומים ויכול אף להפעיל תגובה אוטומטית." },
+  { q: "מהו Resource Group?", opts: ["סוג של כתובת IP", "תיקייה לוגית לקיבוץ משאבים ששייכים יחד", "פרוטוקול רשת", "כלי לניטור עלויות בלבד"], ans: 1, exp: "Resource Group הוא מיכל לוגי שמאגד משאבים ששייכים יחד — מחיקתו מוחקת את כל מה שבתוכו." },
+  { q: "מהו Region ב-Azure?", opts: ["סוג של Virtual Machine", "אזור גיאוגרפי עם מרכזי נתונים של מיקרוסופט", "כלי לניהול הרשאות", "שם אחר ל-Resource Group"], ans: 1, exp: "Region הוא אזור גיאוגרפי (למשל West Europe) שבו ממוקמים מרכזי הנתונים שבהם רץ המשאב שלכם." },
+  { q: "מהי כתובת Private IP?", opts: ["כתובת שכל העולם יכול לגשת אליה מהאינטרנט", "כתובת פנימית שנגישה רק בתוך אותה רשת", "שם דומיין באינטרנט", "מספר הפורט של שירות"], ans: 1, exp: "כתובת Private IP נגישה רק בתוך הרשת הפרטית עצמה — בניגוד ל-Public IP שנגיש מהאינטרנט." },
+];
+
+const MEDIUM_QUESTIONS = [
+  { q: "מה אומר מספר Priority נמוך בכלל NSG?", opts: ["עדיפות נמוכה יותר, נבדק אחרון", "עדיפות גבוהה יותר — נבדק ראשון", "לא רלוונטי לבדיקה", "החוק חסום אוטומטית"], ans: 1, exp: "ככל שמספר ה-Priority נמוך יותר, החוק נבדק מוקדם יותר. ברגע שנמצאה התאמה, החיפוש נעצר." },
+  { q: "VNet Peering מעביר תעבורה...", opts: ["רק דרך האינטרנט הציבורי", "פרטית, דרך הרשת הפנימית (Backbone) של מיקרוסופט", "רק בין VNets באותו רג'ין", "רק דרך ExpressRoute"], ans: 1, exp: "Peering מנתב תעבורה ישירות ברשת הפנימית של מיקרוסופט, ולא דרך האינטרנט. אפשר גם בין רג'ינים שונים (Global Peering)." },
+  { q: "Peering הוא כברירת מחדל...", opts: ["טרנזיטיבי (A מגיע ל-C דרך B)", "לא טרנזיטיבי", "זמין רק עם ExpressRoute", "דורש VPN Gateway תמיד"], ans: 1, exp: "Peering אינו טרנזיטיבי — אם A מחובר ל-B ו-B מחובר ל-C, A לא יכול להגיע ל-C אוטומטית דרך B." },
+  { q: "מה עושה Route Table (UDR)?", opts: ["יוצר כתובות IP חדשות", "דורס את ניתוב ברירת המחדל של Azure", "מנטר תעבורת רשת", "יוצר NSG אוטומטית"], ans: 1, exp: "UDR מאפשר להגדיר ניתוב מותאם אישית שדורס את ה-System Routes של Azure." },
+  { q: "מה ההבדל המרכזי בין VPN Gateway ל-ExpressRoute?", opts: ["אין הבדל ביניהם", "VPN רץ מעל האינטרנט הציבורי (מוצפן), ExpressRoute הוא קו פרטי ייעודי", "ExpressRoute תמיד זול יותר", "VPN Gateway לא תומך בהצפנה כלל"], ans: 1, exp: "VPN Gateway מקים מנהרה מוצפנת מעל האינטרנט הרגיל, בעוד ExpressRoute הוא חיבור פיזי פרטי שלא עובר באינטרנט הציבורי כלל." },
+  { q: "NAT Gateway משמש בעיקר כדי...", opts: ["לתת ל-VM כתובת IP ציבורית קבועה משלו", "לאפשר יציאה לאינטרנט בלי לחשוף כל VM עם IP ציבורי", "לחסום תעבורה נכנסת מהאינטרנט", "ליצור NSG אוטומטי לכל Subnet"], ans: 1, exp: "NAT Gateway מרכז את היציאה לאינטרנט של VMs פרטיים דרך כתובת ציבורית משותפת, ומונע גם אזילת פורטים (SNAT exhaustion)." },
+  { q: "איזה שירות עובד בשכבה 7 (HTTP/HTTPS), תומך ב-WAF וב-Path-Based Routing?", opts: ["Azure Load Balancer", "Application Gateway", "NAT Gateway", "ExpressRoute"], ans: 1, exp: "Application Gateway פועל בשכבה 7, מבין HTTP ותומך בניתוב לפי נתיב/דומיין וב-WAF מובנה." },
+  { q: "Azure Firewall הוא בעיקרו...", opts: ["שירות מנוהל של חומת אש stateful ברמת רשת/אפליקציה", "כלי לניטור ביצועים בלבד", "סוג של Load Balancer", "תחליף מלא ל-DNS"], ans: 0, exp: "Azure Firewall הוא שירות חומת אש מנוהל (SaaS), ממוקם לרוב במרכז טופולוגיית Hub-Spoke." },
+  { q: "Conditional Access מחליט אם להתיר כניסה על בסיס...", opts: ["סיסמה נכונה בלבד", "מיקום, סוג המכשיר ורמת הסיכון של ההתחברות, מעבר לסיסמה בלבד", "מספר טלפון בלבד", "שם המשתמש בלבד"], ans: 1, exp: "Conditional Access בודק תנאים נוספים בזמן אמת — כמו מיקום גיאוגרפי, תאימות המכשיר ורמת סיכון — ולא רק סיסמה נכונה." },
+  { q: "למה משמש Microsoft Entra Domain Services?", opts: ["אחסון קבצים גדולים", "מתן יכולות Kerberos/NTLM/LDAP כשירות מנוהל, בלי להקים Domain Controllers בעצמכם", "פיזור עומסים", "ניטור רשת בלבד"], ans: 1, exp: "AAD DS נותן יכולות בסגנון Active Directory מוכר כשירות מנוהל — שימושי במיוחד להעברת אפליקציות ותיקות לענן." },
+  { q: "מה ההבדל העיקרי בין Azure VM ל-Azure Functions?", opts: ["אין הבדל", "VM הוא שרת מלא שרץ תמיד (IaaS), Functions הוא קוד Serverless שרץ רק כשמפעילים אותו", "Functions יקר יותר תמיד", "VM לא תומך ב-Windows"], ans: 1, exp: "VM נותן שליטה מלאה על שרת שרץ ברציפות; Azure Functions מריץ קטע קוד רק כשיש טריגר, ומחייב רק על זמן הריצה בפועל." },
+  { q: "מה ההבדל המרכזי בין Azure SQL Database ל-Cosmos DB?", opts: ["אין הבדל", "Azure SQL הוא מסד נתונים יחסי עם סכמה קבועה, Cosmos DB הוא NoSQL גמיש ומבוזר גלובלית", "Cosmos DB תמיד יקר יותר", "Azure SQL לא תומך ב-SQL"], ans: 1, exp: "Azure SQL Database מתאים למערכות עסקיות מסורתיות עם טבלאות וקשרים; Cosmos DB מתאים לאפליקציות גלובליות עם דרישת השהיה נמוכה בכל העולם." },
+  { q: "איזה שירות מספק כניסה גלובלית לאפליקציית ווב עם CDN ו-WAF מובנים?", opts: ["Azure Load Balancer", "Azure Front Door", "NAT Gateway", "Private Endpoint"], ans: 1, exp: "Front Door פועל בקצוות הרשת הגלובליים של מיקרוסופט, כולל CDN ו-WAF מובנים, ומתאים לאפליקציות עם משתמשים בכל העולם." },
+  { q: "מה ההבדל בין Load Balancer ל-Application Gateway?", opts: ["אין הבדל, שני השמות לאותו שירות", "Load Balancer עובד בשכבה 4 (TCP/UDP), Application Gateway עובד בשכבה 7 (HTTP) ומבין תוכן", "Application Gateway תמיד זול יותר", "Load Balancer עובד רק עם ExpressRoute"], ans: 1, exp: "Load Balancer מפזר תעבורת רשת גולמית בלי להבין HTTP; Application Gateway מבין HTTP ויכול לנתב לפי נתיב/דומיין." },
+  { q: "מה עושה Azure Policy כשהיא מוגדרת במצב Deny?", opts: ["רק מתריעה בדוח, בלי לחסום כלום", "חוסמת בפועל יצירה של משאב שלא תואם את הכלל", "מוחקת אוטומטית משאבים קיימים", "משביתה את כל ה-Subscription"], ans: 1, exp: "מצב Deny חוסם בפועל את יצירת המשאב אם הוא לא תואם את הכלל, בניגוד ל-Audit שרק מתריע." },
+];
+
+const HARD_QUESTIONS = [
+  { q: "כמה כתובות IP Azure שומר לעצמו בכל Subnet?", opts: ["2", "3", "5", "10"], ans: 2, exp: "Azure שומר 5 כתובות בכל Subnet: כתובת הרשת, שער ברירת מחדל, שתי כתובות DNS פנימיות, וכתובת Broadcast." },
+  { q: "הדרך הנפוצה להעביר את כל התעבורה דרך Firewall מרכזי היא...", opts: ["חוק ניתוב 0.0.0.0/0 שמצביע על ה-Firewall", "שינוי הגדרות DNS", "יצירת Peering חדש", "הוספת ASG"], ans: 0, exp: "מוסיפים UDR עם יעד 0.0.0.0/0 (כל התעבורה) שמנותב אל הכתובת הפרטית של ה-Firewall." },
+  { q: "Traffic Manager עובד ברמת...", opts: ["DNS בלבד — הוא רק מכוון לאן לפנות ולא רואה את התעבורה עצמה", "Load Balancing בשכבה 4", "Firewall מרכזי", "VPN מוצפן"], ans: 0, exp: "Traffic Manager פותר רק שאלות DNS ('לאן לפנות'), ואינו נמצא בנתיב התעבורה בפועל." },
+  { q: "מה ההבדל בין Private Endpoint ל-Service Endpoint?", opts: ["אין הבדל ביניהם", "Private Endpoint נותן כתובת IP פרטית ייעודית לשירות בתוך ה-VNet, Service Endpoint רק מרחיב את זהות ה-VNet לשירות שנשאר ציבורי", "Service Endpoint מאובטח יותר תמיד", "Private Endpoint עובד רק עם Storage Account"], ans: 1, exp: "Private Endpoint מקצה כתובת פרטית ממש בתוך ה-VNet לשירות, בעוד Service Endpoint משאיר את השירות עם כתובת ציבורית." },
+  { q: "מה ההבדל בין DDoS Protection Basic ל-Standard?", opts: ["אין הבדל ביניהם", "Basic פעיל אוטומטית לכולם בחינם; Standard בתשלום עם מדיניות מותאמת והגנת עלויות", "Standard חינמי ו-Basic בתשלום", "שניהם דורשים הגדרה ידנית מלאה מראש"], ans: 1, exp: "Basic מגן אוטומטית ובחינם ברמת בסיס; Standard מוסיף התאמה אישית, ניטור מפורט והגנה כספית." },
+  { q: "מה ההבדל בין Tenant ל-Subscription?", opts: ["אין הבדל", "Tenant הוא גבול הזהות של הארגון, Subscription הוא גבול החיוב וההרשאות למשאבים וחי בתוך Tenant", "Subscription גדול יותר מ-Tenant", "Tenant משמש רק ל-Storage"], ans: 1, exp: "Tenant הוא ה'ספרייה' הארגונית ב-Microsoft Entra ID; בתוכו יכולים לחיות כמה Subscriptions." },
+  { q: "מה קרה לשירות Azure Blueprints?", opts: ["הוא עדיין השירות המומלץ ביותר", "הוא הוצא משימוש (Retired), והוחלף ב-Template Specs ו-Deployment Stacks", "הוא הוחלף ב-Azure Policy בלבד", "הוא שירות חדש שהושק לאחרונה"], ans: 1, exp: "מיקרוסופט הוציאה את Azure Blueprints משימוש, וממליצה כיום על שילוב Template Specs, Deployment Stacks ו-Azure Policy." },
+  { q: "מה שם וה-Priority של החוק שתופס תעבורה נכנסת שלא הותרה במפורש ב-NSG?", opts: ["AllowVNetInBound, priority 65000", "DenyAllInBound, priority 65500", "AllowInternetOutBound, priority 65001", "AllowAzureLoadBalancerInBound, priority 100"], ans: 1, exp: "DenyAllInBound עם Priority 65500 הוא כלל ברירת המחדל האחרון שחוסם כל תעבורה נכנסת שלא הותרה קודם לכן." },
+  { q: "מה קרה לכתובות Public IP מסוג Basic SKU?", opts: ["הן עדיין הסוג המומלץ", "מיקרוסופט הוציאה אותן משימוש (Retired) — כיום Standard הוא הסוג היחיד הזמין", "הן זולות יותר מ-Standard ולכן מומלצות לסביבת ייצור", "הן היחידות שתומכות ב-Availability Zones"], ans: 1, exp: "כתובות Public IP מסוג Basic הוצאו משימוש; Standard, שמאובטח כברירת מחדל ותומך ב-Availability Zones, הוא כיום הסוג היחיד." },
+  { q: "Front Door ו-Application Gateway שניהם פועלים בשכבה 7 — מה עדיין מבדיל ביניהם?", opts: ["אין שום הבדל מעשי", "Front Door הוא שירות גלובלי (Anycast) בין רג'ינים, Application Gateway הוא שירות אזורי (Regional) בתוך רג'ין אחד", "Application Gateway תמיד יקר יותר", "Front Door לא תומך ב-WAF כלל"], ans: 1, exp: "Front Door פרוס גלובלית בקצוות הרשת של מיקרוסופט ומנתב בין רג'ינים; Application Gateway פועל בתוך רג'ין בודד." },
+  { q: "אזילת פורטי SNAT (SNAT Port Exhaustion) קורית בעיקר כאשר...", opts: ["יש יותר מדי כתובות Private IP ב-Subnet", "יותר מדי חיבורים יוצאים בו-זמנית משתפים אותה כתובת Public IP ליציאה לאינטרנט", "ה-NSG חוסם תעבורה נכנסת", "יש יותר מדי Resource Groups ב-Subscription"], ans: 1, exp: "כשהרבה חיבורים יוצאים חולקים יחד את אותה כתובת ציבורית, אפשר לגמור את פורטי המקור הזמינים לתרגום. NAT Gateway בנוי לפתור בעיה זו." },
+  { q: "מה מיוחד ב-Cosmos DB בהשוואה למסדי נתונים רגילים?", opts: ["הוא תומך רק בישראל", "אפשר להגדיר שכפול לעשרות רג'ינים בעולם בלחיצת כפתור, כולל כתיבה רב-אזורית", "הוא לא תומך בשום API סטנדרטי", "הוא זול יותר תמיד מ-Azure SQL"], ans: 1, exp: "Cosmos DB בנוי מלכתחילה לפיזור גלובלי — אפשר לשכפל את הנתונים לרג'ינים רבים ואף לאפשר כתיבה במספר רג'ינים בו-זמנית." },
+  { q: "בטופולוגיית Hub-Spoke גדולה עם עשרות Spokes, הדרך המומלצת לנתב תעבורה בין כל ה-Spokes בלי UDR ידני בכל אחד היא לרוב...", opts: ["למחוק את כל ה-NSGs", "להשתמש ב-Azure Virtual WAN שמנהל את הניתוב המרכזי אוטומטית", "לחבר כל Spoke לכל Spoke אחר ב-Peering ישיר", "זה לא אפשרי ב-Azure"], ans: 1, exp: "Virtual WAN בנוי לנהל קישוריות Hub-Spoke בקנה מידה גדול, כולל ניתוב אוטומטי, במקום עשרות הגדרות Peering ו-UDR ידניות." },
+  { q: "מה זו הגנת עלויות (Cost Protection) שמציע DDoS Protection Standard?", opts: ["הנחה קבועה על כל שירותי Azure", "זיכוי כספי אם משאב מבצע Scale-Out יקר כתוצאה מהתקפת DDoS מתועדת", "ביטול חיוב על כל תעבורת רשת", "הנחה על רכישת Reserved Instances"], ans: 1, exp: "DDoS Protection Standard מציע זיכוי על עלויות Scale-Out שנגרמו כתוצאה מהתקפת DDoS מתועדת — הגנה כלכלית ולא רק טכנית." },
+  { q: "כמה זמן עשוי לקחת לשחזר קובץ מ-Blob Storage בשכבת Archive?", opts: ["מיידי, כמו Hot", "כמה שניות בלבד", "עד כמה שעות (צריך תהליך Rehydrate לפני שהקובץ נגיש)", "זה בלתי אפשרי לשחזר קובץ מ-Archive"], ans: 2, exp: "שכבת Archive הכי זולה לאחסון, אך גישה לקובץ דורשת תהליך Rehydration שיכול לקחת שעות עד שהקובץ זמין שוב." },
+];
+
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function shuffleQuestionOptions(q) {
+  const order = shuffleArray([0, 1, 2, 3]);
+  return {
+    q: q.q,
+    exp: q.exp,
+    opts: order.map(i => q.opts[i]),
+    ans: order.indexOf(q.ans),
+  };
+}
+
+const EXAM_LEVELS = {
+  easy:   { title: "מתחילים",   count: 10, pass: 60, pool: () => EASY_QUESTIONS },
+  medium: { title: "בינוני",    count: 12, pass: 70, pool: () => MEDIUM_QUESTIONS },
+  hard:   { title: "קשה",       count: 12, pass: 80, pool: () => HARD_QUESTIONS },
+  final:  { title: "מבחן מסכם", count: 20, pass: 75, pool: () => EASY_QUESTIONS.concat(MEDIUM_QUESTIONS, HARD_QUESTIONS) },
+};
+
+const EXAM_CARD_TEMPLATE = `
+  <div class="quiz-q-num" id="exam-q-num"></div>
+  <div class="quiz-question" id="exam-question"></div>
+  <div class="quiz-options" id="exam-options"></div>
+  <div class="quiz-feedback" id="exam-feedback"></div>
+  <div class="quiz-nav">
+    <div class="quiz-score" id="exam-score">ציון: 0 / 0</div>
+    <button class="btn btn-primary" id="exam-next-btn" onclick="nextExamQuestion()" style="display:none">השאלה הבאה ▶</button>
+  </div>
+`;
+
+let exam = { level: null, questions: [], idx: 0, score: 0, answered: false };
+
+function getBestScore(level) {
+  try {
+    const v = localStorage.getItem("azqz_best_" + level);
+    return v === null ? null : parseInt(v, 10);
+  } catch (e) { return null; }
+}
+
+function setBestScore(level, pct) {
+  try {
+    const cur = getBestScore(level);
+    if (cur === null || pct > cur) localStorage.setItem("azqz_best_" + level, String(pct));
+  } catch (e) {}
+}
+
+function renderExamHub() {
+  Object.keys(EXAM_LEVELS).forEach(level => {
+    const best = getBestScore(level);
+    const el = document.getElementById("best-" + level);
+    if (!el) return;
+    el.textContent = best === null ? "עדיין לא נבחנת" : ("השיא שלך: " + best + "%");
+    el.classList.toggle("none", best === null);
   });
-});
+}
+
+function startExam(level) {
+  const cfg = EXAM_LEVELS[level];
+  const pool = shuffleArray(cfg.pool());
+  const chosen = pool.slice(0, Math.min(cfg.count, pool.length));
+  exam.level = level;
+  exam.questions = chosen.map(shuffleQuestionOptions);
+  exam.idx = 0;
+  exam.score = 0;
+  exam.answered = false;
+  document.getElementById("exam-hub").style.display = "none";
+  document.getElementById("exam-runner").style.display = "block";
+  document.getElementById("exam-runner-title").textContent = "מבחן — רמת " + cfg.title;
+  document.getElementById("exam-card").innerHTML = EXAM_CARD_TEMPLATE;
+  const progress = document.getElementById("exam-progress");
+  progress.innerHTML = exam.questions.map((_, i) => `<div class="quiz-dot" id="exam-dot-${i}"></div>`).join("");
+  document.getElementById("exam-dot-0").classList.add("current");
+  renderExamQuestion();
+}
+
+function renderExamQuestion() {
+  const q = exam.questions[exam.idx];
+  document.getElementById("exam-q-num").textContent = `שאלה ${exam.idx + 1} מתוך ${exam.questions.length}`;
+  document.getElementById("exam-question").textContent = q.q;
+  document.getElementById("exam-feedback").className = "quiz-feedback";
+  document.getElementById("exam-next-btn").style.display = "none";
+  exam.answered = false;
+  const opts = document.getElementById("exam-options");
+  opts.innerHTML = q.opts.map((o, i) => `<div class="quiz-option" onclick="answerExam(${i})">${o}</div>`).join("");
+  document.getElementById("exam-score").textContent = `ציון: ${exam.score} / ${exam.idx}`;
+}
+
+function answerExam(idx) {
+  if (exam.answered) return;
+  exam.answered = true;
+  const q = exam.questions[exam.idx];
+  const opts = document.querySelectorAll("#exam-options .quiz-option");
+  opts.forEach(o => o.classList.add("disabled"));
+  opts[idx].classList.add(idx === q.ans ? "correct" : "wrong");
+  opts[q.ans].classList.add("correct");
+  if (idx === q.ans) exam.score++;
+  const fb = document.getElementById("exam-feedback");
+  fb.className = `quiz-feedback show ${idx === q.ans ? "correct" : "wrong"}`;
+  fb.innerHTML = `${idx === q.ans ? "✅" : "❌"} <strong>${idx === q.ans ? "נכון!" : "לא נכון."}</strong> ${q.exp}`;
+  document.getElementById("exam-score").textContent = `ציון: ${exam.score} / ${exam.idx + 1}`;
+  if (exam.idx < exam.questions.length - 1) {
+    document.getElementById("exam-next-btn").style.display = "block";
+  } else {
+    setTimeout(showExamResult, 1200);
+  }
+  const dot = document.getElementById(`exam-dot-${exam.idx}`);
+  dot.classList.remove("current");
+  dot.classList.add("done");
+  dot.style.background = idx === q.ans ? "var(--green)" : "var(--red)";
+}
+
+function nextExamQuestion() {
+  exam.idx++;
+  if (exam.idx < exam.questions.length) {
+    document.getElementById(`exam-dot-${exam.idx}`).classList.add("current");
+    renderExamQuestion();
+  } else {
+    showExamResult();
+  }
+}
+
+function showExamResult() {
+  const cfg = EXAM_LEVELS[exam.level];
+  const pct = Math.round((exam.score / exam.questions.length) * 100);
+  const passed = pct >= cfg.pass;
+  setBestScore(exam.level, pct);
+  const best = getBestScore(exam.level);
+  document.getElementById("exam-card").innerHTML = `
+    <div class="quiz-result">
+      <div class="result-score">${pct}%</div>
+      <div style="font-size:1.3rem; color:${passed ? "var(--green)" : "var(--red)"}; margin:1rem 0; font-weight:700">${passed ? "✅ עברת את המבחן!" : "❌ לא עברת הפעם"}</div>
+      <div style="color:var(--text2); font-size:1rem; margin-bottom:0.5rem">ענית נכון על ${exam.score} מתוך ${exam.questions.length} שאלות (סף מעבר: ${cfg.pass}%)</div>
+      <div style="color:var(--text3); font-size:0.85rem; margin-bottom:2rem">השיא שלך ברמה זו: ${best}%</div>
+      <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="startExam('${exam.level}')">🔄 מבחן חדש (שאלות אקראיות)</button>
+        <button class="btn btn-outline" onclick="backToExamHub()">📋 חזרה למבחנים</button>
+      </div>
+    </div>
+  `;
+}
+
+function backToExamHub() {
+  document.getElementById("exam-runner").style.display = "none";
+  document.getElementById("exam-hub").style.display = "block";
+  renderExamHub();
+}
+
+renderExamHub();
+
+
+// ===== PAGE ROUTER =====
+const PAGE_ORDER = ["home", "what-is-cloud", "azure-structure", "azure-management", "security-identity", "compute", "storage-db", "net-basics", "vnet", "nsg", "routing", "connectivity", "load-balancing", "private-link", "dns", "firewall", "lab", "exams", "flashcards", "match-game", "glossary"];
+const PAGE_TITLES = {"home": "בית", "what-is-cloud": "מה זה ענן", "azure-structure": "מבנה Azure", "azure-management": "ניהול Azure", "security-identity": "אבטחה וזהויות", "compute": "מחשוב", "storage-db": "אחסון ומסדי נתונים", "net-basics": "יסודות רשת", "vnet": "VNet ותתי-רשת", "nsg": "NSG ואבטחת רשת", "routing": "Peering ו-Routing", "connectivity": "חיבור לעולם החוץ", "load-balancing": "איזון עומסים", "private-link": "Private Link", "dns": "DNS", "firewall": "Firewall, WAF ו-DDoS", "lab": "מעבדה מעשית", "exams": "מבחנים", "flashcards": "כרטיסי למידה", "match-game": "משחק התאמה", "glossary": "מילון מונחים"};
+
+function showPage(id) {
+  if (!PAGE_ORDER.includes(id)) id = "home";
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  const target = document.querySelector('.page[data-page="' + id + '"]');
+  if (target) target.classList.add("active");
+  document.querySelectorAll(".sidebar-link").forEach(a => a.classList.toggle("active", a.dataset.page === id));
+  renderFooterNav(id);
+  document.body.classList.remove("sidebar-open");
+  window.scrollTo(0, 0);
+  document.title = (id === "home" ? "Azure Networks Academy" : PAGE_TITLES[id] + " — Azure Networks Academy");
+}
+
+function renderFooterNav(id) {
+  const el = document.getElementById("page-footer-nav");
+  if (!el) return;
+  if (id === "home") { el.innerHTML = ""; return; }
+  const idx = PAGE_ORDER.indexOf(id);
+  const prevId = idx > 0 ? PAGE_ORDER[idx - 1] : null;
+  const nextId = idx < PAGE_ORDER.length - 1 ? PAGE_ORDER[idx + 1] : null;
+  let html = "";
+  html += prevId
+    ? ('<a href="#' + prevId + '" class="pfn-btn pfn-prev"><span class="pfn-label">◀ הקודם</span><span class="pfn-title">' + PAGE_TITLES[prevId] + '</span></a>')
+    : '<div></div>';
+  html += nextId
+    ? ('<a href="#' + nextId + '" class="pfn-btn pfn-next"><span class="pfn-label">הבא ▶</span><span class="pfn-title">' + PAGE_TITLES[nextId] + '</span></a>')
+    : '<div></div>';
+  el.innerHTML = html;
+}
+
+function toggleSidebar() {
+  document.body.classList.toggle("sidebar-open");
+}
+
+function handleHash() {
+  const id = (location.hash || "#home").replace("#", "");
+  showPage(id);
+}
+window.addEventListener("hashchange", handleHash);
+handleHash();
+
 </script>
 </body>
 </html>
