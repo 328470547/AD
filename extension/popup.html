@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>מתרגם דפים חכם</title>
+  <style>
+    body {
+      width: 300px;
+      font-family: system-ui, "Segoe UI", Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      color: #1a1a1a;
+    }
+    h1 {
+      font-size: 15px;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    label {
+      display: block;
+      font-size: 12px;
+      color: #555;
+      margin-bottom: 4px;
+    }
+    select {
+      width: 100%;
+      padding: 6px 8px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      margin-bottom: 12px;
+    }
+    button {
+      width: 100%;
+      padding: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    #translateBtn { background: #2563eb; color: #fff; }
+    #translateBtn:disabled { background: #93b4f2; cursor: default; }
+    #revertBtn { background: #f1f1f1; color: #222; }
+    #revertBtn:disabled { opacity: 0.5; cursor: default; }
+    .row { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; font-size: 12px; color: #444; }
+    #status { font-size: 12px; color: #666; min-height: 32px; line-height: 1.5; }
+    #status.error { color: #c0392b; }
+    a.opts-link { font-size: 12px; color: #2563eb; text-decoration: none; display: block; text-align: center; margin-top: 6px; }
+  </style>
+</head>
+<body>
+  <h1>🌐 מתרגם דפים חכם</h1>
+
+  <label for="targetLang">תרגם אל:</label>
+  <select id="targetLang">
+    <option value="he">עברית</option>
+    <option value="en">English</option>
+    <option value="ar">العربية</option>
+    <option value="ru">Русский</option>
+    <option value="fr">Français</option>
+    <option value="es">Español</option>
+    <option value="de">Deutsch</option>
+    <option value="pt">Português</option>
+    <option value="it">Italiano</option>
+    <option value="zh">中文</option>
+    <option value="ja">日本語</option>
+    <option value="hi">हिन्दी</option>
+  </select>
+
+  <div class="row">
+    <input type="checkbox" id="autoTranslate" />
+    <label for="autoTranslate" style="margin:0;">תרגם אוטומטית דפים בשפה זרה</label>
+  </div>
+
+  <button id="translateBtn">תרגם את הדף</button>
+  <button id="revertBtn" disabled>שחזר טקסט מקורי</button>
+
+  <div id="status"></div>
+  <a class="opts-link" id="optionsLink" href="#">⚙️ הגדרות ומפתח API</a>
+
+  <script src="popup.js"></script>
+</body>
+</html>

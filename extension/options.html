@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>הגדרות – מתרגם דפים חכם</title>
+  <style>
+    body {
+      font-family: system-ui, "Segoe UI", Arial, sans-serif;
+      max-width: 520px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 20px; }
+    p.hint { color: #666; font-size: 13px; line-height: 1.6; }
+    label { display: block; font-weight: 600; margin: 18px 0 6px; font-size: 14px; }
+    input[type="password"], input[type="text"], select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 22px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #saved { color: #16a34a; font-size: 13px; margin-inline-start: 12px; }
+    a { color: #2563eb; }
+  </style>
+</head>
+<body>
+  <h1>⚙️ הגדרות המתרגם</h1>
+  <p class="hint">
+    התוסף משתמש ב-API של Anthropic (Claude) כדי לתרגם את הדפים שלך תוך הבנת הקשר —
+    ולא תרגום מילה-במילה. המפתח נשמר <strong>מקומית בלבד</strong> על המחשב שלך ונשלח
+    רק ישירות ל-Anthropic בזמן תרגום. אפשר ליצור מפתח בכתובת
+    <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>.
+  </p>
+
+  <label for="apiKey">מפתח API של Anthropic</label>
+  <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" />
+
+  <label for="model">מודל תרגום</label>
+  <select id="model">
+    <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — מהיר וזול (מומלץ)</option>
+    <option value="claude-sonnet-5">Claude Sonnet 5 — איכות גבוהה יותר</option>
+    <option value="claude-opus-5">Claude Opus 5 — האיכות הגבוהה ביותר</option>
+  </select>
+
+  <label for="defaultLang">שפת יעד ברירת מחדל</label>
+  <select id="defaultLang">
+    <option value="he">עברית</option>
+    <option value="en">English</option>
+    <option value="ar">العربية</option>
+    <option value="ru">Русский</option>
+    <option value="fr">Français</option>
+    <option value="es">Español</option>
+    <option value="de">Deutsch</option>
+    <option value="pt">Português</option>
+    <option value="it">Italiano</option>
+    <option value="zh">中文</option>
+    <option value="ja">日本語</option>
+    <option value="hi">हिन्दी</option>
+  </select>
+
+  <div>
+    <button id="saveBtn">שמור</button>
+    <span id="saved"></span>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
