@@ -1,0 +1,23 @@
+.smt-badge {
+  position: fixed;
+  z-index: 2147483647;
+  bottom: 18px;
+  inset-inline-end: 18px;
+  background: #1a1a1a;
+  color: #fff;
+  font-family: system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+  direction: rtl;
+}
+
+.smt-badge-visible {
+  opacity: 1;
+  transform: translateY(0);
+}

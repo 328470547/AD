@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>הגדרות – מתרגם דפים חכם</title>
+  <style>
+    body {
+      font-family: system-ui, "Segoe UI", Arial, sans-serif;
+      max-width: 520px;
+      margin: 40px auto;
+      padding: 0 20px;
+      color: #1a1a1a;
+    }
+    h1 { font-size: 20px; }
+    p.hint { color: #666; font-size: 13px; line-height: 1.6; }
+    label { display: block; font-weight: 600; margin: 18px 0 6px; font-size: 14px; }
+    input[type="password"], input[type="text"], select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 10px;
+      font-size: 14px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 22px;
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    #saved { color: #16a34a; font-size: 13px; margin-inline-start: 12px; }
+    a { color: #2563eb; }
+    .provider-block { display: none; }
+    .provider-block.active { display: block; }
+  </style>
+</head>
+<body>
+  <h1>⚙️ הגדרות המתרגם</h1>
+  <p class="hint">
+    התוסף מתרגם את הדפים שלך תוך הבנת הקשר (ולא מילה-במילה) בעזרת מודל שפה.
+    אפשר לבחור לעבוד עם Anthropic (Claude) או עם Google (Gemini) — לפי איזה
+    מפתח API יש לך. המפתח נשמר <strong>מקומית בלבד</strong> על המחשב שלך ונשלח
+    ישירות לספק שבחרת בזמן תרגום בלבד.
+  </p>
+
+  <label for="provider">ספק תרגום</label>
+  <select id="provider">
+    <option value="anthropic">Anthropic (Claude)</option>
+    <option value="gemini">Google (Gemini)</option>
+  </select>
+
+  <div id="block-anthropic" class="provider-block">
+    <p class="hint">
+      אפשר ליצור מפתח בכתובת
+      <a href="https://console.anthropic.com/settings/keys" target="_blank">console.anthropic.com</a>
+      (שירות בתשלום לפי שימוש).
+    </p>
+    <label for="apiKeyAnthropic">מפתח API של Anthropic</label>
+    <input type="password" id="apiKeyAnthropic" placeholder="sk-ant-..." autocomplete="off" />
+
+    <label for="modelAnthropic">מודל תרגום</label>
+    <select id="modelAnthropic">
+      <option value="claude-haiku-4-5-20251001">Claude Haiku 4.5 — מהיר וזול (מומלץ)</option>
+      <option value="claude-sonnet-5">Claude Sonnet 5 — איכות גבוהה יותר</option>
+      <option value="claude-opus-5">Claude Opus 5 — האיכות הגבוהה ביותר</option>
+    </select>
+  </div>
+
+  <div id="block-gemini" class="provider-block">
+    <p class="hint">
+      אפשר ליצור מפתח בחינם בכתובת
+      <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
+      (יש מכסה חינמית יומית).
+    </p>
+    <label for="apiKeyGemini">מפתח API של Gemini</label>
+    <input type="password" id="apiKeyGemini" placeholder="AIza..." autocomplete="off" />
+
+    <label for="modelGemini">מודל תרגום</label>
+    <select id="modelGemini">
+      <option value="gemini-2.5-flash">Gemini 2.5 Flash — מהיר וזול (מומלץ)</option>
+      <option value="gemini-2.5-pro">Gemini 2.5 Pro — איכות גבוהה יותר</option>
+    </select>
+  </div>
+
+  <label for="defaultLang">שפת יעד ברירת מחדל</label>
+  <select id="defaultLang">
+    <option value="he">עברית</option>
+    <option value="en">English</option>
+    <option value="ar">العربية</option>
+    <option value="ru">Русский</option>
+    <option value="fr">Français</option>
+    <option value="es">Español</option>
+    <option value="de">Deutsch</option>
+    <option value="pt">Português</option>
+    <option value="it">Italiano</option>
+    <option value="zh">中文</option>
+    <option value="ja">日本語</option>
+    <option value="hi">हिन्दी</option>
+  </select>
+
+  <div>
+    <button id="saveBtn">שמור</button>
+    <span id="saved"></span>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
