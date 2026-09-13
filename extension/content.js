@@ -163,11 +163,11 @@
     return chunks;
   }
 
-  async function translateChunk(chunk, targetLang, sourceLang, pageContext, model) {
+  async function translateChunk(chunk, targetLang, sourceLang, pageContext) {
     const items = chunk.map(u => u.sourceString);
     const resp = await chrome.runtime.sendMessage({
       type: 'smt-translate-batch',
-      payload: { items, targetLang, sourceLang, pageContext, model }
+      payload: { items, targetLang, sourceLang, pageContext }
     });
     if (!resp || !resp.success) {
       throw new Error((resp && resp.error) || 'Unknown translation error');
@@ -175,7 +175,7 @@
     return resp.translations;
   }
 
-  async function translatePage(targetLang, model) {
+  async function translatePage(targetLang) {
     if (inProgress) return { ok: false, error: 'already-in-progress' };
     inProgress = true;
     try {
@@ -208,7 +208,7 @@
           const myIdx = idx++;
           const chunk = chunks[myIdx];
           try {
-            const translations = await translateChunk(chunk, targetLang, sourceLang, pageContext, model);
+            const translations = await translateChunk(chunk, targetLang, sourceLang, pageContext);
             chunk.forEach((u, i) => {
               u.translatedString = translations[i] != null ? String(translations[i]) : u.sourceString;
               u.element.setAttribute('data-smt-unit', '1');
@@ -231,7 +231,7 @@
       try {
         const [titleTranslation] = await translateChunk(
           [{ sourceString: document.title }],
-          targetLang, sourceLang, pageContext, model
+          targetLang, sourceLang, pageContext
         );
         if (titleTranslation) document.title = titleTranslation;
       } catch (e) { /* non-critical */ }
@@ -269,7 +269,7 @@
   chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (!msg || msg.target !== 'smt-content') return;
     if (msg.action === 'translate') {
-      translatePage(msg.targetLang, msg.model).then(sendResponse);
+      translatePage(msg.targetLang).then(sendResponse);
       return true;
     }
     if (msg.action === 'revert') {
@@ -284,11 +284,11 @@
 
   // Optional auto-translate: only runs if the user enabled it and the page
   // language differs from their configured target language.
-  chrome.storage.local.get(['smtAutoTranslate', 'smtTargetLang', 'smtModel'], (cfg) => {
+  chrome.storage.local.get(['smtAutoTranslate', 'smtTargetLang'], (cfg) => {
     if (!cfg.smtAutoTranslate || !cfg.smtTargetLang) return;
     const pageLang = detectPageLang();
     if (pageLang === cfg.smtTargetLang) return;
     // give the page a moment to finish rendering dynamic content
-    setTimeout(() => translatePage(cfg.smtTargetLang, cfg.smtModel), 1200);
+    setTimeout(() => translatePage(cfg.smtTargetLang), 1200);
   });
 })();

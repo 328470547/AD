@@ -48,10 +48,14 @@ async function refreshStatus() {
 }
 
 async function loadSettings() {
-  const cfg = await chrome.storage.local.get(['smtTargetLang', 'smtAutoTranslate', 'smtApiKey']);
+  const cfg = await chrome.storage.local.get([
+    'smtTargetLang', 'smtAutoTranslate', 'smtProvider', 'smtApiKey', 'smtApiKeyGemini'
+  ]);
   targetLangEl.value = cfg.smtTargetLang || 'he';
   autoTranslateEl.checked = !!cfg.smtAutoTranslate;
-  if (!cfg.smtApiKey) {
+  const provider = cfg.smtProvider || 'anthropic';
+  const hasKey = provider === 'gemini' ? !!cfg.smtApiKeyGemini : !!cfg.smtApiKey;
+  if (!hasKey) {
     setStatus('יש להזין מפתח API בהגדרות לפני התרגום.', true);
     translateBtn.disabled = true;
   }
@@ -69,8 +73,7 @@ translateBtn.addEventListener('click', async () => {
   translateBtn.disabled = true;
   setStatus('מתרגם את הדף…');
   try {
-    const cfg = await chrome.storage.local.get(['smtModel']);
-    const result = await sendToContent('translate', { targetLang: targetLangEl.value, model: cfg.smtModel });
+    const result = await sendToContent('translate', { targetLang: targetLangEl.value });
     if (result && result.ok) {
       revertBtn.disabled = false;
       setStatus(

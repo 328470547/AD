@@ -1,10 +1,11 @@
 // Smart Context Translator - background service worker
-// Owns the only network call in the extension: relays batches of text to the
-// Anthropic API for context-aware translation, keeping the API key out of
-// every page's execution context.
+// Owns the only network calls in the extension: relays batches of text to
+// the user's chosen provider (Anthropic Claude or Google Gemini) for
+// context-aware translation, keeping API keys out of every page's context.
 
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const DEFAULT_MODEL = 'claude-haiku-4-5-20251001';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
+const DEFAULT_ANTHROPIC_MODEL = 'claude-haiku-4-5-20251001';
+const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 const LANG_NAMES = {
   he: 'Hebrew', ar: 'Arabic', en: 'English', ru: 'Russian', fr: 'French',
@@ -47,16 +48,21 @@ function extractJsonArray(text) {
   return JSON.parse(cleaned.slice(start, end + 1));
 }
 
-async function callAnthropic({ items, targetLang, sourceLang, pageContext, model }) {
-  const { smtApiKey } = await chrome.storage.local.get(['smtApiKey']);
-  if (!smtApiKey) {
-    throw new Error('missing-api-key');
+function assertTranslationShape(translations, expectedLength) {
+  if (!Array.isArray(translations) || translations.length !== expectedLength) {
+    throw new Error('Translation count mismatch from model response');
   }
+}
+
+async function callAnthropic({ items, targetLang, sourceLang, pageContext }) {
+  const { smtApiKey, smtModel } = await chrome.storage.local.get(['smtApiKey', 'smtModel']);
+  if (!smtApiKey) throw new Error('missing-api-key');
+
   const systemPrompt = buildSystemPrompt(targetLang, sourceLang, pageContext);
   const userPrompt = JSON.stringify(items);
   const estimatedTokens = Math.min(8000, Math.max(512, Math.ceil(userPrompt.length * 1.8)));
 
-  const res = await fetch(API_URL, {
+  const res = await fetch(ANTHROPIC_URL, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -65,7 +71,7 @@ async function callAnthropic({ items, targetLang, sourceLang, pageContext, model
       'anthropic-dangerous-direct-browser-access': 'true'
     },
     body: JSON.stringify({
-      model: model || DEFAULT_MODEL,
+      model: smtModel || DEFAULT_ANTHROPIC_MODEL,
       max_tokens: estimatedTokens,
       system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
@@ -85,15 +91,66 @@ async function callAnthropic({ items, targetLang, sourceLang, pageContext, model
   const data = await res.json();
   const text = (data.content || []).map(b => b.text || '').join('');
   const translations = extractJsonArray(text);
-  if (!Array.isArray(translations) || translations.length !== items.length) {
-    throw new Error('Translation count mismatch from model response');
-  }
+  assertTranslationShape(translations, items.length);
   return translations;
+}
+
+async function callGemini({ items, targetLang, sourceLang, pageContext }) {
+  const { smtApiKeyGemini, smtModelGemini } = await chrome.storage.local.get(['smtApiKeyGemini', 'smtModelGemini']);
+  if (!smtApiKeyGemini) throw new Error('missing-api-key');
+
+  const model = smtModelGemini || DEFAULT_GEMINI_MODEL;
+  const systemPrompt = buildSystemPrompt(targetLang, sourceLang, pageContext);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      'x-goog-api-key': smtApiKeyGemini
+    },
+    body: JSON.stringify({
+      system_instruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ role: 'user', parts: [{ text: JSON.stringify(items) }] }],
+      generationConfig: {
+        temperature: 0.2,
+        responseMimeType: 'application/json',
+        responseSchema: { type: 'ARRAY', items: { type: 'STRING' } }
+      }
+    })
+  });
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    let message = `API error ${res.status}`;
+    try {
+      const parsed = JSON.parse(body);
+      if (parsed && parsed.error && parsed.error.message) message = parsed.error.message;
+    } catch (_) { /* ignore */ }
+    throw new Error(message);
+  }
+
+  const data = await res.json();
+  const text = ((data.candidates || [])[0]?.content?.parts || []).map(p => p.text || '').join('');
+  let translations;
+  try {
+    translations = JSON.parse(text);
+  } catch (_) {
+    translations = extractJsonArray(text);
+  }
+  assertTranslationShape(translations, items.length);
+  return translations;
+}
+
+async function translateBatch(payload) {
+  const { smtProvider } = await chrome.storage.local.get(['smtProvider']);
+  if (smtProvider === 'gemini') return callGemini(payload);
+  return callAnthropic(payload);
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (!msg || msg.type !== 'smt-translate-batch') return;
-  callAnthropic(msg.payload)
+  translateBatch(msg.payload)
     .then(translations => sendResponse({ success: true, translations }))
     .catch(err => sendResponse({ success: false, error: err.message || String(err) }));
   return true; // keep the message channel open for the async response
